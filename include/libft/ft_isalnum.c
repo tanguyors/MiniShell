@@ -1,19 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_isalnum.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: torsini <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/28 09:50:02 by root              #+#    #+#             */
-/*   Updated: 2024/11/28 10:16:45 by root             ###   ########.fr       */
+/*   Created: 2024/02/28 16:05:36 by torsini           #+#    #+#             */
+/*   Updated: 2024/02/28 16:05:41 by torsini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/libft/libft.h"
+#include "libft.h"
 
-int main(void) 
+int	ft_isalnum(int c)
 {
-    ft_putstr("Hello from libft!\n");
-    return 0;
+	if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
+		|| (c >= '0' && c <= '9'))
+	{
+		return (1);
+	}
+	else
+	{
+		return (0);
+	}
 }

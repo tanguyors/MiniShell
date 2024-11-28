@@ -1,19 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_isprint.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: torsini <torsini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/28 09:50:02 by root              #+#    #+#             */
-/*   Updated: 2024/11/28 10:16:45 by root             ###   ########.fr       */
+/*   Created: 2024/02/28 16:09:27 by torsini           #+#    #+#             */
+/*   Updated: 2024/10/14 10:10:43 by torsini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/libft/libft.h"
-
-int main(void) 
+int	ft_isprint(int c)
 {
-    ft_putstr("Hello from libft!\n");
-    return 0;
+	return (c >= 32 && c <= 126);
 }

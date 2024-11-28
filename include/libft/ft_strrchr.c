@@ -1,19 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_strrchr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: torsini <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/28 09:50:02 by root              #+#    #+#             */
-/*   Updated: 2024/11/28 10:16:45 by root             ###   ########.fr       */
+/*   Created: 2024/03/03 16:04:18 by torsini           #+#    #+#             */
+/*   Updated: 2024/03/03 16:14:01 by torsini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/libft/libft.h"
+#include "libft.h"
 
-int main(void) 
+char	*ft_strrchr(const char *s, int c)
 {
-    ft_putstr("Hello from libft!\n");
-    return 0;
+	int		i;
+
+	i = ft_strlen(s);
+	while (i > 0)
+	{
+		if (s[i] == (char)c)
+			return ((char *)s + i);
+		i--;
+	}
+	if (s[i] == (char)c)
+		return ((char *)s + i);
+	return (NULL);
 }

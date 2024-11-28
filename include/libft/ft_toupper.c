@@ -1,19 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_toupper.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: torsini <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/28 09:50:02 by root              #+#    #+#             */
-/*   Updated: 2024/11/28 10:16:45 by root             ###   ########.fr       */
+/*   Created: 2024/03/01 19:00:55 by torsini           #+#    #+#             */
+/*   Updated: 2024/03/01 19:01:50 by torsini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/libft/libft.h"
+#include "libft.h"
 
-int main(void) 
+int	ft_toupper( int c )
 {
-    ft_putstr("Hello from libft!\n");
-    return 0;
+	if (c >= 'a' && c <= 'z')
+	{
+		c -= 32;
+		return (c);
+	}
+	return (c);
 }

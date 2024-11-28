@@ -1,19 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_strlen.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: torsini <torsini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/28 09:50:02 by root              #+#    #+#             */
-/*   Updated: 2024/11/28 10:16:45 by root             ###   ########.fr       */
+/*   Created: 2023/12/14 22:09:31 by torsini           #+#    #+#             */
+/*   Updated: 2024/10/14 10:08:51 by torsini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/libft/libft.h"
+#include "libft.h"
 
-int main(void) 
+size_t	ft_strlen(const char *s)
 {
-    ft_putstr("Hello from libft!\n");
-    return 0;
+	int	i;
+
+	i = 0;
+	while (s[i] != '\0')
+	{
+		i++;
+	}
+	return (i);
 }

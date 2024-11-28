@@ -1,19 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_striteri.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: torsini <torsini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/28 09:50:02 by root              #+#    #+#             */
-/*   Updated: 2024/11/28 10:16:45 by root             ###   ########.fr       */
+/*   Created: 2024/03/02 19:00:20 by torsini           #+#    #+#             */
+/*   Updated: 2024/10/14 10:06:39 by torsini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/libft/libft.h"
+#include "libft.h"
 
-int main(void) 
+void	ft_striteri(char *s, void (*f)(unsigned int, char *))
 {
-    ft_putstr("Hello from libft!\n");
-    return 0;
+	int	i;
+	int	i2;
+
+	i = 0;
+	i2 = 0;
+	if (s != NULL && f != NULL)
+	{
+		i = ft_strlen(s);
+		while (i2 < i)
+		{
+			(*f)(i2, s);
+			s++;
+			i2++;
+		}
+	}
 }
