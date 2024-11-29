@@ -6,7 +6,7 @@
 /*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 09:51:41 by root              #+#    #+#             */
-/*   Updated: 2024/11/28 11:09:00 by root             ###   ########.fr       */
+/*   Updated: 2024/11/29 10:52:35 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,5 +45,23 @@ int ft_echo(char **argv)
     }
     return 0;
 }
+
+int ft_pwd(void) 
+{
+    char cwd[1024]; // Buffer pour stocker le chemin
+
+    if (getcwd(cwd, sizeof(cwd)) != NULL) 
+    {
+        ft_printf("%s\n", cwd); // Affiche le répertoire courant avec un saut de ligne
+        return 0;
+    } 
+    else 
+    {
+        perror("pwd"); // Affiche une erreur si getcwd échoue
+        return 1;
+    }
+}
+
+
 
 

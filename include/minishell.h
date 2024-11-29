@@ -6,7 +6,7 @@
 /*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 09:53:48 by root              #+#    #+#             */
-/*   Updated: 2024/11/28 11:23:54 by root             ###   ########.fr       */
+/*   Updated: 2024/11/29 10:52:55 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,13 @@ char **parse_command(char *input);
 void free_array(char **array);
 int ft_strcmp(const char *s1, const char *s2);
 void trim_newline(char *line);
+char *expand_var(char *str);
+char *remove_quotes(char *str);
+char *ft_strndup(const char *s, size_t n);
 //builtins.c
 int ft_echo(char **argv);
+int ft_pwd(void);
+//int ft_cd(char **argv);
 
 
 #endif
