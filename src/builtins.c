@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 09:51:41 by root              #+#    #+#             */
-/*   Updated: 2024/11/29 10:52:35 by root             ###   ########.fr       */
+/*   Updated: 2024/12/02 15:50:22 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,11 @@
  */
 int ft_echo(char **argv) 
 {
-    int i = 1; // Commence à analyser après "echo"
-    int newline = 1; // Par défaut, ajoute un saut de ligne
+    int i;
+    int newline;
+
+    i = 1; // Commence à analyser après "echo"
+    newline = 1; // Par défaut, ajoute un saut de ligne
     // Vérifie si l'option "-n" est présente
     if (argv[i] && ft_strcmp(argv[i], "-n") == 0) 
     {
@@ -43,7 +46,7 @@ int ft_echo(char **argv)
     {
         ft_putchar_fd('\n', 1); // Ajoute un saut de ligne si nécessaire
     }
-    return 0;
+    return (0);
 }
 
 int ft_pwd(void) 
@@ -53,15 +56,11 @@ int ft_pwd(void)
     if (getcwd(cwd, sizeof(cwd)) != NULL) 
     {
         ft_printf("%s\n", cwd); // Affiche le répertoire courant avec un saut de ligne
-        return 0;
+        return (0);
     } 
     else 
     {
         perror("pwd"); // Affiche une erreur si getcwd échoue
-        return 1;
+        return (1);
     }
 }
-
-
-
-

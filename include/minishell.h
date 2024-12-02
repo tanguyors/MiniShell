@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 09:53:48 by root              #+#    #+#             */
-/*   Updated: 2024/11/29 10:52:55 by root             ###   ########.fr       */
+/*   Updated: 2024/12/02 15:39:34 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <errno.h>   // Gestion des erreurs (errno)
 #include <sys/wait.h> // wait, waitpid
 #include "libft/libft.h"
+#include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 

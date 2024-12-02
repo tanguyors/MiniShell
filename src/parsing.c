@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 09:51:09 by root              #+#    #+#             */
-/*   Updated: 2024/11/28 10:56:28 by root             ###   ########.fr       */
+/*   Updated: 2024/12/02 15:48:20 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,19 @@
  */
 char **parse_command(char *input) 
 {
+    char **tokens;
+    
     if (!input || *input == '\0') 
     {
-        return NULL;
+        return (NULL);
     }
     // Découpe la ligne avec ft_split, en séparant par les espaces
-    char **tokens = ft_split(input, ' ');
+    tokens = ft_split(input, ' ');
     // Vérifie si la commande a été correctement découpée
     if (!tokens) 
     {
         perror("Parsing error"); // Affiche une erreur si la découpe échoue
+        exit(EXIT_FAILURE);
     }
-    return tokens; // Retourne le tableau de tokens
+    return (tokens); // Retourne le tableau de tokens
 }

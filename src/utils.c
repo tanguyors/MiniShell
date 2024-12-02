@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 09:53:09 by root              #+#    #+#             */
-/*   Updated: 2024/11/29 10:51:27 by root             ###   ########.fr       */
+/*   Updated: 2024/12/02 15:49:14 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,11 @@
  */
 void free_array(char **array) 
 {
-    int i = 0;
-
+    int i;
+    
+    i = 0;
     if (!array) 
-    {
         return; // Rien à libérer
-    }
-
     while (array[i]) 
     {
         free(array[i]); // Libère chaque chaîne de caractères
@@ -54,7 +52,7 @@ void trim_newline(char *line)
     size_t len;
 
     if (!line)
-        return;
+        return ;
     len = strlen(line);
     if (len > 0 && line[len - 1] == '\n') 
     {
