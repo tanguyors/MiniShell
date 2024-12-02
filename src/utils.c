@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 09:53:09 by root              #+#    #+#             */
-/*   Updated: 2024/12/02 15:49:14 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/12/02 19:52:44 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,18 @@ void free_array(char **array)
         i++;
     }
     free(array); // Libère le tableau lui-même
+}
+
+void free_list(struct s_shell *head)
+{
+	struct s_shell	*tmp;
+
+	while (head != NULL)
+	{
+		tmp = head;
+		head = head->next;
+		free(tmp);
+	}
 }
 
 int ft_strcmp(const char *s1, const char *s2) 

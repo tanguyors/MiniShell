@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 09:51:09 by root              #+#    #+#             */
-/*   Updated: 2024/12/02 15:48:20 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/12/02 19:35:25 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
  *
  * Retourne un tableau de chaînes de caractères (les arguments de la commande).
  */
-char **parse_command(char *input) 
+char **parse_tokens(char *input) 
 {
     char **tokens;
     
@@ -36,4 +36,21 @@ char **parse_command(char *input)
         exit(EXIT_FAILURE);
     }
     return (tokens); // Retourne le tableau de tokens
+}
+
+/* Incomplete, Parse the input to call the correct function,
+    and execute the right command */
+void parse_commands(char *input, char **tokens) 
+{
+    if (!input || *input == '\0') 
+        return ;
+    if (ft_strcmp(input, "pwd") == 0)
+    {
+        ft_pwd();
+    }
+    if (ft_strcmp(input, "echo") == 0)
+    {
+        ft_echo(tokens);
+    }
+    // ...
 }

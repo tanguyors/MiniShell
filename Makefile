@@ -6,7 +6,7 @@
 #    By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/28 10:00:09 by root              #+#    #+#              #
-#    Updated: 2024/12/02 15:37:59 by lmonsat          ###   ########.fr        #
+#    Updated: 2024/12/02 16:36:57 by lmonsat          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,6 +19,7 @@ OBJ_DIR = obj
 INCLUDE = include
 LIBFT_DIR = include/libft
 LIBFT = $(LIBFT_DIR)/libft.a
+LDLIBS = -lreadline
 
 # Fichiers source et objets
 SRC = main.c parsing.c execution.c builtins.c signal.c utils.c
@@ -38,8 +39,8 @@ $(NAME): $(OBJS) $(LIBFT)
 	@if [ ! -f $(NAME) ]; \
 	then \
 		echo "\n$(B_BLUE)Compiling $(NAME)...$(B_WHITE)\n"; \
-		echo "$(CC) $(CFLAGS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT)"; \
-		$(CC) $(CFLAGS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT); \
+		echo "$(CC) $(CFLAGS) $(LDLIBS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT)"; \
+		$(CC) $(CFLAGS) $(LDLIBS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT); \
 		echo "\n$(B_GREEN)$(NAME) compiled successfully!$(B_WHITE)\n"; \
 	fi
 
