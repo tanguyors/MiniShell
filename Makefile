@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: root <root@student.42.fr>                  +#+  +:+       +#+         #
+#    By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/28 10:00:09 by root              #+#    #+#              #
-#    Updated: 2024/11/28 10:29:42 by root             ###   ########.fr        #
+#    Updated: 2024/12/02 14:15:54 by lmonsat          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,11 +25,23 @@ SRC = main.c parsing.c execution.c builtins.c signal.c utils.c
 SRCS = $(addprefix $(SRC_DIR)/, $(SRC))
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
+# Colors
+B_BLUE = \033[1;36m
+B_GREEN = \033[1;32m
+B_WHITE = \033[1;37m
+RESET = \033[0m
+
 # Règles
 all: $(NAME)
 
 $(NAME): $(OBJS) $(LIBFT)
-	$(CC) $(CFLAGS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT)
+	@if [ ! -f $(NAME) ]; \
+	then \
+		echo "\n$(B_BLUE)Compiling $(NAME)...$(B_WHITE)\n"; \
+		echo "$(CC) $(CFLAGS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT)"; \
+		$(CC) $(CFLAGS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT); \
+		echo "\n$(B_GREEN)$(NAME) compiled successfully!$(B_WHITE)\n"; \
+	fi
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
@@ -41,12 +53,19 @@ $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
 
 clean:
+	@echo "\n$(B_BLUE)Cleaning $(NAME) objs and objs directory...$(B_WHITE)\n"
 	rm -rf $(OBJ_DIR)
+	@echo "\n$(B_BLUE)Cleaning libft directory...$(B_WHITE)\n"
 	$(MAKE) -C $(LIBFT_DIR) clean
+	@echo "\n$(B_GREEN)Objs files was removed successfully!$(B_WHITE)\n"
+	@echo "$(RESET)"
 
 fclean: clean
-	rm -f $(NAME)
+	@echo "\n$(B_BLUE)Removing executables...$(B_WHITE)\n"
+	rm -rf $(NAME)
 	$(MAKE) -C $(LIBFT_DIR) fclean
+	@echo "\n$(B_GREEN)All files was removed successfully!$(B_WHITE)\n"
+	@echo "$(RESET)"
 
 re: fclean all
 
