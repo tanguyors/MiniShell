@@ -23,7 +23,18 @@ struct s_shell	*create_node(char *data)
 		exit(EXIT_FAILURE);
 	}
 	ft_memset(new_node, 0, sizeof(struct s_shell));
-	new_node->data = data;
+    if (data == NULL)
+	{
+		new_node->data = malloc(256 * sizeof(char));
+		if (new_node->data == NULL)
+		{
+			write(2, "Error\n", 6);
+			free(new_node);
+			exit(EXIT_FAILURE);
+		}
+	}
+    else
+	    new_node->data = data;
 	new_node->next = NULL;
 	new_node->prev = NULL;
 	return (new_node);
@@ -49,18 +60,19 @@ int main(void)
     struct sigaction sa;
     char **tokens;
     
-    head = NULL;
     sa.sa_sigaction = &handle_signal;
 	sigemptyset(&sa.sa_mask);
-    sigaction(SIGINT, &sa, NULL);
+    //sigaction(SIGINT, &sa, NULL);
     sigaction(SIGQUIT, &sa, NULL);
     while (1)
     {
         int i;
+        char *input;
         
         head = NULL;
         i = 0;
-        //tokens = parse_tokens(readline("> "));
+        input = readline("> ");
+        //tokens = parse_tokens(input);
         
         /* temporary exit */
         /*if(tokens && ft_strcmp(tokens[0], "exit") == 0)
@@ -73,8 +85,8 @@ int main(void)
         }*/
         /*while(i--)
             insert_head(&head, tokens[i]);*/
-        parse_commands(tokens);
-        //parsing(readline("> "), &value);
+        //parse_commands(tokens);
+        head = parsing(input, head);
         //ft_echo(tokens);
         //ft_pwd();
         if (head)

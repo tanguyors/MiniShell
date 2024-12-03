@@ -29,25 +29,30 @@ char **parse_tokens(char *input)
 
 int is_alpha(int c)
 {
-    if((c >= 65 && c <= 90) || c >= 97 && c <= 122)
-        return(1);
-    return(0);
+    if ((c >= 65 && c <= 90) || c >= 97 && c <= 122)
+        return (1);
+    return (0);
 }
 
 int is_redirect(int c)
 {
-    if(c == '<' || c == '>')
+    if (c == '<' || c == '>')
         return(1);
     return(0);
 }
 
-void parsing(char *str, struct s_shell *value) 
+int is_space(int c)
+{
+    if (c == ' ' || c == '\t')
+        return (1);
+    return (0);
+}
+
+struct s_shell *parsing(char *str, struct s_shell *value) 
 {
     int i;
     int j;
-    
-    if (!str || *str == '\0' || !value)
-        return;
+
     i = 0;
     while (str[i] != '\0') 
     {
@@ -56,33 +61,34 @@ void parsing(char *str, struct s_shell *value)
         
         if (is_redirect(str[i])) 
         {
+            insert_head(&value, NULL);
             value->token = TOKEN_WORD;
-            j = 0;
-            value->data[j++] = str[i++];
-            value->data[j] = '\0';
+            value->data[0] = str[i++];
+            value->data[1] = '\0';
             
             if (is_redirect(str[i])) 
             {
-                value->data[j++] = str[i++];
+                value->data[1] = str[i++];
+                value->data[2] = '\0';
+            }
+            if (str[++i])
+            {
+                insert_head(&value, NULL);
+                //value = value->next;
+                value->token = TOKEN_INFILE;
+                j = 0;
+                while (str[i] != '\0' && !is_space(str[i])) 
+                {
+                    value->data[j++] = str[i++];
+                }
                 value->data[j] = '\0';
             }
-            if (value->next)
-                value = value->next;
             else
-                break;
-             j = 0;
-            while (str[i] != ' ' && str[i] != '\t' && str[i] != '\0') 
-            {
-                value->data[j++] = str[i++];
-            }
-            value->data[j] = '\0';
-            value->token = TOKEN_INFILE;
+                perror("syntax error near unexpected token `newline'\n");
         }
-        if (value->next)
-            value = value->next;
-        else
-            break;
+        break;
     }
+    return (value);
 }
 
 

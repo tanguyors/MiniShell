@@ -33,8 +33,10 @@ struct s_shell
 
 /*-- Parsing --*/
 char **parse_tokens(char *input);
-void parsing(char *str, struct s_shell *value);
+struct s_shell *parsing(char *str, struct s_shell *value);
 void parse_commands(char **tokens);
+/*-- Nodes --*/
+void insert_head(struct s_shell **head, char *new_data);
 /*-- Utils --*/
 void free_array(char **array);
 void free_list(struct s_shell *head);
