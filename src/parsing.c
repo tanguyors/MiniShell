@@ -29,15 +29,13 @@ char **parse_tokens(char *input)
 
 /* Incomplete, Parse the input to call the correct function,
     and execute the right command */
-void parse_commands(char *input, char **tokens) 
+void parse_commands(char **tokens) 
 {
-    if (!input || *input == '\0') 
-        return ;
-    if (ft_strcmp(input, "pwd") == 0)
+    if (ft_strcmp(tokens[0], "pwd") == 0)
     {
         ft_pwd();
     }
-    if (ft_strcmp(input, "echo") == 0)
+    if (ft_strcmp(tokens[0], "echo") == 0)
     {
         ft_echo(tokens);
     }
