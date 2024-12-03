@@ -72,18 +72,18 @@ int main(void)
         head = NULL;
         i = 0;
         input = readline("> ");
-        //tokens = parse_tokens(input);
+        //tokens = parse_tokens(input);   //  <-- a décommenter pour tes tests
         
         /* temporary exit */
-        /*if(tokens && ft_strcmp(tokens[0], "exit") == 0)
+        /*if(tokens && ft_strcmp(tokens[0], "exit") == 0) //  <-- a décommenter pour tes tests
             exit(EXIT_SUCCESS);*/
 
-        /*while(tokens && tokens[i])
+        /*while(tokens && tokens[i])  //  <-- a décommenter pour tes tests
         {
             printf("token [%d]: %s\n", i, tokens[i]);
             i++;
         }*/
-        /*while(i--)
+        /*while(i--)   // <-- a décommenter pour tes tests
             insert_head(&head, tokens[i]);*/
         //parse_commands(tokens);
         head = parsing(input, head);
