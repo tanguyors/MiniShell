@@ -6,7 +6,7 @@ void print_list(struct s_shell *current)
 	ft_printf("Liste chainé : ");
 	while (current != NULL)
 	{
-		ft_printf("%d -> ", current->data);
+		ft_printf("%s -> ", current->data);
 		current = current->next;
 	}
 	ft_printf("NULL\n");
@@ -46,9 +46,9 @@ int main(void)
 {
     struct s_shell *head;
     struct sigaction sa;
-
     char **tokens;
     
+    head = NULL;
     sa.sa_sigaction = &handle_signal;
 	sigemptyset(&sa.sa_mask);
     sigaction(SIGINT, &sa, NULL);
@@ -67,16 +67,16 @@ int main(void)
         while(tokens && tokens[i])
         {
             printf("token [%d]: %s\n", i, tokens[i]);
-            //insert_head(&head, tokens[0]); // -> SEGVFAULT
+            insert_head(&head, tokens[0]); // -> SEGVFAULT
             i++;
         }
         //ft_echo(tokens);
         //ft_pwd();
-        /*if (head)
+        if (head)
         {
             print_list(head);
             free_list(head);
-        }*/
+        }
     }
     return (0);
 }
