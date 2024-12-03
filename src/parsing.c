@@ -41,35 +41,50 @@ int is_redirect(int c)
     return(0);
 }
 
-/*void parsing(char *str, struct s_shell *value) 
+void parsing(char *str, struct s_shell *value) 
 {
     int i;
-    enum tokens token_value;
+    int j;
     
+    if (!str || *str == '\0' || !value)
+        return;
     i = 0;
-    if (!str || *str == '\0') 
-        return (NULL);
-    while(str)
+    while (str[i] != '\0') 
     {
-        if(str[i] == ' ' || str[i] == '\t')
+        while (str[i] == ' ' || str[i] == '\t')
             i++;
-        if (is_redirect(str[i]))
+        
+        if (is_redirect(str[i])) 
         {
-           token_value = TOKEN_WORD;
-           value->token = &token_value;
-           value->data = str[i];
-           value = value->next;
-           i++;
-           if (is_redirect(str[i]))
-           {
-                value->data = str[i];
+            value->token = TOKEN_WORD;
+            j = 0;
+            value->data[j++] = str[i++];
+            value->data[j] = '\0';
+            
+            if (is_redirect(str[i])) 
+            {
+                value->data[j++] = str[i++];
+                value->data[j] = '\0';
+            }
+            if (value->next)
                 value = value->next;
-                i++;
-           }
-           
+            else
+                break;
+             j = 0;
+            while (str[i] != ' ' && str[i] != '\t' && str[i] != '\0') 
+            {
+                value->data[j++] = str[i++];
+            }
+            value->data[j] = '\0';
+            value->token = TOKEN_INFILE;
         }
+        if (value->next)
+            value = value->next;
+        else
+            break;
     }
-}*/
+}
+
 
 /* Incomplete, Parse the input to call the correct function,
     and execute the right command */
@@ -86,6 +101,10 @@ void parse_commands(char **tokens)
     if (ft_strcmp(tokens[0], "env") == 0)
     {
         ft_env(tokens);
+    }
+    if (ft_strcmp(tokens[0], "export") == 0)
+    {
+        ft_export(tokens);
     }
     // ...
 }

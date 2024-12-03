@@ -14,20 +14,21 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
-struct s_shell
-{
-    struct s_shell *next;
-    struct s_shell *prev;
-    enum tokens *token;
-    char *data;
-};
-
-enum tokens
+enum e_tokens
 {
     TOKEN_WORD,
     TOKEN_CMD,
     TOEKEN_ARG,
-    TOKEN_RED
+    TOKEN_RED,
+    TOKEN_INFILE
+};
+
+struct s_shell
+{
+    struct s_shell *next;
+    struct s_shell *prev;
+    enum e_tokens token;
+    char *data;
 };
 
 /*-- Parsing --*/
@@ -46,6 +47,8 @@ char *ft_strndup(const char *s, size_t n);
 int ft_echo(char **argv);
 int ft_pwd(void);
 int ft_env(char **argv);
+int	ft_export(char **argv);
+int	is_valid_identifier(const char *str);
 //int ft_cd(char **argv);
 /*-- Signal --*/
 void handle_signal(int sig, siginfo_t *info, void *context);

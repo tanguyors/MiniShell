@@ -60,19 +60,19 @@ int main(void)
         
         head = NULL;
         i = 0;
-        tokens = parse_tokens(readline("> "));
+        //tokens = parse_tokens(readline("> "));
         
         /* temporary exit */
-        if(tokens && ft_strcmp(tokens[0], "exit") == 0)
-            exit(EXIT_SUCCESS);
+        /*if(tokens && ft_strcmp(tokens[0], "exit") == 0)
+            exit(EXIT_SUCCESS);*/
 
-        while(tokens && tokens[i])
+        /*while(tokens && tokens[i])
         {
             printf("token [%d]: %s\n", i, tokens[i]);
             i++;
-        }
-        while(i--)
-            insert_head(&head, tokens[i]);
+        }*/
+        /*while(i--)
+            insert_head(&head, tokens[i]);*/
         parse_commands(tokens);
         //parsing(readline("> "), &value);
         //ft_echo(tokens);
