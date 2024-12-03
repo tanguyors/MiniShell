@@ -27,6 +27,50 @@ char **parse_tokens(char *input)
     return (tokens); // Retourne le tableau de tokens
 }
 
+int is_alpha(int c)
+{
+    if((c >= 65 && c <= 90) || c >= 97 && c <= 122)
+        return(1);
+    return(0);
+}
+
+int is_redirect(int c)
+{
+    if(c == '<' || c == '>')
+        return(1);
+    return(0);
+}
+
+/*void parsing(char *str, struct s_shell *value) 
+{
+    int i;
+    enum tokens token_value;
+    
+    i = 0;
+    if (!str || *str == '\0') 
+        return (NULL);
+    while(str)
+    {
+        if(str[i] == ' ' || str[i] == '\t')
+            i++;
+        if (is_redirect(str[i]))
+        {
+           token_value = TOKEN_WORD;
+           value->token = &token_value;
+           value->data = str[i];
+           value = value->next;
+           i++;
+           if (is_redirect(str[i]))
+           {
+                value->data = str[i];
+                value = value->next;
+                i++;
+           }
+           
+        }
+    }
+}*/
+
 /* Incomplete, Parse the input to call the correct function,
     and execute the right command */
 void parse_commands(char **tokens) 
@@ -38,6 +82,10 @@ void parse_commands(char **tokens)
     if (ft_strcmp(tokens[0], "echo") == 0)
     {
         ft_echo(tokens);
+    }
+    if (ft_strcmp(tokens[0], "env") == 0)
+    {
+        ft_env(tokens);
     }
     // ...
 }

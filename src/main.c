@@ -44,6 +44,7 @@ void insert_head(struct s_shell **head, char *new_data)
 
 int main(void)
 {
+    struct s_shell value;
     struct s_shell *head;
     struct sigaction sa;
     char **tokens;
@@ -57,6 +58,7 @@ int main(void)
     {
         int i;
         
+        head = NULL;
         i = 0;
         tokens = parse_tokens(readline("> "));
         
@@ -67,10 +69,12 @@ int main(void)
         while(tokens && tokens[i])
         {
             printf("token [%d]: %s\n", i, tokens[i]);
-            insert_head(&head, tokens[0]); // -> SEGVFAULT
             i++;
         }
+        while(i--)
+            insert_head(&head, tokens[i]);
         parse_commands(tokens);
+        //parsing(readline("> "), &value);
         //ft_echo(tokens);
         //ft_pwd();
         if (head)

@@ -1,14 +1,14 @@
 
-
 //Implementations des commandes interne
 #include "../include/minishell.h"
 
 /**
  * ft_echo - Implémente le built-in echo.
- * @args: Tableau d'arguments, args[0] = "echo".
+ * @argv: Tableau d'arguments, argv[0] = "echo".
  *
  * Retourne 0 en cas de succès.
  */
+
 int ft_echo(char **argv) 
 {
     int i;
@@ -53,4 +53,31 @@ int ft_pwd(void)
         perror("pwd"); // Affiche une erreur si getcwd échoue
         return (1);
     }
+}
+
+extern char **environ; // Déclare la variable globale environ qui se trouve dans le systeme 
+
+/**
+ * ft_env - Affiche toutes les variables d'environnement.
+ * @argv: Les arguments passés à la commande (argv[0] = "env").
+ *
+ * Retourne 0 en cas de succès, 1 si des arguments sont passés.
+ */
+int ft_env(char **argv) 
+{
+    int i = 0;
+
+    // Vérifie si des arguments supplémentaires sont donnés
+    if (argv[1]) 
+    {
+        ft_printf("env: No such file or directory\n");
+        return (1);
+    }
+    // Parcourt la variable globale environ et affiche chaque variable
+    while (environ[i]) 
+    {
+        ft_printf("%s\n", environ[i]);
+        i++;
+    }
+    return (0);
 }

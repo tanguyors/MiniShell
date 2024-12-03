@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: torsini <torsini@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/28 09:53:48 by root              #+#    #+#             */
-/*   Updated: 2024/12/03 14:36:56 by torsini          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -29,11 +18,21 @@ struct s_shell
 {
     struct s_shell *next;
     struct s_shell *prev;
+    enum tokens *token;
     char *data;
+};
+
+enum tokens
+{
+    TOKEN_WORD,
+    TOKEN_CMD,
+    TOEKEN_ARG,
+    TOKEN_RED
 };
 
 /*-- Parsing --*/
 char **parse_tokens(char *input);
+void parsing(char *str, struct s_shell *value);
 void parse_commands(char **tokens);
 /*-- Utils --*/
 void free_array(char **array);
@@ -46,6 +45,7 @@ char *ft_strndup(const char *s, size_t n);
 /*-- Built-in --*/
 int ft_echo(char **argv);
 int ft_pwd(void);
+int ft_env(char **argv);
 //int ft_cd(char **argv);
 /*-- Signal --*/
 void handle_signal(int sig, siginfo_t *info, void *context);
