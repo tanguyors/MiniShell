@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
+/*   By: torsini <torsini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 09:53:48 by root              #+#    #+#             */
-/*   Updated: 2024/12/02 19:55:07 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/12/03 14:36:56 by torsini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ struct s_shell
 
 /*-- Parsing --*/
 char **parse_tokens(char *input);
-void parse_commands(char *input, char **tokens);
+void parse_commands(char **tokens);
 /*-- Utils --*/
 void free_array(char **array);
 void free_list(struct s_shell *head);

@@ -70,6 +70,7 @@ int main(void)
             insert_head(&head, tokens[0]); // -> SEGVFAULT
             i++;
         }
+        parse_commands(tokens);
         //ft_echo(tokens);
         //ft_pwd();
         if (head)
