@@ -95,6 +95,7 @@ void p_command(int *i, char *str, struct s_shell **value)
 	}
 }
 
+/* uniquement considéré comme arg si str[i] = '-' */
 static void p_arg(int *i, char *str, struct s_shell **value)
 {
 	int j;
