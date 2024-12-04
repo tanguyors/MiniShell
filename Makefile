@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: torsini <torsini@student.42.fr>            +#+  +:+       +#+         #
+#    By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/28 10:00:09 by root              #+#    #+#              #
-#    Updated: 2024/12/03 16:40:16 by torsini          ###   ########.fr        #
+#    Updated: 2024/12/04 16:59:54 by lmonsat          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,8 +39,8 @@ $(NAME): $(OBJS) $(LIBFT)
 	@if [ ! -f $(NAME) ]; \
 	then \
 		echo "\n$(B_BLUE)Compiling $(NAME)...$(B_WHITE)\n"; \
-		echo "$(CC) $(CFLAGS) $(LDLIBS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT)"; \
-		$(CC) $(CFLAGS) $(LDLIBS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT); \
+		echo "$(CC) $(CFLAGS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT) $(LDLIBS)"; \
+		$(CC) $(CFLAGS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT) $(LDLIBS); \
 		echo "\n$(B_GREEN)$(NAME) compiled successfully!$(B_WHITE)\n"; \
 	fi
 
