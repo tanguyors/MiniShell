@@ -60,6 +60,9 @@ static void p_redirection(int *i, char *str, struct s_shell **value)
 	}
 }
 
+/* appel récursif viable ? 
+	incrémentation de i non pris en compte par p_command() 
+	passer i a p_pipe par référence ? */
 static void p_pipe(int i, char *str, struct s_shell **value)
 {
 	if (str[i] == '|')
@@ -72,7 +75,6 @@ static void p_pipe(int i, char *str, struct s_shell **value)
 		i++;
 		p_command(&i, str, value);
 	}
-	
 }
 
 void p_command(int *i, char *str, struct s_shell **value)
