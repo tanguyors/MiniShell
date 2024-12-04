@@ -16,10 +16,11 @@
 
 enum e_tokens
 {
-    TOKEN_WORD,
+    TOKEN_WORD, 
     TOKEN_CMD,
-    TOEKEN_ARG,
+    TOKEN_ARG,
     TOKEN_RED,
+	TOKEN_PIPE,
     TOKEN_INFILE
 };
 
@@ -45,6 +46,12 @@ void trim_newline(char *line);
 char *expand_var(char *str);
 char *remove_quotes(char *str);
 char *ft_strndup(const char *s, size_t n);
+/*-- Is_Utils --*/
+int is_valid_char(int c);
+int is_alpha(int c);
+int is_redirect(int c);
+int is_alnum(int c);
+int is_space(int c);
 /*-- Built-in --*/
 int ft_echo(char **argv);
 int ft_pwd(void);
