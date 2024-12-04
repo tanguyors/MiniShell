@@ -22,7 +22,18 @@ struct s_shell	*create_node(char *data)
 		exit(EXIT_FAILURE);
 	}
 	ft_memset(new_node, 0, sizeof(struct s_shell));
-    if (data == NULL)
+	if (data != NULL)
+	{
+		new_node->data = malloc((strlen(data) + 1) * sizeof(char));
+		if (new_node->data == NULL)
+		{
+			write(2, "Error\n", 6);
+			free(new_node);
+			exit(EXIT_FAILURE);
+		}
+		strcpy(new_node->data, data);
+	}
+	else
 	{
 		new_node->data = malloc(256 * sizeof(char));
 		if (new_node->data == NULL)
@@ -31,13 +42,13 @@ struct s_shell	*create_node(char *data)
 			free(new_node);
 			exit(EXIT_FAILURE);
 		}
+		ft_memset(new_node->data, 0, 256);
 	}
-    else
-	    new_node->data = data;
 	new_node->next = NULL;
 	new_node->prev = NULL;
 	return (new_node);
 }
+
 
 void insert_head(struct s_shell **head, char *new_data)
 {

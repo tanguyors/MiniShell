@@ -27,66 +27,105 @@ char **parse_tokens(char *input)
     return (tokens); // Retourne le tableau de tokens
 }
 
-int is_alpha(int c)
+
+static void p_redirection(int *i, char *str, struct s_shell **value)
 {
-    if ((c >= 65 && c <= 90) || c >= 97 && c <= 122)
-        return (1);
-    return (0);
+	int j;
+
+	if (is_redirect(str[(*i)])) 
+	{
+		printf("redirection:\n");
+		insert_head(value, NULL);
+		(*value)->token = TOKEN_WORD;
+		(*value)->data[0] = str[(*i)++];
+		(*value)->data[1] = '\0';
+		if (is_redirect(str[(*i)])) 
+		{
+			(*value)->data[1] = str[(*i)++];
+			(*value)->data[2] = '\0';
+		}
+		if (str[++(*i)] && is_alnum(str[(*i)]))
+		{
+			printf("infile:\n");
+			insert_head(value, NULL);
+			(*value)->token = TOKEN_INFILE;
+			j = 0;
+			while (str[(*i)] != '\0' && !is_space(str[(*i)])) 
+				(*value)->data[j++] = str[(*i)++];
+			(*value)->data[j] = '\0';
+		}
+		else
+			perror("syntax error near unexpected token `newline'\n");
+		(*i)++;
+	}
 }
 
-int is_redirect(int c)
+static void p_pipe(int i, char *str, struct s_shell **value)
 {
-    if (c == '<' || c == '>')
-        return(1);
-    return(0);
+	if (str[i] == '|')
+	{
+		printf("pipe:\n");
+		insert_head(value, NULL);
+		(*value)->token = TOKEN_PIPE;
+		(*value)->data[0] = '|';
+		(*value)->data[1] = '\0';
+		i++;
+		p_command(&i, str, value);
+	}
+	
 }
 
-int is_space(int c)
+void p_command(int *i, char *str, struct s_shell **value)
 {
-    if (c == ' ' || c == '\t')
-        return (1);
-    return (0);
+	int j;
+
+	if (str[(*i)] && is_alnum(str[(*i)]))
+	{
+		printf("command:\n");
+		insert_head(value, NULL);
+		(*value)->token = TOKEN_CMD;
+		j = 0;
+		while (str[(*i)] != '\0' && !is_space(str[(*i)])) 
+			(*value)->data[j++] = str[(*i)++];
+		(*value)->data[j] = '\0';
+		(*i)++;
+		p_pipe((*i), str, value);
+	}
 }
+
+static void p_arg(int *i, char *str, struct s_shell **value)
+{
+	int j;
+
+	if (str[(*i)] && is_alpha(str[++(*i)]))
+	{
+		(*i)--;
+		printf("arg:\n");
+		insert_head(value, NULL);
+		(*value)->token = TOKEN_ARG;
+		j = 0;
+		while (str[(*i)] != '\0' && !is_space(str[(*i)])) 
+			(*value)->data[j++] = str[(*i)++];
+		(*value)->data[j] = '\0';
+		(*i)++;
+		p_pipe((*i), str, value);
+	}
+}
+
 
 struct s_shell *parsing(char *str, struct s_shell *value) 
 {
     int i;
-    int j;
 
     i = 0;
     while (str[i] != '\0') 
     {
-        while (str[i] == ' ' || str[i] == '\t')
+        while (is_space(str[i]))
             i++;
-        
-        if (is_redirect(str[i])) 
-        {
-            insert_head(&value, NULL);
-            value->token = TOKEN_WORD;
-            value->data[0] = str[i++];
-            value->data[1] = '\0';
-            
-            if (is_redirect(str[i])) 
-            {
-                value->data[1] = str[i++];
-                value->data[2] = '\0';
-            }
-            if (str[++i])
-            {
-                insert_head(&value, NULL);
-                //value = value->next;
-                value->token = TOKEN_INFILE;
-                j = 0;
-                while (str[i] != '\0' && !is_space(str[i])) 
-                {
-                    value->data[j++] = str[i++];
-                }
-                value->data[j] = '\0';
-            }
-            else
-                perror("syntax error near unexpected token `newline'\n");
-        }
-        break;
+        p_redirection(&i, str, &value);
+		p_command(&i, str, &value);
+		p_arg(&i, str, &value);
+		break;
     }
     return (value);
 }
