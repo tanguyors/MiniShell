@@ -38,6 +38,13 @@ typedef struct s_dir_stack
     struct s_dir_stack  *next;
 }   t_dir_stack;
 
+//gestion et execution des builtins 
+typedef struct s_builtin
+{
+    char *name;
+    int (*func)(char **);
+} t_builtin;
+
 
 /*-- Parsing --*/
 char **parse_tokens(char *input);

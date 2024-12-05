@@ -135,32 +135,36 @@ struct s_shell *parsing(char *str, struct s_shell *value)
 }
 
 
-/* Incomplete, Parse the input to call the correct function,
-    and execute the right command */
-void parse_commands(char **tokens) 
+void parse_commands(char **tokens)
 {
-    if (ft_strcmp(tokens[0], "pwd") == 0) 
+    t_builtin builtins[] = {
+        {"pwd", ft_pwd},
+        {"echo", ft_echo},
+        {"env", ft_env},
+        {"export", ft_export},
+        {"unset", ft_unset},
+        {"cd", ft_cd},
+        {NULL, NULL}
+    };
+    int i = 0;
+
+    if (!tokens[0]) // Commande vide
     {
-        ft_pwd();
+        ft_printf("Error: Empty command\n");
+        return;
     }
-    if (ft_strcmp(tokens[0], "echo") == 0)
+
+    // Parcourt la table des commandes internes
+    while (builtins[i].name != NULL)
     {
-        ft_echo(tokens); // a revoir apres l'ajout des quote
+        if (ft_strcmp(tokens[0], builtins[i].name) == 0)
+        {
+            builtins[i].func(tokens); // Appelle la fonction correspondante
+            return;
+        }
+        i++;
     }
-    if (ft_strcmp(tokens[0], "env") == 0)
-    {
-        ft_env(tokens);
-    }
-    if (ft_strcmp(tokens[0], "export") == 0)
-    {
-        ft_export(tokens); // a revoir apres l'ajout des quote
-    }
-	if (ft_strcmp(tokens[0], "unset") == 0)
-    {
-        ft_unset(tokens);
-    }
-	if (ft_strcmp(tokens[0], "cd") == 0)
-    {
-        ft_cd(tokens);
-    }
+
+    // Si aucune commande builtin ne correspond
+    ft_printf("minishell: %s: command not found\n", tokens[0]);
 }
