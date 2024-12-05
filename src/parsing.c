@@ -8,6 +8,7 @@
  *
  * Retourne un tableau de chaînes de caractères (les arguments de la commande).
  */
+
 char **parse_tokens(char *input) 
 {
     char **tokens;
@@ -138,13 +139,13 @@ struct s_shell *parsing(char *str, struct s_shell *value)
     and execute the right command */
 void parse_commands(char **tokens) 
 {
-    if (ft_strcmp(tokens[0], "pwd") == 0)
+    if (ft_strcmp(tokens[0], "pwd") == 0) 
     {
         ft_pwd();
     }
     if (ft_strcmp(tokens[0], "echo") == 0)
     {
-        ft_echo(tokens);
+        ft_echo(tokens); // a revoir apres l'ajout des quote
     }
     if (ft_strcmp(tokens[0], "env") == 0)
     {
@@ -152,7 +153,14 @@ void parse_commands(char **tokens)
     }
     if (ft_strcmp(tokens[0], "export") == 0)
     {
-        ft_export(tokens);
+        ft_export(tokens); // a revoir apres l'ajout des quote
     }
-    // ...
+	if (ft_strcmp(tokens[0], "unset") == 0)
+    {
+        ft_unset(tokens);
+    }
+	if (ft_strcmp(tokens[0], "cd") == 0)
+    {
+        ft_cd(tokens);
+    }
 }

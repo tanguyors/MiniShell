@@ -32,6 +32,7 @@ struct s_shell
     char *data;
 };
 
+
 /*-- Parsing --*/
 char **parse_tokens(char *input);
 struct s_shell *parsing(char *str, struct s_shell *value);
@@ -61,7 +62,12 @@ int ft_pwd(void);
 int ft_env(char **argv);
 int	ft_export(char **argv);
 int	is_valid_identifier(const char *str);
-//int ft_cd(char **argv);
+int ft_unset(char **argv);
+int ft_cd(char **argv);
+static void update_pwd(void);
+static char *construct_path(const char *base, const char *input);
+void push_dir(const char *dir);
+char *pop_dir(void);
 /*-- Signal --*/
 void handle_signal(int sig, siginfo_t *info, void *context);
 

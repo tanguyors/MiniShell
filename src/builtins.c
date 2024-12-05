@@ -173,3 +173,183 @@ int	ft_export(char **argv)
 	}
 	return (0); // Fin de la commande avec succès
 }
+// Version definitive a revoir pour mettre a la norme !!!!!
+int	ft_unset(char **argv)
+{
+	int	i;
+	int	j;
+	int	k;
+
+	if (!argv[1]) // Aucun argument : rien à faire
+		return (0);
+
+	i = 1;
+	while (argv[i])
+	{
+		if (!is_valid_identifier(argv[i]))
+		{
+			ft_printf("unset: `%s': not a valid identifier\n", argv[i]);
+		}
+		else
+		{
+			j = 0;
+			while (environ[j])
+			{
+				// Compare uniquement la partie avant le '='
+				if (ft_strncmp(environ[j], argv[i], ft_strlen(argv[i])) == 0 &&
+					environ[j][ft_strlen(argv[i])] == '=')
+				{
+					// Décale toutes les entrées après j
+					k = j;
+					while (environ[k + 1])
+					{
+						environ[k] = environ[k + 1];
+						k++;
+					}
+					environ[k] = NULL; // Termine le tableau après décalage
+					break; // Une fois trouvée et supprimée, arrête la recherche
+				}
+				j++;
+			}
+		}
+		i++;
+	}
+	return (0);
+}
+
+
+static char *construct_path(const char *base, const char *input)
+{
+    char *full_path;
+    size_t base_len;
+
+    base_len = ft_strlen(base);
+    full_path = malloc(base_len + ft_strlen(input) + 2); // +2 pour '/' et '\0'
+    if (!full_path)
+        return (NULL);
+
+    ft_strlcpy(full_path, base, base_len + 1); // Copie `base` dans `full_path`
+    ft_strlcat(full_path, "/", base_len + ft_strlen(input) + 2); // Ajoute '/'
+    ft_strlcat(full_path, input, base_len + ft_strlen(input) + 2); // Ajoute `input`
+
+    return (full_path);
+}
+
+/**
+ * update_pwd - Met à jour les variables d'environnement PWD et OLDPWD.
+ */
+static void update_pwd(void)
+{
+    char cwd[1024];
+
+    if (getcwd(cwd, sizeof(cwd)))
+    {
+        setenv("OLDPWD", getenv("PWD"), 1); // Met à jour OLDPWD avec l'ancien PWD
+        setenv("PWD", cwd, 1);              // Met à jour PWD avec le chemin actuel
+    }
+}
+
+typedef struct s_dir_stack
+{
+    char                *dir; // Répertoire sauvegardé
+    struct s_dir_stack  *next;
+}   t_dir_stack;
+
+
+static t_dir_stack *g_dir_stack = NULL; // Pile globale
+
+void push_dir(const char *dir)
+{
+    t_dir_stack *new_node;
+
+    new_node = malloc(sizeof(t_dir_stack));
+    if (!new_node)
+        return;
+    new_node->dir = strdup(dir);
+    new_node->next = g_dir_stack;
+    g_dir_stack = new_node;
+}
+char *pop_dir(void)
+{
+    t_dir_stack *top;
+    char        *dir;
+
+    if (!g_dir_stack)
+        return (NULL); // Pile vide
+    top = g_dir_stack;
+    dir = top->dir;
+    g_dir_stack = g_dir_stack->next;
+    free(top);
+    return (dir);
+}
+
+/**
+ * ft_cd - Implémente la commande cd.
+ * @argv: Tableau d'arguments (argv[0] = "cd").
+ *
+ * Retourne 0 en cas de succès, 1 en cas d'erreur.
+ */
+
+int ft_cd(char **argv)
+{
+    char cwd[1024];
+    char *path;
+    char *previous_dir;
+    // Récupère le répertoire courant
+    if (!getcwd(cwd, sizeof(cwd)))
+    {
+        perror("cd");
+        return (1);
+    }
+    if (!argv[1]) // Aucun argument : aller dans $HOME
+    {
+        path = getenv("HOME");
+        if (!path || *path == '\0')
+        {
+            ft_printf("cd: HOME not set\n");
+            return (1);
+        }
+    }
+    else if (ft_strcmp(argv[1], "-") == 0) // "cd -" : revenir au dernier répertoire
+    {
+        previous_dir = pop_dir();
+        if (!previous_dir)
+        {
+            ft_printf("cd: No previous directory\n");
+            return (1);
+        }
+        ft_printf("%s\n", previous_dir); // Affiche le répertoire précédent
+        path = previous_dir;
+    }
+    else
+    {
+        path = argv[1]; // Chemin spécifié par l'utilisateur
+    }
+
+    // Vérifie si le chemin existe
+    if (access(path, F_OK) == -1)
+    {
+        ft_printf("cd: %s: No such file or directory\n", path);
+        return (1);
+    }
+    if (access(path, X_OK) == -1)
+    {
+        ft_printf("cd: %s: Permission denied\n", path);
+        return (1);
+    }
+    // Ajoute le répertoire courant à la pile
+    push_dir(cwd);
+    // Change le répertoire
+    if (chdir(path) == -1)
+    {
+        perror("cd");
+        return (1);
+    }
+    // Met à jour PWD après changement
+    if (getcwd(cwd, sizeof(cwd)))
+        setenv("PWD", cwd, 1);
+
+    return (0);
+}
+
+
