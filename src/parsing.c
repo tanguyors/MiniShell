@@ -57,7 +57,8 @@ static void p_redirection(int *i, char *str, struct s_shell **value)
 		}
 		else
 			perror("syntax error near unexpected token `newline'\n");
-		(*i)++;
+		while (is_space(str[(*i)]))
+			(*i)++;
 	}
 }
 
@@ -66,14 +67,16 @@ static void p_redirection(int *i, char *str, struct s_shell **value)
 	passer i a p_pipe par référence ? */
 static void p_pipe(int i, char *str, struct s_shell **value)
 {
-	if (str[i] == '|')
+	if (str[i++] == '|')
 	{
+		
 		printf("pipe:\n");
 		insert_head(value, NULL);
 		(*value)->token = TOKEN_PIPE;
 		(*value)->data[0] = '|';
 		(*value)->data[1] = '\0';
-		i++;
+		while (is_space(str[i]))
+			i++;
 		p_command(&i, str, value);
 	}
 }
@@ -82,36 +85,51 @@ void p_command(int *i, char *str, struct s_shell **value)
 {
 	int j;
 
-	if (str[(*i)] && is_alnum(str[(*i)]))
+	while (is_space(str[(*i)]))
+		(*i)++;
+	if (str[(*i)] && !is_spec_char(str[(*i)]))
 	{
 		printf("command:\n");
 		insert_head(value, NULL);
 		(*value)->token = TOKEN_CMD;
+		while (is_space(str[(*i)]))
+			(*i)++;
 		j = 0;
-		while (str[(*i)] != '\0' && !is_space(str[(*i)])) 
-			(*value)->data[j++] = str[(*i)++];
+		while (str[(*i)] != '\0' && !is_spec_char(str[(*i)]))
+		{
+			if (!is_space(str[(*i)]))
+				(*value)->data[j++] = str[(*i)];
+			(*i)++;
+		}	
 		(*value)->data[j] = '\0';
-		(*i)++;
+		//(*i)++;
 		p_pipe((*i), str, value);
 	}
 }
 
-/* uniquement considéré comme arg si str[i] = '-' */
 static void p_arg(int *i, char *str, struct s_shell **value)
 {
 	int j;
 
-	if (str[(*i)] && is_alpha(str[++(*i)]))
+	while (is_space(str[(*i)]))
+		(*i)++;
+
+	if (str[(*i)] && str[(*i)] == '-')
 	{
-		(*i)--;
 		printf("arg:\n");
 		insert_head(value, NULL);
 		(*value)->token = TOKEN_ARG;
 		j = 0;
-		while (str[(*i)] != '\0' && !is_space(str[(*i)])) 
-			(*value)->data[j++] = str[(*i)++];
-		(*value)->data[j] = '\0';
+		(*value)->data[j++] = '-';
 		(*i)++;
+		while (str[(*i)] != '\0' && !is_spec_char(str[(*i)]))
+		{
+			if (!is_space(str[(*i)]))
+				(*value)->data[j++] = str[(*i)];
+			(*i)++;
+		}	
+		(*value)->data[j] = '\0';
+		//(*i)++;
 		p_pipe((*i), str, value);
 	}
 }
@@ -129,7 +147,7 @@ struct s_shell *parsing(char *str, struct s_shell *value)
         p_redirection(&i, str, &value);
 		p_command(&i, str, &value);
 		p_arg(&i, str, &value);
-		break;
+		//break;
     }
     return (value);
 }

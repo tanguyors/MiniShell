@@ -1,8 +1,8 @@
 #include "../include/minishell.h"
 
-int is_valid_char(int c) 
+int is_spec_char(int c) 
 {
-    if (is_alnum(c) || c == '_' || c == '-')
+    if (c == '|' || c == '-')
 		return (1);
 	return (0);
 }

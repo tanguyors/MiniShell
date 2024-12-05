@@ -64,7 +64,7 @@ char *expand_var(char *str);
 char *remove_quotes(char *str);
 char *ft_strndup(const char *s, size_t n);
 /*-- Is_Utils --*/
-int is_valid_char(int c);
+int is_spec_char(int c);
 int is_alpha(int c);
 int is_redirect(int c);
 int is_alnum(int c);
