@@ -65,7 +65,7 @@ static void p_redirection(int *i, char *str, struct s_shell **value)
 /* appel récursif viable ? 
 	incrémentation de i non pris en compte par p_command() 
 	passer i a p_pipe par référence ? */
-static void p_pipe(int i, char *str, struct s_shell **value)
+static int p_pipe(int i, char *str, struct s_shell **value)
 {
 	if (str[i++] == '|')
 	{
@@ -78,10 +78,12 @@ static void p_pipe(int i, char *str, struct s_shell **value)
 		while (is_space(str[i]))
 			i++;
 		p_command(&i, str, value);
+		return (0);
 	}
+	return (1);
 }
 
-void p_command(int *i, char *str, struct s_shell **value)
+int p_command(int *i, char *str, struct s_shell **value)
 {
 	int j;
 
@@ -105,9 +107,10 @@ void p_command(int *i, char *str, struct s_shell **value)
 		//(*i)++;
 		p_pipe((*i), str, value);
 	}
+	return (1);
 }
 
-static void p_arg(int *i, char *str, struct s_shell **value)
+static int p_arg(int *i, char *str, struct s_shell **value)
 {
 	int j;
 
@@ -132,8 +135,8 @@ static void p_arg(int *i, char *str, struct s_shell **value)
 		//(*i)++;
 		p_pipe((*i), str, value);
 	}
+	return (1);
 }
-
 
 struct s_shell *parsing(char *str, struct s_shell *value) 
 {
@@ -144,14 +147,20 @@ struct s_shell *parsing(char *str, struct s_shell *value)
     {
         while (is_space(str[i]))
             i++;
-        p_redirection(&i, str, &value);
-		p_command(&i, str, &value);
-		p_arg(&i, str, &value);
-		//break;
+        //p_redirection(&i, str, &value);
+		//p_command(&i, str, &value);
+		//p_arg(&i, str, &value);
+		printf("test index: %d\n", i);
+		if (p_redirection(&i, str, &value),
+		 p_command(&i, str, &value),
+		 p_arg(&i, str, &value))
+		{
+			i++;
+		}
+		
     }
     return (value);
 }
-
 
 void parse_commands(char **tokens)
 {

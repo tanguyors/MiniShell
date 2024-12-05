@@ -20,7 +20,7 @@ int main(void)
         head = NULL;
         i = 0;
         input = readline("> ");
-        if (input != NULL)       // Permet d'avoir un historique
+        if (input != NULL)       // Permet d'avoir un historique cmd
             add_history(input);
         else if (input == NULL)  // Permet d'exit le shell (ctrl + D)
             exit(EXIT_SUCCESS);

@@ -50,7 +50,7 @@ typedef struct s_builtin
 char **parse_tokens(char *input);
 struct s_shell *parsing(char *str, struct s_shell *value);
 void parse_commands(char **tokens);
-void p_command(int *i, char *str, struct s_shell **value);
+int p_command(int *i, char *str, struct s_shell **value);
 /*-- Linked_list --*/
 void print_list(struct s_shell *current);
 struct s_shell	*create_node(char *data);
