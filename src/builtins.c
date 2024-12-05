@@ -1,7 +1,7 @@
 
 //Implementations des commandes interne
 #include "../include/minishell.h"
-
+//------------------------------------------------------------------------------------------ECHO----------------------------------------------------------------
 /**
  * ft_echo - Implémente le built-in echo.
  * @argv: Tableau d'arguments, argv[0] = "echo".
@@ -38,7 +38,7 @@ int ft_echo(char **argv)
     }
     return (0);
 }
-
+ //--------------------------------------------------------------------------------------PWD------------------------------------------------------------------------
 int ft_pwd(void) 
 {
     char cwd[1024]; // Buffer pour stocker le chemin
@@ -55,11 +55,10 @@ int ft_pwd(void)
     }
 }
 
-//_______________________________________________________________________________________________________________________________//
-                        // GESTION VARIABLE ENVIRONNEMENT//
 
 extern char **environ; // Déclare la variable globale environ qui se trouve dans le systeme 
 
+//-----------------------------------------------------------------------------------ENV---------------------------------------------------------------------------------
 /**
  * ft_env - Affiche toutes les variables d'environnement.
  * @argv: Les arguments passés à la commande (argv[0] = "env").
@@ -85,6 +84,7 @@ int ft_env(char **argv)
     return (0);
 }
 
+//-----------------------------------------------------------------------------------EXPORT------------------------------------------------------------------------------------------
 /**
  * ft_export - Implémente la commande export.
  * @argv: Les arguments passés à la commande (argv[0] = "export").
@@ -173,6 +173,8 @@ int	ft_export(char **argv)
 	}
 	return (0); // Fin de la commande avec succès
 }
+
+//--------------------------------------------------------------------------------------------------------------------------UNSET---------------------------------------------------------------------------------------------
 // Version definitive a revoir pour mettre a la norme !!!!!
 int	ft_unset(char **argv)
 {
@@ -217,7 +219,7 @@ int	ft_unset(char **argv)
 	return (0);
 }
 
-
+//-------------------------------------------------------------------------------------------------------------------------------------------CD---------------------------------------------------------------------------------------------------------------
 static char *construct_path(const char *base, const char *input)
 {
     char *full_path;
@@ -249,11 +251,6 @@ static void update_pwd(void)
     }
 }
 
-typedef struct s_dir_stack
-{
-    char                *dir; // Répertoire sauvegardé
-    struct s_dir_stack  *next;
-}   t_dir_stack;
 
 
 static t_dir_stack *g_dir_stack = NULL; // Pile globale

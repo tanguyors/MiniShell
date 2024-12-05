@@ -32,6 +32,12 @@ struct s_shell
     char *data;
 };
 
+typedef struct s_dir_stack
+{
+    char                *dir; // Répertoire sauvegardé
+    struct s_dir_stack  *next;
+}   t_dir_stack;
+
 
 /*-- Parsing --*/
 char **parse_tokens(char *input);
