@@ -2,7 +2,7 @@
 
 int is_spec_char(int c) 
 {
-    if (c == '|' || c == '-')
+    if (c == '|' || c == '-' || is_redirect(c))
 		return (1);
 	return (0);
 }

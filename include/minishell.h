@@ -55,6 +55,8 @@ int p_command(int *i, char *str, struct s_shell **value);
 void print_list(struct s_shell *current);
 struct s_shell	*create_node(char *data);
 void insert_head(struct s_shell **head, char *new_data);
+void insert_tail(struct s_shell **head, char *new_data);
+struct s_shell *get_last_node(struct s_shell *head);
 /*-- Utils --*/
 void free_array(char **array);
 void free_list(struct s_shell *head);
