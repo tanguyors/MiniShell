@@ -37,7 +37,7 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head)
 		(*i)++;
 	if (str[(*i)] && is_alnum(str[(*i)]))
 	{
-		insert_tail(head, NULL);
+		insert_tail(head, NULL, "TOKEN_FILE");
 		tail = get_last_node(*head);
 		tail->token = TOKEN_FILE;
 		j = 0;
@@ -60,7 +60,7 @@ static void p_redirection(int *i, char *str, struct s_shell **head)
 	if (is_redirect(str[(*i)])) 
 	{
 		printf("redirection:\n");
-		insert_tail(head, NULL);
+		insert_tail(head, NULL, "TOKEN_RED");
 		tail = get_last_node(*head);
 		tail->token = TOKEN_RED;
 		tail->data[0] = str[(*i)++];
@@ -81,7 +81,7 @@ static int p_pipe(int *i, char *str, struct s_shell **head)
 	if (str[(*i)] == '|')
 	{
 		printf("pipe:\n");
-		insert_tail(head, NULL);
+		insert_tail(head, NULL, NULL);
 		tail = get_last_node(*head);
 		tail->token = TOKEN_PIPE;
 		tail->data[0] = '|';
@@ -103,7 +103,7 @@ int p_command(int *i, char *str, struct s_shell **head)
 	if (str[(*i)] && !is_spec_char(str[(*i)]))
 	{
 		printf("command:\n");
-		insert_tail(head, NULL);
+		insert_tail(head, NULL, NULL);
 		tail = get_last_node(*head);
 		tail->token = TOKEN_CMD;
 		while (is_space(str[(*i)]))
@@ -133,7 +133,7 @@ static int p_arg(int *i, char *str, struct s_shell **head)
 	if (str[(*i)] && str[(*i)] == '-')
 	{
 		printf("arg:\n");
-		insert_tail(head, NULL);
+		insert_tail(head, NULL, NULL);
 		tail = get_last_node(*head);
 		tail->token = TOKEN_ARG;
 		j = 0;
@@ -148,6 +148,32 @@ static int p_arg(int *i, char *str, struct s_shell **head)
 		tail->data[j] = '\0';
 	}
 	return (1);
+}
+
+static void p_quotes(int *i, char *str, struct s_shell **head)
+{
+	struct s_shell *tail;
+	int j;
+
+	j = 0;
+	insert_tail(head, NULL, "TOKEN_QUOTES");
+	tail = get_last_node(*head);
+	if (str[(*i)++] == '~')
+	{
+		tail->token = TOKEN_SIMPLE_QUOTE;
+		while (str[(*i)++] != '~')
+		{
+			tail->data[j++] = str[(*i)];
+		}
+	}
+	else if (str[(*i)++] != '"')
+	{
+		tail->token = TOKEN_DOUBLE_QUOTE;
+		while (str[(*i)++] != '"')
+		{
+			tail->data[j++] = str[(*i)];
+		}
+	}
 }
 
 struct s_shell *parsing(char *str, struct s_shell *head) 
@@ -167,6 +193,8 @@ struct s_shell *parsing(char *str, struct s_shell *head)
             p_arg(&i, str, &head);
 		else if (str[i] == '|')
             p_pipe(&i, str, &head);
+		else if (str[i] == '~' || str[i] == '"')
+            p_quotes(&i, str, &head);
         else
             i++;
     }

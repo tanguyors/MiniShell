@@ -8,11 +8,14 @@
 # include <fcntl.h>   // open, O_CREAT, O_RDONLY
 # include <errno.h>   // Gestion des erreurs (errno)
 # include <sys/wait.h> // wait, waitpid
+# include <limits.h>
 # include <signal.h>
 # include "libft/libft.h"
 # include <stdio.h>
 # include <readline/readline.h>
 # include <readline/history.h>
+# define ARG_MAX 2097152 // Arg max de la plupart des systèmes linux // getconf ARG_MAX
+# define NAME_MAX 255 // Name max d'un nom de fichier // getconf NAME_MAX /
 
 enum e_tokens
 {
@@ -21,7 +24,9 @@ enum e_tokens
     TOKEN_ARG,
     TOKEN_RED,
 	TOKEN_PIPE,
-    TOKEN_FILE
+    TOKEN_FILE,
+	TOKEN_SIMPLE_QUOTE,
+	TOKEN_DOUBLE_QUOTE
 };
 
 struct s_shell
@@ -54,9 +59,9 @@ int p_command(int *i, char *str, struct s_shell **value);
 /*-- Linked_list --*/
 void print_list(struct s_shell *current);
 void print_token(struct s_shell *current);
-struct s_shell	*create_node(char *data);
-void insert_head(struct s_shell **head, char *new_data);
-void insert_tail(struct s_shell **head, char *new_data);
+struct s_shell	*create_node(char *data, char *token_type);
+void insert_head(struct s_shell **head, char *new_data, char *token_type);
+void insert_tail(struct s_shell **head, char *new_data, char *token_type);
 struct s_shell *get_last_node(struct s_shell *head);
 /*-- Utils --*/
 void free_array(char **array);

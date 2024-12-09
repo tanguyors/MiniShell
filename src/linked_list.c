@@ -38,19 +38,31 @@ void print_token(struct s_shell *current)
 	ft_printf("NULL\n");
 }
 
-static void data_node(struct s_shell *new_node)
+static void data_node(struct s_shell *new_node, char *token_type)
 {
-	new_node->data = malloc(256 * sizeof(char));
+	int size;
+
+	size = 255;
+	if (token_type)
+	{
+		if (strcmp(token_type, "TOKEN_RED") == 0)
+			size = 3;
+		else if (strcmp(token_type, "TOKEN_FILE") == 0)
+			size = NAME_MAX;
+		else if (strcmp(token_type, "TOKEN_QUOTES") == 0)
+			size = ARG_MAX;
+	}
+	new_node->data = malloc(size * sizeof(char));
 	if (new_node->data == NULL)
 	{
 		write(2, "Error\n", 6);
 		free(new_node);
 		exit(EXIT_FAILURE);
 	}
-	ft_memset(new_node->data, 0, 256);
+	ft_memset(new_node->data, 0, size);
 }
 
-struct s_shell	*create_node(char *data)
+struct s_shell	*create_node(char *data, char *token_type)
 {
 	struct s_shell	*new_node;
 
@@ -73,18 +85,18 @@ struct s_shell	*create_node(char *data)
 		ft_strcpy(new_node->data, data);
 	}
 	else
-		data_node(new_node);
+		data_node(new_node, token_type);
 	new_node->next = NULL;
 	new_node->prev = NULL;
 	return (new_node);
 }
 
 
-void insert_head(struct s_shell **head, char *new_data)
+void insert_head(struct s_shell **head, char *new_data, char *token_type)
 {
 	struct s_shell	*new_node;
 
-	new_node = create_node(new_data);
+	new_node = create_node(new_data, token_type);
 	new_node->next = *head;
 	if (*head != NULL)
 	{
@@ -102,12 +114,12 @@ struct s_shell *get_last_node(struct s_shell *head)
     return (head);
 }
 
-void insert_tail(struct s_shell **head, char *new_data)
+void insert_tail(struct s_shell **head, char *new_data, char *token_type)
 {
     struct s_shell *new_node;
     struct s_shell *last_node;
 
-    new_node = create_node(new_data);
+    new_node = create_node(new_data, token_type);
 	new_node->next = NULL;
     if(*head == NULL)
          *head = new_node;
