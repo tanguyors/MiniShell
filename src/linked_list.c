@@ -1,5 +1,6 @@
 #include "../include/minishell.h"
 
+/* fonction de test */
 void print_list(struct s_shell *current)
 {
 	ft_printf("Liste chainé : ");
@@ -9,6 +10,44 @@ void print_list(struct s_shell *current)
 		current = current->next;
 	}
 	ft_printf("NULL\n");
+}
+
+/* fonction de test */
+static const char *get_token_name(enum e_tokens token) 
+{
+   switch (token) 
+   {
+      case TOKEN_UNDEFINED: return "TOKEN_UNDEFINED";
+      case TOKEN_CMD: return "TOKEN_CMD";
+	  case TOKEN_ARG: return "TOKEN_ARG";
+	  case TOKEN_RED: return "TOKEN_RED";
+	  case TOKEN_PIPE: return "TOKEN_PIPE";
+	  case TOKEN_FILE: return "TOKEN_INFILE";
+   }
+}
+
+/* fonction de test */
+void print_token(struct s_shell *current)
+{
+	ft_printf("Liste token : ");
+	while (current != NULL)
+	{
+		ft_printf("%s -> ", get_token_name(current->token));
+		current = current->next;
+	}
+	ft_printf("NULL\n");
+}
+
+static void data_node(struct s_shell *new_node)
+{
+	new_node->data = malloc(256 * sizeof(char));
+	if (new_node->data == NULL)
+	{
+		write(2, "Error\n", 6);
+		free(new_node);
+		exit(EXIT_FAILURE);
+	}
+	ft_memset(new_node->data, 0, 256);
 }
 
 struct s_shell	*create_node(char *data)
@@ -31,19 +70,10 @@ struct s_shell	*create_node(char *data)
 			free(new_node);
 			exit(EXIT_FAILURE);
 		}
-		strcpy(new_node->data, data);
+		ft_strcpy(new_node->data, data);
 	}
 	else
-	{
-		new_node->data = malloc(256 * sizeof(char));
-		if (new_node->data == NULL)
-		{
-			write(2, "Error\n", 6);
-			free(new_node);
-			exit(EXIT_FAILURE);
-		}
-		ft_memset(new_node->data, 0, 256);
-	}
+		data_node(new_node);
 	new_node->next = NULL;
 	new_node->prev = NULL;
 	return (new_node);
@@ -79,19 +109,15 @@ void insert_tail(struct s_shell **head, char *new_data)
 
     new_node = create_node(new_data);
 	new_node->next = NULL;
-    //if head is NULL, it is an empty list
     if(*head == NULL)
          *head = new_node;
-    //Otherwise, find the last node and add the newNode
     else
     {
         last_node = *head;
-        //last node's next address will be NULL.
         while(last_node->next != NULL)
         {
             last_node = last_node->next;
         }
-        //add the newNode at the end of the linked list
         last_node->next = new_node;
     }
 }

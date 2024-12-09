@@ -28,51 +28,64 @@ char **parse_tokens(char *input)
     return (tokens); // Retourne le tableau de tokens
 }
 
-
-static void p_redirection(int *i, char *str, struct s_shell **value, struct s_shell **head)
+static void r_in_out_file(int *i, char *str, struct s_shell **head)
 {
+	struct s_shell *tail;
 	int j;
+
+	while (is_space(str[(*i)]))
+		(*i)++;
+	if (str[(*i)] && is_alnum(str[(*i)]))
+	{
+		insert_tail(head, NULL);
+		tail = get_last_node(*head);
+		tail->token = TOKEN_FILE;
+		j = 0;
+		while (str[(*i)] != '\0' && !is_space(str[(*i)])) 
+			tail->data[j++] = str[(*i)++];
+		tail->data[j] = '\0';
+		printf("test :%s\n", tail->data);
+	}
+	else
+		perror("syntax error near unexpected token `newline'\n");
+	while (is_space(str[(*i)]))
+		(*i)++;
+}
+
+
+static void p_redirection(int *i, char *str, struct s_shell **head)
+{
+	struct s_shell *tail;
 
 	if (is_redirect(str[(*i)])) 
 	{
 		printf("redirection:\n");
-		insert_tail(value, NULL);
-		(*value)->token = TOKEN_WORD;
-		(*value)->data[0] = str[(*i)++];
-		(*value)->data[1] = '\0';
+		insert_tail(head, NULL);
+		tail = get_last_node(*head);
+		tail->token = TOKEN_RED;
+		tail->data[0] = str[(*i)++];
+		tail->data[1] = '\0';
 		if (is_redirect(str[(*i)])) 
 		{
-			(*value)->data[1] = str[(*i)++];
-			(*value)->data[2] = '\0';
+			tail->data[1] = str[(*i)++];
+			tail->data[2] = '\0';
 		}
-		if (str[++(*i)] && is_alnum(str[(*i)]))
-		{
-			insert_tail(value, NULL);
-			(*value)->token = TOKEN_INFILE;
-			j = 0;
-			while (str[(*i)] != '\0' && !is_space(str[(*i)])) 
-				(*value)->data[j++] = str[(*i)++];
-			(*value)->data[j] = '\0';
-			printf("test :%s\n", (*value)->data);
-		}
-		else
-			perror("syntax error near unexpected token `newline'\n");
-		while (is_space(str[(*i)]))
-			(*i)++;
+		r_in_out_file(i, str, head);
 	}
 }
 
-static int p_pipe(int *i, char *str, struct s_shell **value)
+static int p_pipe(int *i, char *str, struct s_shell **head)
 {
+	struct s_shell *tail;
+
 	if (str[(*i)] == '|')
 	{
-		
 		printf("pipe:\n");
-		insert_tail(value, NULL);
-		(*value) = get_last_node((*value));
-		(*value)->token = TOKEN_PIPE;
-		(*value)->data[0] = '|';
-		(*value)->data[1] = '\0';
+		insert_tail(head, NULL);
+		tail = get_last_node(*head);
+		tail->token = TOKEN_PIPE;
+		tail->data[0] = '|';
+		tail->data[1] = '\0';
 		(*i)++;
 		while (is_space(str[(*i)]))
 			(*i)++;
@@ -80,8 +93,9 @@ static int p_pipe(int *i, char *str, struct s_shell **value)
 	return (1);
 }
 
-int p_command(int *i, char *str, struct s_shell **value)
+int p_command(int *i, char *str, struct s_shell **head)
 {
+	struct s_shell *tail;
 	int j;
 
 	while (is_space(str[(*i)]))
@@ -89,27 +103,28 @@ int p_command(int *i, char *str, struct s_shell **value)
 	if (str[(*i)] && !is_spec_char(str[(*i)]))
 	{
 		printf("command:\n");
-		insert_tail(value, NULL);
-		(*value) = get_last_node((*value));
-		(*value)->token = TOKEN_CMD;
+		insert_tail(head, NULL);
+		tail = get_last_node(*head);
+		tail->token = TOKEN_CMD;
 		while (is_space(str[(*i)]))
 			(*i)++;
 		j = 0;
 		while (str[(*i)] != '\0' && !is_spec_char(str[(*i)]))
 		{
 			if (!is_space(str[(*i)]))
-				(*value)->data[j++] = str[(*i)];
+				tail->data[j++] = str[(*i)];
 			(*i)++;
 		}	
-		(*value)->data[j] = '\0';
+		tail->data[j] = '\0';
         while (is_space(str[(*i)]))
             (*i)++;
 	}
 	return (1);
 }
 
-static int p_arg(int *i, char *str, struct s_shell **value)
+static int p_arg(int *i, char *str, struct s_shell **head)
 {
+	struct s_shell *tail;
 	int j;
 
 	while (is_space(str[(*i)]))
@@ -118,47 +133,44 @@ static int p_arg(int *i, char *str, struct s_shell **value)
 	if (str[(*i)] && str[(*i)] == '-')
 	{
 		printf("arg:\n");
-		insert_tail(value, NULL);
-		(*value) = get_last_node((*value));
-		(*value)->token = TOKEN_ARG;
+		insert_tail(head, NULL);
+		tail = get_last_node(*head);
+		tail->token = TOKEN_ARG;
 		j = 0;
-		(*value)->data[j++] = '-';
+		tail->data[j++] = '-';
 		(*i)++;
 		while (str[(*i)] != '\0' && !is_spec_char(str[(*i)]))
 		{
 			if (!is_space(str[(*i)]))
-				(*value)->data[j++] = str[(*i)];
+				tail->data[j++] = str[(*i)];
 			(*i)++;
 		}	
-		(*value)->data[j] = '\0';
+		tail->data[j] = '\0';
 	}
 	return (1);
 }
 
-struct s_shell *parsing(char *str, struct s_shell *value) 
+struct s_shell *parsing(char *str, struct s_shell *head) 
 {
-	struct s_shell *head;
     int i;
 
     i = 0;
-	head = value;
     while (str[i] != '\0') 
     {
         while (is_space(str[i]))
             i++;
-		printf("test index: %d\n", i);
         if (is_redirect(str[i]))
-            p_redirection(&i, str, &value, &head);
-        /*else if (!is_spec_char(str[i]))
-            p_command(&i, str, &value);
+			p_redirection(&i, str, &head);
+        else if (!is_spec_char(str[i]))
+            p_command(&i, str, &head);
         else if (str[i] == '-')
-            p_arg(&i, str, &value);
+            p_arg(&i, str, &head);
 		else if (str[i] == '|')
-            p_pipe(&i, str, &value);*/
+            p_pipe(&i, str, &head);
         else
             i++;
     }
-    return (value);
+    return (head);
 }
 
 void parse_commands(char **tokens)
