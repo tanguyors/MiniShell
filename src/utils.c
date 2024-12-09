@@ -25,11 +25,14 @@ void free_array(char **array)
 void free_list(struct s_shell *head)
 {
 	struct s_shell	*tmp;
+	int i;
 
 	while (head != NULL)
 	{
 		tmp = head;
 		head = head->next;
+		if (tmp->data != NULL)
+			free(tmp->data);
 		free(tmp);
 	}
 }
