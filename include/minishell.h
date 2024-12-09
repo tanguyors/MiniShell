@@ -16,12 +16,12 @@
 
 enum e_tokens
 {
-    TOKEN_WORD, 
+    TOKEN_UNDEFINED, 
     TOKEN_CMD,
     TOKEN_ARG,
     TOKEN_RED,
 	TOKEN_PIPE,
-    TOKEN_INFILE
+    TOKEN_FILE
 };
 
 struct s_shell
@@ -53,6 +53,7 @@ void parse_commands(char **tokens);
 int p_command(int *i, char *str, struct s_shell **value);
 /*-- Linked_list --*/
 void print_list(struct s_shell *current);
+void print_token(struct s_shell *current);
 struct s_shell	*create_node(char *data);
 void insert_head(struct s_shell **head, char *new_data);
 void insert_tail(struct s_shell **head, char *new_data);
@@ -61,6 +62,7 @@ struct s_shell *get_last_node(struct s_shell *head);
 void free_array(char **array);
 void free_list(struct s_shell *head);
 int ft_strcmp(const char *s1, const char *s2);
+char *ft_strcpy(char *dest, char *src);
 void trim_newline(char *line);
 char *expand_var(char *str);
 char *remove_quotes(char *str);

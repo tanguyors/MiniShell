@@ -42,6 +42,7 @@ int main(void)
         if (head)
         {
             print_list(head);
+			print_token(head);
             free_list(head);
         }
     }

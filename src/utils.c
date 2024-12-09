@@ -34,6 +34,20 @@ void free_list(struct s_shell *head)
 	}
 }
 
+char *ft_strcpy(char *dest, char *src)
+{
+	int i;
+
+	i = 0;
+	while(src[i])
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (dest);
+}
+
 int ft_strcmp(const char *s1, const char *s2) 
 {
     while (*s1 && (*s1 == *s2)) 
