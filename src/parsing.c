@@ -93,6 +93,7 @@ static int p_pipe(int *i, char *str, struct s_shell **head)
 	return (1);
 }
 
+/* implementer un deuxième parsing afin de résoudre TOKEN_CMD -> TOKEN_CMD */
 int p_command(int *i, char *str, struct s_shell **head)
 {
 	struct s_shell *tail;
@@ -100,24 +101,24 @@ int p_command(int *i, char *str, struct s_shell **head)
 
 	while (is_space(str[(*i)]))
 		(*i)++;
-	if (str[(*i)] && !is_spec_char(str[(*i)]))
+	if (str[(*i)] && !is_spec_char(str[(*i)]) && !is_space(str[(*i)]))
 	{
 		printf("command:\n");
 		insert_tail(head, NULL, NULL);
 		tail = get_last_node(*head);
 		tail->token = TOKEN_CMD;
-		while (is_space(str[(*i)]))
-			(*i)++;
+		//while (is_space(str[(*i)]))
+			//(*i)++;
 		j = 0;
-		while (str[(*i)] != '\0' && !is_spec_char(str[(*i)]))
+		while (str[(*i)] != '\0' && !is_space(str[(*i)]))
 		{
 			if (!is_space(str[(*i)]))
 				tail->data[j++] = str[(*i)];
 			(*i)++;
 		}	
 		tail->data[j] = '\0';
-        while (is_space(str[(*i)]))
-            (*i)++;
+        //while (is_space(str[(*i)]))
+            //(*i)++;
 	}
 	return (1);
 }
@@ -158,10 +159,10 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 	j = 0;
 	insert_tail(head, NULL, "TOKEN_QUOTES");
 	tail = get_last_node(*head);
-	if (str[(*i)++] == '~')
+	if (str[(*i)++] == 39)
 	{
 		tail->token = TOKEN_SIMPLE_QUOTE;
-		while (str[(*i)++] != '~')
+		while (str[(*i)++] != 39)
 		{
 			tail->data[j++] = str[(*i)];
 		}
