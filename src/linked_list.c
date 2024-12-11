@@ -23,6 +23,8 @@ static const char *get_token_name(enum e_tokens token)
 	  case TOKEN_RED: return "TOKEN_RED";
 	  case TOKEN_PIPE: return "TOKEN_PIPE";
 	  case TOKEN_FILE: return "TOKEN_INFILE";
+	  case TOKEN_SIMPLE_QUOTE: return "TOKEN_SIMPLE_QUOTE";
+	  case TOKEN_DOUBLE_QUOTE: return "TOKEN_DOUBLE_QUOTE";
 	  default: return (NULL);
    }
 }

@@ -159,22 +159,51 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 	j = 0;
 	insert_tail(head, NULL, "TOKEN_QUOTES");
 	tail = get_last_node(*head);
-	if (str[(*i)++] == 39)
+	tail->token = TOKEN_CMD;
+	if (tail->token)
+		printf("tail exist, token: %d\n", tail->token);
+	if (str[(*i)] == 39)
 	{
+		(*i)++;
+		printf("simple quote: \n");
 		tail->token = TOKEN_SIMPLE_QUOTE;
-		while (str[(*i)++] != 39)
+		while (str[(*i)] && str[(*i)] != 39)
 		{
 			tail->data[j++] = str[(*i)];
+			(*i)++;
 		}
 	}
-	else if (str[(*i)++] != '"')
+	else if (str[(*i)] == '"')
 	{
+		(*i)++;
 		tail->token = TOKEN_DOUBLE_QUOTE;
-		while (str[(*i)++] != '"')
+		while (str[(*i)] && str[(*i)] != '"')
 		{
 			tail->data[j++] = str[(*i)];
+			(*i)++;
 		}
 	}
+	tail->data[j] = '\0';
+	(*i)++;
+}
+
+struct s_shell *p_reparsing(struct s_shell *head)
+{
+	struct s_shell *current;
+
+	current = head;
+	while (current)
+	{
+		if (current && current->next)
+		{
+			if (current->token == TOKEN_CMD && current->next->token == TOKEN_CMD)
+			{
+				current->next->token = TOKEN_ARG;
+			}
+		}
+		current = current->next;
+	}
+	return (head);
 }
 
 struct s_shell *parsing(char *str, struct s_shell *head) 
@@ -192,13 +221,14 @@ struct s_shell *parsing(char *str, struct s_shell *head)
             p_command(&i, str, &head);
         else if (str[i] == '-')
             p_arg(&i, str, &head);
+		else if (str[i] == 39 || str[i] == '"')
+            p_quotes(&i, str, &head);
 		else if (str[i] == '|')
             p_pipe(&i, str, &head);
-		else if (str[i] == '~' || str[i] == '"')
-            p_quotes(&i, str, &head);
         else
             i++;
     }
+	head = p_reparsing(head);
     return (head);
 }
 
