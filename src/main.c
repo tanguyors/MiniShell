@@ -10,6 +10,7 @@ int main(void)
     
     sa.sa_sigaction = &handle_signal;
 	sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_SIGINFO;
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGQUIT, &sa, NULL);
     while (1)
@@ -45,6 +46,7 @@ int main(void)
 			print_token(head);
             free_list(head);
         }
+        exit(EXIT_SUCCESS);
     }
     return (0);
 }
