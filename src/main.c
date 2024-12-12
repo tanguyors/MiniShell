@@ -46,6 +46,7 @@ int main(void)
 			print_token(head);
             free_list(head);
         }
+        free(input);
     }
     return (0);
 }
