@@ -167,8 +167,10 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 		(*i)++;
 		printf("simple quote: \n");
 		tail->token = TOKEN_SIMPLE_QUOTE;
-		while (str[(*i)] && str[(*i)] != 39)
+		while (str[(*i)])
 		{
+			while(str[(*i)] == 39)
+				(*i)++;
 			tail->data[j++] = str[(*i)];
 			(*i)++;
 		}
@@ -177,8 +179,11 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 	{
 		(*i)++;
 		tail->token = TOKEN_DOUBLE_QUOTE;
-		while (str[(*i)] && str[(*i)] != '"')
+		while (str[(*i)] && (str[(*i)] != '"' || str[(*i) + 1] != '\0'))
 		{
+			while(str[(*i)] == '"')
+				(*i)++;
+			
 			tail->data[j++] = str[(*i)];
 			(*i)++;
 		}
