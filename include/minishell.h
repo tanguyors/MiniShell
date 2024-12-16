@@ -72,6 +72,8 @@ void trim_newline(char *line);
 char *expand_var(char *str);
 char *remove_quotes(char *str);
 char *ft_strndup(const char *s, size_t n);
+void update_pwd(void);
+
 /*-- Is_Utils --*/
 int is_spec_char(int c);
 int is_alpha(int c);
@@ -86,7 +88,6 @@ int	ft_export(char **argv);
 int	is_valid_identifier(const char *str);
 int ft_unset(char **argv);
 int ft_cd(char **argv);
-static void update_pwd(void);
 static char *construct_path(const char *base, const char *input);
 void push_dir(const char *dir);
 char *pop_dir(void);

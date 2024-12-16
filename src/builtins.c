@@ -9,33 +9,27 @@
  * Retourne 0 en cas de succès.
  */
 
-int ft_echo(char **argv) 
+int ft_echo(char **argv)
 {
-    int i;
-    int newline;
+    int i = 1;
+    int newline = 1;
 
-    i = 1; // Commence à analyser après "echo"
-    newline = 1; // Par défaut, ajoute un saut de ligne
-    // Vérifie si l'option "-n" est présente
-    if (argv[i] && ft_strcmp(argv[i], "-n") == 0) 
+    // Gestion des multiples "-n"
+    while (argv[i] && ft_strcmp(argv[i], "-n") == 0)
     {
-        newline = 0; // Désactive le saut de ligne
+        newline = 0;
         i++;
     }
-    // Affiche les arguments restants
-    while (argv[i]) 
+    // Affichage des arguments
+    while (argv[i])
     {
-        ft_putstr_fd(argv[i], 1); // Utilise la libft pour écrire la chaîne
-        if (argv[i + 1]) 
-        {
-            ft_putchar_fd(' ', 1); // Ajoute un espace entre les arguments
-        }
+        ft_putstr_fd(argv[i], 1);
+        if (argv[i + 1])
+            ft_putchar_fd(' ', 1);
         i++;
     }
-    if (newline) 
-    {
-        ft_putchar_fd('\n', 1); // Ajoute un saut de ligne si nécessaire
-    }
+    if (newline)
+        ft_putchar_fd('\n', 1);
     return (0);
 }
  //--------------------------------------------------------------------------------------PWD------------------------------------------------------------------------
@@ -237,22 +231,6 @@ static char *construct_path(const char *base, const char *input)
     return (full_path);
 }
 
-/**
- * update_pwd - Met à jour les variables d'environnement PWD et OLDPWD.
- */
-static void update_pwd(void)
-{
-    char cwd[1024];
-
-    if (getcwd(cwd, sizeof(cwd)))
-    {
-        setenv("OLDPWD", getenv("PWD"), 1); // Met à jour OLDPWD avec l'ancien PWD
-        setenv("PWD", cwd, 1);              // Met à jour PWD avec le chemin actuel
-    }
-}
-
-
-
 static t_dir_stack *g_dir_stack = NULL; // Pile globale
 
 void push_dir(const char *dir)
@@ -292,22 +270,23 @@ int ft_cd(char **argv)
     char cwd[1024];
     char *path;
     char *previous_dir;
-    // Récupère le répertoire courant
-    if (!getcwd(cwd, sizeof(cwd)))
+
+    if (!getcwd(cwd, sizeof(cwd))) // Récupère le répertoire courant
     {
         perror("cd");
         return (1);
     }
-    if (!argv[1]) // Aucun argument : aller dans $HOME
+
+    if (!argv[1] || ft_strcmp(argv[1], "~") == 0) // "cd" ou "cd ~"
     {
         path = getenv("HOME");
-        if (!path || *path == '\0')
+        if (!path || !*path)
         {
             ft_printf("cd: HOME not set\n");
             return (1);
         }
     }
-    else if (ft_strcmp(argv[1], "-") == 0) // "cd -" : revenir au dernier répertoire
+    else if (ft_strcmp(argv[1], "-") == 0) // "cd -"
     {
         previous_dir = pop_dir();
         if (!previous_dir)
@@ -319,34 +298,15 @@ int ft_cd(char **argv)
         path = previous_dir;
     }
     else
-    {
-        path = argv[1]; // Chemin spécifié par l'utilisateur
-    }
+        path = argv[1]; // Sinon, utilise le chemin donné
 
-    // Vérifie si le chemin existe
-    if (access(path, F_OK) == -1)
+    if (chdir(path) == -1)
     {
         ft_printf("cd: %s: No such file or directory\n", path);
         return (1);
     }
-    if (access(path, X_OK) == -1)
-    {
-        ft_printf("cd: %s: Permission denied\n", path);
-        return (1);
-    }
-    // Ajoute le répertoire courant à la pile
-    push_dir(cwd);
-    // Change le répertoire
-    if (chdir(path) == -1)
-    {
-        perror("cd");
-        return (1);
-    }
-    // Met à jour PWD après changement
-    if (getcwd(cwd, sizeof(cwd)))
-        setenv("PWD", cwd, 1);
-
+    push_dir(cwd);    // Sauvegarde l'ancien répertoire
+    update_pwd();     // Met à jour PWD et OLDPWD
     return (0);
 }
-
 

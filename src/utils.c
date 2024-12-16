@@ -77,3 +77,14 @@ void trim_newline(char *line)
         line[len - 1] = '\0';
     }
 }
+
+void update_pwd(void)
+{
+    char cwd[1024];
+
+    if (getcwd(cwd, sizeof(cwd)))
+    {
+        setenv("OLDPWD", getenv("PWD"), 1); // Met à jour OLDPWD avec l'ancien PWD
+        setenv("PWD", cwd, 1);              // Met à jour PWD avec le chemin actuel
+    }
+}
