@@ -41,6 +41,9 @@ void print_token(struct s_shell *current)
 	ft_printf("NULL\n");
 }
 
+/* Fonction complémentaire de create_node 
+	permet de set la size ainsi que d'initialiser data, 
+	si necessaire*/
 static void data_node(struct s_shell *new_node, char *token_type)
 {
 	int size;
@@ -94,7 +97,9 @@ struct s_shell	*create_node(char *data, char *token_type)
 	return (new_node);
 }
 
-
+/* Insert un noeud au début de la liste donnée
+	le token_type peut être précisé afin d'optimisé la taille de size 
+	si token_type == NULL alors data n'est pas initialisé */
 void insert_head(struct s_shell **head, char *new_data, char *token_type)
 {
 	struct s_shell	*new_node;
@@ -108,6 +113,7 @@ void insert_head(struct s_shell **head, char *new_data, char *token_type)
 	*head = new_node;
 }
 
+/* Retourne le dernier noeud de la liste donnée */
 struct s_shell *get_last_node(struct s_shell *head)
 {
     if (head == NULL)
@@ -117,6 +123,9 @@ struct s_shell *get_last_node(struct s_shell *head)
     return (head);
 }
 
+/* Insert un noeud a la fin de la liste donnée
+	le token_type peut être précisé afin d'optimisé la taille de size 
+	si token_type == NULL alors data n'est pas initialisé */
 void insert_tail(struct s_shell **head, char *new_data, char *token_type)
 {
     struct s_shell *new_node;
