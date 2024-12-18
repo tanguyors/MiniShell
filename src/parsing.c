@@ -28,6 +28,8 @@ char **parse_tokens(char *input)
     return (tokens); // Retourne le tableau de tokens
 }
 
+/* Fonction complémentaire de p_redirection elle permet de traiter
+	les fichier in file et out file et de les tokenizer */
 static void r_in_out_file(int *i, char *str, struct s_shell **head)
 {
 	struct s_shell *tail;
@@ -52,7 +54,8 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head)
 		(*i)++;
 }
 
-
+/* Fonction permettant de tokenizer les redirections
+	celles ci pouvant être n'importe ou dans la string */
 static void p_redirection(int *i, char *str, struct s_shell **head)
 {
 	struct s_shell *tail;
@@ -74,6 +77,7 @@ static void p_redirection(int *i, char *str, struct s_shell **head)
 	}
 }
 
+/* Fonction permettant de tokenizer les pipes */
 static int p_pipe(int *i, char *str, struct s_shell **head)
 {
 	struct s_shell *tail;
@@ -92,8 +96,7 @@ static int p_pipe(int *i, char *str, struct s_shell **head)
 	}
 	return (1);
 }
-
-/* implementer un deuxième parsing afin de résoudre TOKEN_CMD -> TOKEN_CMD */
+/* Fonction permettant de tokenizer les commandes */
 int p_command(int *i, char *str, struct s_shell **head)
 {
 	struct s_shell *tail;
@@ -123,6 +126,7 @@ int p_command(int *i, char *str, struct s_shell **head)
 	return (1);
 }
 
+/* Fonction permettant de tokenizer les arguments de commandes */
 static int p_arg(int *i, char *str, struct s_shell **head)
 {
 	struct s_shell *tail;
@@ -151,6 +155,31 @@ static int p_arg(int *i, char *str, struct s_shell **head)
 	return (1);
 }
 
+/* Fonction complémentaire a p_quotes, permet de vérifier s'il y a des double quotes
+	et tokenize en conséquence */
+static void p_double_quotes(int *i, char *str, struct s_shell *tail)
+{
+	int j;
+
+	j = 0;
+	if (str[(*i)] == '"')
+	{
+		(*i)++;
+		tail->token = TOKEN_DOUBLE_QUOTE;
+		while (str[(*i)] && (str[(*i)] != '"' || str[(*i) + 1] != '\0'))
+		{
+			while(str[(*i)] == '"')
+				(*i)++;
+			
+			tail->data[j++] = str[(*i)];
+			(*i)++;
+		}
+	}
+	tail->data[j] = '\0';
+	(*i)++;
+}
+
+/* Fonction de vérification et tokenization des quotes */
 static void p_quotes(int *i, char *str, struct s_shell **head)
 {
 	struct s_shell *tail;
@@ -175,23 +204,10 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 			(*i)++;
 		}
 	}
-	else if (str[(*i)] == '"')
-	{
-		(*i)++;
-		tail->token = TOKEN_DOUBLE_QUOTE;
-		while (str[(*i)] && (str[(*i)] != '"' || str[(*i) + 1] != '\0'))
-		{
-			while(str[(*i)] == '"')
-				(*i)++;
-			
-			tail->data[j++] = str[(*i)];
-			(*i)++;
-		}
-	}
-	tail->data[j] = '\0';
-	(*i)++;
+	p_double_quotes(i, str, tail);
 }
 
+/* Second parsing afin d'éviter la succession de 2 commandes */
 struct s_shell *p_reparsing(struct s_shell *head)
 {
 	struct s_shell *current;
@@ -211,6 +227,8 @@ struct s_shell *p_reparsing(struct s_shell *head)
 	return (head);
 }
 
+/* Parsing principale permettant de parcourir l'entièreté de la string
+	et y crée une liste chainé avec les différentes valeurs et tokens */
 struct s_shell *parsing(char *str, struct s_shell *head) 
 {
     int i;
