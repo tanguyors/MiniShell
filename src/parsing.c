@@ -207,8 +207,9 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 	p_double_quotes(i, str, tail);
 }
 
-/* Second parsing afin d'éviter la succession de 2 commandes */
-struct s_shell *p_reparsing(struct s_shell *head)
+/* Second parsing corrige la succession de 2 commandes,
+	succession d'une prochaine commande sans pipe  */
+struct s_shell *p_post_parsing(struct s_shell *head)
 {
 	struct s_shell *current;
 
@@ -218,12 +219,28 @@ struct s_shell *p_reparsing(struct s_shell *head)
 		if (current && current->next)
 		{
 			if (current->token == TOKEN_CMD && current->next->token == TOKEN_CMD)
-			{
 				current->next->token = TOKEN_ARG;
-			}
+			if (current->token != TOKEN_PIPE && current->next->token == TOKEN_CMD)
+				current->next->token = TOKEN_ARG;
 		}
 		current = current->next;
 	}
+	return (head);
+}
+
+struct s_shell *pre_parsing(char *str, struct s_shell *head) 
+{
+	int i;
+
+    i = 0;
+ 	while (str[i] != '\0') 
+    {
+        while (is_space(str[i]))
+            i++;
+        if (is_redirect(str[i]))
+			p_redirection(&i, str, &head);
+        i++;
+    }
 	return (head);
 }
 
@@ -234,13 +251,14 @@ struct s_shell *parsing(char *str, struct s_shell *head)
     int i;
 
     i = 0;
+	//head = pre_parsing(str, head);
     while (str[i] != '\0') 
     {
         while (is_space(str[i]))
             i++;
         if (is_redirect(str[i]))
 			p_redirection(&i, str, &head);
-        else if (!is_spec_char(str[i]))
+        if (!is_spec_char(str[i]))
             p_command(&i, str, &head);
         else if (str[i] == '-')
             p_arg(&i, str, &head);
@@ -251,7 +269,7 @@ struct s_shell *parsing(char *str, struct s_shell *head)
         else
             i++;
     }
-	head = p_reparsing(head);
+	head = p_post_parsing(head);
     return (head);
 }
 
