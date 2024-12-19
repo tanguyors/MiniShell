@@ -54,6 +54,21 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head)
 		(*i)++;
 }
 
+/* Fonction permettant de déterminer le type de redirection */
+enum e_tokens which_red(int *i, char *str)
+{
+	printf("token : %c\n", str[(*i)]);
+    if (str[(*i)] == '<' && str[(*i) + 1] == '<') 
+        return (REDIR_HEREDOC);
+    else if (str[(*i)] == '>' && str[(*i) + 1] == '>') 
+        return (REDIR_APPEND);
+    else if (str[(*i)] == '<') 
+        return (REDIR_INPUT);
+    else if (str[(*i)] == '>') 
+        return (REDIR_OUTPUT);
+    return (TOKEN_RED);
+}
+
 /* Fonction permettant de tokenizer les redirections
 	celles ci pouvant être n'importe ou dans la string */
 static void p_redirection(int *i, char *str, struct s_shell **head)
@@ -65,7 +80,7 @@ static void p_redirection(int *i, char *str, struct s_shell **head)
 		printf("redirection:\n");
 		insert_tail(head, NULL, "TOKEN_RED");
 		tail = get_last_node(*head);
-		tail->token = TOKEN_RED;
+		tail->token = which_red(i, str);
 		tail->data[0] = str[(*i)++];
 		tail->data[1] = '\0';
 		if (is_redirect(str[(*i)])) 
