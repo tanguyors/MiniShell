@@ -21,6 +21,10 @@ static const char *get_token_name(enum e_tokens token)
       case TOKEN_CMD: return "TOKEN_CMD";
 	  case TOKEN_ARG: return "TOKEN_ARG";
 	  case TOKEN_RED: return "TOKEN_RED";
+	  case REDIR_INPUT: return "REDIR_INPUT";
+	  case REDIR_OUTPUT: return "REDIR_OUTPUT";
+	  case REDIR_APPEND: return "REDIR_APPEND";
+	  case REDIR_HEREDOC: return "REDIR_HEREDOC";
 	  case TOKEN_PIPE: return "TOKEN_PIPE";
 	  case TOKEN_FILE: return "TOKEN_FILE";
 	  case TOKEN_SIMPLE_QUOTE: return "TOKEN_SIMPLE_QUOTE";
