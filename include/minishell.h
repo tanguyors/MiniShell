@@ -16,6 +16,8 @@
 # include <readline/history.h>
 # define ARG_MAX 2097152 // Arg max de la plupart des systèmes linux // getconf ARG_MAX
 # define NAME_MAX 255 // Name max d'un nom de fichier // getconf NAME_MAX /
+# define B_BLUE "\033[1;36m"
+# define RESET "\033[0m"
 
 enum e_tokens
 {
