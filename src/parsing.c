@@ -115,7 +115,7 @@ static int p_pipe(int *i, char *str, struct s_shell **head)
 	return (1);
 }
 /* Fonction permettant de tokenizer les commandes */
-int p_command(int *i, char *str, struct s_shell **head)
+int p_command(int *i, char *str, struct s_shell **head, int *stop_flag)
 {
 	struct s_shell *tail;
 	int j;
@@ -274,6 +274,15 @@ struct s_shell *pre_parsing(char *str, struct s_shell *head, int *stop_flag)
 	return (head);
 }
 
+void directory_parsing(int *i, char *str, int *stop_flag)
+{
+	if (str[(*i)] == '/')
+	{
+		printf("bash: %s: Is a directory\n", str);
+		*stop_flag = 1;
+	}
+}
+
 /* Parsing principale permettant de parcourir l'entièreté de la string
 	et y crée une liste chainé avec les différentes valeurs et tokens */
 struct s_shell *parsing(char *str, struct s_shell *head) 
@@ -284,6 +293,7 @@ struct s_shell *parsing(char *str, struct s_shell *head)
     i = 0;
 	stop_flag = 0;
 	//head = pre_parsing(str, head);
+	directory_parsing(&i, str, &stop_flag);
     while (str[i] != '\0' && !stop_flag) 
     {
         while (is_space(str[i]))
@@ -291,7 +301,7 @@ struct s_shell *parsing(char *str, struct s_shell *head)
         if (is_redirect(str[i]))
 			p_redirection(&i, str, &head, &stop_flag);
         if (!is_spec_char(str[i]))
-            p_command(&i, str, &head);
+            p_command(&i, str, &head, &stop_flag);
         else if (str[i] == '-')
             p_arg(&i, str, &head);
 		else if (str[i] == 39 || str[i] == '"')
