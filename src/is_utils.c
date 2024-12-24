@@ -7,6 +7,13 @@ int is_spec_char(int c)
 	return (0);
 }
 
+int is_ignored_char(int c) 
+{
+    if (c == '/' || c == '\\' || c == '!' || c == ':' || c == '.')
+		return (1);
+	return (0);
+}
+
 int is_alpha(int c)
 {
     if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122))
