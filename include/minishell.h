@@ -61,7 +61,7 @@ typedef struct s_builtin
 char **parse_tokens(char *input);
 struct s_shell *parsing(char *str, struct s_shell *value);
 void parse_commands(char **tokens);
-int p_command(int *i, char *str, struct s_shell **value);
+int p_command(int *i, char *str, struct s_shell **value, int *stop_flag);
 /*-- Linked_list --*/
 void print_list(struct s_shell *current);
 void print_token(struct s_shell *current);
@@ -82,6 +82,7 @@ void update_pwd(void);
 
 /*-- Is_Utils --*/
 int is_spec_char(int c);
+int is_ignored_char(int c);
 int is_alpha(int c);
 int is_redirect(int c);
 int is_alnum(int c);
