@@ -30,7 +30,7 @@ char **parse_tokens(char *input)
 
 /* Fonction complémentaire de p_redirection elle permet de traiter
 	les fichier in file et out file et de les tokenizer */
-static void r_in_out_file(int *i, char *str, struct s_shell **head)
+static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_flag)
 {
 	struct s_shell *tail;
 	int j;
@@ -49,7 +49,10 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head)
 		printf("test :%s\n", tail->data);
 	}
 	else
+	{
 		perror("syntax error near unexpected token `newline'\n");
+		*stop_flag = 1;
+	}
 	while (is_space(str[(*i)]))
 		(*i)++;
 }
@@ -71,7 +74,7 @@ enum e_tokens which_red(int *i, char *str)
 
 /* Fonction permettant de tokenizer les redirections
 	celles ci pouvant être n'importe ou dans la string */
-static void p_redirection(int *i, char *str, struct s_shell **head)
+static void p_redirection(int *i, char *str, struct s_shell **head, int *stop_flag)
 {
 	struct s_shell *tail;
 
@@ -88,7 +91,7 @@ static void p_redirection(int *i, char *str, struct s_shell **head)
 			tail->data[1] = str[(*i)++];
 			tail->data[2] = '\0';
 		}
-		r_in_out_file(i, str, head);
+		r_in_out_file(i, str, head, stop_flag);
 	}
 }
 
@@ -237,13 +240,25 @@ struct s_shell *p_post_parsing(struct s_shell *head)
 				current->next->token = TOKEN_ARG;
 			if (current->token != TOKEN_PIPE && current->next->token == TOKEN_CMD)
 				current->next->token = TOKEN_ARG;
+			if (current->token == TOKEN_PIPE && current->next->token == TOKEN_PIPE 
+			|| current->token == TOKEN_PIPE && current->next->token != TOKEN_CMD
+			|| current->token == TOKEN_PIPE && !current->prev)
+			{
+				perror("bash: syntax error near unexpected token `|'");
+				break;
+			}
+		}
+		if (current->token == TOKEN_PIPE && !current->next)
+		{
+			perror("bash: syntax error near unexpected token `|'");
+			break;
 		}
 		current = current->next;
 	}
 	return (head);
 }
 
-struct s_shell *pre_parsing(char *str, struct s_shell *head) 
+struct s_shell *pre_parsing(char *str, struct s_shell *head, int *stop_flag) 
 {
 	int i;
 
@@ -253,7 +268,7 @@ struct s_shell *pre_parsing(char *str, struct s_shell *head)
         while (is_space(str[i]))
             i++;
         if (is_redirect(str[i]))
-			p_redirection(&i, str, &head);
+			p_redirection(&i, str, &head, stop_flag);
         i++;
     }
 	return (head);
@@ -264,15 +279,17 @@ struct s_shell *pre_parsing(char *str, struct s_shell *head)
 struct s_shell *parsing(char *str, struct s_shell *head) 
 {
     int i;
+	int stop_flag;
 
     i = 0;
+	stop_flag = 0;
 	//head = pre_parsing(str, head);
-    while (str[i] != '\0') 
+    while (str[i] != '\0' && !stop_flag) 
     {
         while (is_space(str[i]))
             i++;
         if (is_redirect(str[i]))
-			p_redirection(&i, str, &head);
+			p_redirection(&i, str, &head, &stop_flag);
         if (!is_spec_char(str[i]))
             p_command(&i, str, &head);
         else if (str[i] == '-')
