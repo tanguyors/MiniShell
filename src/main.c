@@ -26,13 +26,13 @@ int main(void)
     sa.sa_flags = SA_SIGINFO;
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGQUIT, &sa, NULL);
+    ascii_art();
     while (1)
     {
         int i;
         char *input;
         head = NULL;
         i = 0;
-        ascii_art();
         input = readline("minishell> ");
         if (input != NULL)       // Permet d'avoir un historique cmd
             add_history(input);
