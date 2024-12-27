@@ -9,9 +9,11 @@
  * Retourne 0 en cas de succès.
  */
 
+/* Passage de l'index i a 0 car data[0] correspond au premier argument,
+	alors qu'avant token[0] correspondait au type de commande */
 int ft_echo(char **argv)
 {
-    int i = 1;
+    int i = 0;
     int newline = 1;
 
     // Gestion des multiples "-n"
@@ -33,8 +35,9 @@ int ft_echo(char **argv)
     return (0);
 }
  //--------------------------------------------------------------------------------------PWD------------------------------------------------------------------------
-int ft_pwd(void) 
+int ft_pwd(char **argv)
 {
+	(void)argv;
     char cwd[1024]; // Buffer pour stocker le chemin
 
     if (getcwd(cwd, sizeof(cwd)) != NULL) 
