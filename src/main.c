@@ -53,6 +53,7 @@ int main(void)
         	//insert_head(&head, tokens[i], NULL);
         //parse_commands(tokens);
         head = parsing(input, head);
+		parse_execution(head);
         if (head)
         {
             print_list(head);
