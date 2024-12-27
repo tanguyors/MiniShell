@@ -79,7 +79,6 @@ char *expand_var(char *str);
 char *remove_quotes(char *str);
 char *ft_strndup(const char *s, size_t n);
 void update_pwd(void);
-
 /*-- Is_Utils --*/
 int is_spec_char(int c);
 int is_ignored_char(int c);
@@ -87,9 +86,12 @@ int is_alpha(int c);
 int is_redirect(int c);
 int is_alnum(int c);
 int is_space(int c);
+int is_token_red(enum e_tokens token);
+/*-- Executions --*/
+void parse_execution(struct s_shell *head);
 /*-- Built-in --*/
 int ft_echo(char **argv);
-int ft_pwd(void);
+int ft_pwd(char **argv);
 int ft_env(char **argv);
 int	ft_export(char **argv);
 int	is_valid_identifier(const char *str);
