@@ -3,7 +3,7 @@
 #include "../include/minishell.h"
 
 /* Remise a la norme de l'initialisation de ta structure t_builtin */
-static void initialize_builtin(t_builtin *builtin) 
+static void initialize_builtin(t_builtin *builtin)
 {
     builtin[0] = (t_builtin){"pwd", ft_pwd};
     builtin[1] = (t_builtin){"echo", ft_echo};
@@ -13,6 +13,7 @@ static void initialize_builtin(t_builtin *builtin)
     builtin[5] = (t_builtin){"cd", ft_cd};
     builtin[6] = (t_builtin){NULL, NULL};
 }
+
 /* Version adapté de ta fonction parse_command() pour la liste chaînée 
 	Lis la commande étant dans le token_cmd et la compare avec le tableau builtin 
 	si la commande correspond celle ci est ensuite executé
