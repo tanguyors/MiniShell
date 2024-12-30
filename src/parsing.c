@@ -131,7 +131,7 @@ int p_command(int *i, char *str, struct s_shell **head, int *stop_flag)
 		//while (is_space(str[(*i)]))
 			//(*i)++;
 		j = 0;
-		while (str[(*i)] != '\0' && !is_space(str[(*i)]))
+		while (str[(*i)] != '\0' && !is_space(str[(*i)]) && !is_spec_char(str[(*i)]))
 		{
 			if (!is_space(str[(*i)]))
 				tail->data[j++] = str[(*i)];
@@ -241,8 +241,7 @@ struct s_shell *p_post_parsing(struct s_shell *head)
 			if (current->token != TOKEN_PIPE && current->next->token == TOKEN_CMD)
 				current->next->token = TOKEN_ARG;
 			if (current->token == TOKEN_PIPE && current->next->token == TOKEN_PIPE 
-			|| current->token == TOKEN_PIPE && current->next->token != TOKEN_CMD
-			|| current->token == TOKEN_PIPE && !current->prev)
+			|| current->token == TOKEN_PIPE && current->next->token != TOKEN_CMD)
 			{
 				perror("bash: syntax error near unexpected token `|'");
 				break;
