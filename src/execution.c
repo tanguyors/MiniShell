@@ -58,7 +58,6 @@ void cmd_execution(struct s_shell *current)
         }
         i++;
     }
-	//free_array(data);
     // Si aucune commande builtin ne correspond
     ft_printf("minishell: %s: command not found\n", current->data);
 }
