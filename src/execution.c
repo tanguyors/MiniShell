@@ -34,7 +34,7 @@ void cmd_execution(struct s_shell *current)
 	initialize_builtin(builtin);
 	i = 0;
 	p_arg = current;
-	printf("p_arg: %s\n", p_arg->data);
+	//printf("p_arg: %s\n", p_arg->data);
 	while (p_arg)
 	{
 		if (p_arg->token == TOKEN_ARG)
@@ -43,6 +43,8 @@ void cmd_execution(struct s_shell *current)
 			//printf("data[%d]: %s\n", i, data[i]);
 			i++;
 		}
+		if (p_arg->token == TOKEN_PIPE)
+			break;
 		p_arg = p_arg->next;
 	}
 	i = 0;
@@ -56,6 +58,7 @@ void cmd_execution(struct s_shell *current)
         }
         i++;
     }
+	//free_array(data);
     // Si aucune commande builtin ne correspond
     ft_printf("minishell: %s: command not found\n", current->data);
 }
