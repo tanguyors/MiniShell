@@ -1,6 +1,12 @@
 
 //Implementations des commandes interne
 #include "../include/minishell.h"
+
+int ft_exit(char **argv)
+{
+	exit(EXIT_SUCCESS);
+}
+
 //------------------------------------------------------------------------------------------ECHO----------------------------------------------------------------
 /**
  * ft_echo - Implémente le built-in echo.
@@ -124,7 +130,7 @@ int	ft_export(char **argv)
 	char	*name;   // Stocke le nom de la variable
 	char	*value;  // Stocke la valeur associée
 	// Si aucun argument n'est donné, affiche toutes les variables exportées
-	if (!argv[1])
+	if (!argv[0])
 	{
 		i = 0;
 		// Parcourt toutes les variables d'environnement
@@ -137,7 +143,7 @@ int	ft_export(char **argv)
 		return (0); // Fin de la commande avec succès
 	}
 	// Parcourt les arguments donnés pour les ajouter/modifier
-	i = 1;
+	i = 0;
 	while (argv[i])
 	{
 		// Vérifie si l'argument est un identifiant valide
@@ -179,10 +185,10 @@ int	ft_unset(char **argv)
 	int	j;
 	int	k;
 
-	if (!argv[1]) // Aucun argument : rien à faire
+	if (!argv[0]) // Aucun argument : rien à faire
 		return (0);
 
-	i = 1;
+	i = 0;
 	while (argv[i])
 	{
 		if (!is_valid_identifier(argv[i]))

@@ -11,7 +11,8 @@ static void initialize_builtin(t_builtin *builtin)
     builtin[3] = (t_builtin){"export", ft_export};
     builtin[4] = (t_builtin){"unset", ft_unset};
     builtin[5] = (t_builtin){"cd", ft_cd};
-    builtin[6] = (t_builtin){NULL, NULL};
+    builtin[6] = (t_builtin){"exit", ft_exit};
+	builtin[7] = (t_builtin){NULL, NULL};
 }
 
 /* Version adapté de ta fonction parse_command() pour la liste chaînée 
@@ -27,7 +28,7 @@ static void initialize_builtin(t_builtin *builtin)
 	dans celle ci mais aussi les builtin */
 void cmd_execution(struct s_shell *current)
 {
-	t_builtin builtin[7];
+	t_builtin builtin[8];
     int i;
 	struct s_shell *p_arg;
 	char *data[1024];
