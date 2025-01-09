@@ -17,27 +17,44 @@ int ft_exit(char **argv)
 
 /* Passage de l'index i a 0 car data[0] correspond au premier argument,
 	alors qu'avant token[0] correspondait au type de commande */
+char *expand_variable(const char *var)
+{
+    char *value = getenv(var);
+    return (value ? value : ""); // Retourne la valeur ou une chaîne vide
+}
+
 int ft_echo(char **argv)
 {
-    int i = 0;
+    int i = 1;
     int newline = 1;
 
-    // Gestion des multiples "-n"
+    // Gère l'option "-n"
     while (argv[i] && ft_strcmp(argv[i], "-n") == 0)
     {
         newline = 0;
         i++;
     }
-    // Affichage des arguments
+
+    // Parcourt les arguments
     while (argv[i])
     {
-        ft_putstr_fd(argv[i], 1);
+        if (argv[i][0] == '$') // Vérifie si c'est une variable d'environnement
+        {
+            // Récupère et affiche la valeur de la variable (sans le '$')
+            ft_putstr_fd(expand_variable(argv[i] + 1), 1);
+        }
+        else
+        {
+            ft_putstr_fd(argv[i], 1); // Affiche l'argument normal
+        }
+
         if (argv[i + 1])
-            ft_putchar_fd(' ', 1);
+            ft_putchar_fd(' ', 1); // Ajoute un espace entre les arguments
         i++;
     }
+
     if (newline)
-        ft_putchar_fd('\n', 1);
+        ft_putchar_fd('\n', 1); // Ajoute un saut de ligne si nécessaire
     return (0);
 }
  //--------------------------------------------------------------------------------------PWD------------------------------------------------------------------------
