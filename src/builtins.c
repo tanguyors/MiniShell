@@ -1,6 +1,12 @@
 
 //Implementations des commandes interne
 #include "../include/minishell.h"
+
+int ft_exit(char **argv)
+{
+	exit(EXIT_SUCCESS);
+}
+
 //------------------------------------------------------------------------------------------ECHO----------------------------------------------------------------
 /**
  * ft_echo - Implémente le built-in echo.
@@ -11,27 +17,44 @@
 
 /* Passage de l'index i a 0 car data[0] correspond au premier argument,
 	alors qu'avant token[0] correspondait au type de commande */
+char *expand_variable(const char *var)
+{
+    char *value = getenv(var);
+    return (value ? value : ""); // Retourne la valeur ou une chaîne vide
+}
+
 int ft_echo(char **argv)
 {
     int i = 0;
     int newline = 1;
 
-    // Gestion des multiples "-n"
+    // Gère l'option "-n"
     while (argv[i] && ft_strcmp(argv[i], "-n") == 0)
     {
         newline = 0;
         i++;
     }
-    // Affichage des arguments
+
+    // Parcourt les arguments
     while (argv[i])
     {
-        ft_putstr_fd(argv[i], 1);
+        if (argv[i][0] == '$') // Vérifie si c'est une variable d'environnement
+        {
+            // Récupère et affiche la valeur de la variable (sans le '$')
+            ft_putstr_fd(expand_variable(argv[i] + 1), 1);
+        }
+        else
+        {
+            ft_putstr_fd(argv[i], 1); // Affiche l'argument normal
+        }
+
         if (argv[i + 1])
-            ft_putchar_fd(' ', 1);
+            ft_putchar_fd(' ', 1); // Ajoute un espace entre les arguments
         i++;
     }
+
     if (newline)
-        ft_putchar_fd('\n', 1);
+        ft_putchar_fd('\n', 1); // Ajoute un saut de ligne si nécessaire
     return (0);
 }
  //--------------------------------------------------------------------------------------PWD------------------------------------------------------------------------
@@ -124,7 +147,7 @@ int	ft_export(char **argv)
 	char	*name;   // Stocke le nom de la variable
 	char	*value;  // Stocke la valeur associée
 	// Si aucun argument n'est donné, affiche toutes les variables exportées
-	if (!argv[1])
+	if (!argv[0])
 	{
 		i = 0;
 		// Parcourt toutes les variables d'environnement
@@ -137,7 +160,7 @@ int	ft_export(char **argv)
 		return (0); // Fin de la commande avec succès
 	}
 	// Parcourt les arguments donnés pour les ajouter/modifier
-	i = 1;
+	i = 0;
 	while (argv[i])
 	{
 		// Vérifie si l'argument est un identifiant valide
@@ -179,10 +202,10 @@ int	ft_unset(char **argv)
 	int	j;
 	int	k;
 
-	if (!argv[1]) // Aucun argument : rien à faire
+	if (!argv[0]) // Aucun argument : rien à faire
 		return (0);
 
-	i = 1;
+	i = 0;
 	while (argv[i])
 	{
 		if (!is_valid_identifier(argv[i]))

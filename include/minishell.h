@@ -90,6 +90,7 @@ int is_token_red(enum e_tokens token);
 /*-- Executions --*/
 void parse_execution(struct s_shell *head);
 /*-- Built-in --*/
+int ft_exit(char **argv);
 int ft_echo(char **argv);
 int ft_pwd(char **argv);
 int ft_env(char **argv);
