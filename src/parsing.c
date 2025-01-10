@@ -192,9 +192,9 @@ static void p_double_quotes(int *i, char *str, struct s_shell *tail)
 			tail->data[j++] = str[(*i)];
 			(*i)++;
 		}
+		tail->data[j] = '\0';
+		(*i)++;
 	}
-	tail->data[j] = '\0';
-	(*i)++;
 }
 
 /* Fonction de vérification et tokenization des quotes */
@@ -214,13 +214,14 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 		(*i)++;
 		printf("simple quote: \n");
 		tail->token = TOKEN_SIMPLE_QUOTE;
-		while (str[(*i)])
+		while (str[(*i)] && (str[(*i)] != 39 || str[(*i) + 1] != '\0'))
 		{
 			while(str[(*i)] == 39)
 				(*i)++;
 			tail->data[j++] = str[(*i)];
 			(*i)++;
 		}
+		tail->data[j] = '\0';
 	}
 	p_double_quotes(i, str, tail);
 }
