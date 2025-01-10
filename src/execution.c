@@ -39,7 +39,7 @@ void cmd_execution(struct s_shell *current)
 	//printf("p_arg: %s\n", p_arg->data);
 	while (p_arg)
 	{
-		if (p_arg->token == TOKEN_ARG)
+		if (p_arg->token == TOKEN_ARG || p_arg->token == TOKEN_SIMPLE_QUOTE || p_arg->token == TOKEN_DOUBLE_QUOTE)
 		{
 			data[i] = p_arg->data;
 			//printf("data[%d]: %s\n", i, data[i]);

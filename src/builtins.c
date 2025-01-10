@@ -25,7 +25,7 @@ char *expand_variable(const char *var)
 
 int ft_echo(char **argv)
 {
-    int i = 1;
+    int i = 0;
     int newline = 1;
 
     // Gère l'option "-n"
