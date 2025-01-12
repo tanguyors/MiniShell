@@ -25,6 +25,7 @@ void cmd_execution(struct s_shell *current, char **data)
     // Parcourt la table des commandes internes
     while (builtin[i].name != NULL)
     {
+		//printf("current data: %s\n", current->data);
         if (ft_strcmp(current->data, builtin[i].name) == 0)
         {
             builtin[i].func(data); // Appelle la fonction correspondante.
@@ -176,13 +177,22 @@ void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 	}
 	if (pid1 == 0)
 	{
-		dup2(fd[1], STDOUT_FILENO);
+		if (dup2(fd[1], STDOUT_FILENO) < 0)
+		{
+			perror("dup2 error fd[1]");
+			exit(EXIT_FAILURE);
+		}
 		close(fd[0]);
 		close(fd[1]);
 		extract_data(*current_pipe);
+		exit(EXIT_SUCCESS);
 	}
-	/*while ((*current_pipe) && (*current_pipe)->token != TOKEN_CMD)
+	//printf("current_pipe data: %s\n", (*current_pipe)->data);
+	(*current_pipe) = (*current_pipe)->next;
+	while ((*current_pipe) && (*current_pipe)->token != TOKEN_CMD)
 		(*current_pipe) = (*current_pipe)->next;
+	//printf("current_pipe data: %s\n", (*current_pipe)->data);
+	//printf("current: %s\n", get_token_name((*current_pipe)->token));
 	pid2 = fork();
 	if (pid2 < 0)
 	{
@@ -191,15 +201,28 @@ void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 	}
 	if (pid2 == 0)
 	{
-		dup2(fd[0], STDIN_FILENO);
+		if (dup2(fd[0], STDIN_FILENO) < 0)
+		{
+			perror("dup2 error fd[0]");
+			exit(EXIT_FAILURE);
+		}
 		close(fd[0]);
 		close(fd[1]);
 		extract_data(*current_pipe);
-	}*/
+		exit(EXIT_SUCCESS);
+	}
 	close(fd[0]);
 	close(fd[1]);
-	waitpid(pid1, NULL, 0);
-	//waitpid(pid2, NULL, 0);
+	if (waitpid(pid1, NULL, 0) == -1)
+	{
+		perror("waitpid error");
+		exit(EXIT_FAILURE);
+	}
+	if (waitpid(pid2, NULL, 0) == -1)
+	{
+		perror("waitpid error");
+		exit(EXIT_FAILURE);
+	}
 }
 
 void exec_without_pipe(struct s_shell *current)

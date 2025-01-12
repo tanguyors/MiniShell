@@ -1,5 +1,6 @@
 
 #include "../include/minishell.h"
+# include <unistd.h> 
 
 static void ascii_art()
 {
@@ -26,13 +27,14 @@ int main(void)
     sa.sa_flags = SA_SIGINFO;
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGQUIT, &sa, NULL);
+    int i;
+    i = 0;
     ascii_art();
-    while (1)
+    while ( 1)
     {
-        int i;
         char *input;
         head = NULL;
-        i = 0;
+        printf("test while %d\n", i);
         input = readline("minishell> ");
         if (input != NULL)       // Permet d'avoir un historique cmd
             add_history(input);

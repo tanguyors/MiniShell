@@ -79,6 +79,7 @@ char *expand_var(char *str);
 char *remove_quotes(char *str);
 char *ft_strndup(const char *s, size_t n);
 void update_pwd(void);
+const char *get_token_name(enum e_tokens token);
 /*-- Is_Utils --*/
 int is_spec_char(int c);
 int is_ignored_char(int c);
