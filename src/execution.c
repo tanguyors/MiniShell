@@ -165,23 +165,14 @@ void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 	int pid2;
 
 	if (pipe(fd) == -1)
-	{
-		perror("pipe error");
-		exit(EXIT_FAILURE);
-	}
+		exit_with_error("pipe error");
 	pid1 = fork();
 	if (pid1 < 0)
-	{
-		perror("fork error");
-		exit(EXIT_FAILURE);
-	}
+		exit_with_error("fork error");
 	if (pid1 == 0)
 	{
 		if (dup2(fd[1], STDOUT_FILENO) < 0)
-		{
-			perror("dup2 error fd[1]");
-			exit(EXIT_FAILURE);
-		}
+			exit_with_error("dup2 error fd[1]");
 		close(fd[0]);
 		close(fd[1]);
 		extract_data(*current_pipe);
@@ -195,17 +186,11 @@ void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 	//printf("current: %s\n", get_token_name((*current_pipe)->token));
 	pid2 = fork();
 	if (pid2 < 0)
-	{
-		perror("fork error");
-		exit(EXIT_FAILURE);
-	}
+	exit_with_error("fork error");
 	if (pid2 == 0)
 	{
 		if (dup2(fd[0], STDIN_FILENO) < 0)
-		{
-			perror("dup2 error fd[0]");
-			exit(EXIT_FAILURE);
-		}
+			exit_with_error("dup2 error fd[0]");
 		close(fd[0]);
 		close(fd[1]);
 		extract_data(*current_pipe);
@@ -214,16 +199,75 @@ void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 	close(fd[0]);
 	close(fd[1]);
 	if (waitpid(pid1, NULL, 0) == -1)
-	{
-		perror("waitpid error");
-		exit(EXIT_FAILURE);
-	}
+		exit_with_error("waitpid error");
 	if (waitpid(pid2, NULL, 0) == -1)
-	{
-		perror("waitpid error");
-		exit(EXIT_FAILURE);
-	}
+		exit_with_error("waitpid error");
 }
+
+void multi_pipe_handling(struct s_shell **current_pipe)
+{
+    int fd[2];
+    int prev_fd;
+    int pid;
+    
+	prev_fd = -1;
+    while ((*current_pipe))
+    {
+        if (pipe(fd) == -1)
+            exit_with_error("pipe error");
+
+        pid = fork();
+        if (pid < 0)
+            exit_with_error("fork error");
+        
+        if (pid == 0)
+        {
+            // Si un pipe précédent existe, connectez-le à STDIN
+            if (prev_fd != -1)
+            {
+                if (dup2(prev_fd, STDIN_FILENO) < 0)
+                    exit_with_error("dup2 error prev_fd");
+                close(prev_fd);
+            }
+
+            // Si un pipe suivant existe, connectez-le à STDOUT
+			/*(*current_pipe) = (*current_pipe)->next;
+        	while ((*current_pipe) && (*current_pipe)->token != TOKEN_CMD)
+            	(*current_pipe) = (*current_pipe)->next;*/
+			printf("test current token: %s\n", get_token_name((*current_pipe)->token));
+            if ((*current_pipe)->next && (*current_pipe)->next->token != TOKEN_ARG)
+            {
+				printf("PASS\n");
+                if (dup2(fd[1], STDOUT_FILENO) < 0)
+                    exit_with_error("dup2 error fd[1]");
+            }
+            close(fd[0]);
+            close(fd[1]);
+            extract_data(*current_pipe);
+            exit(EXIT_SUCCESS);
+        }
+
+        // Parent : Gérer les descripteurs
+        if (prev_fd != -1)
+            close(prev_fd); // Fermer le descripteur précédent
+ 		if ((*current_pipe)->next)
+        {
+            close(fd[1]);    // Fermer le côté écriture du pipe actuel
+            prev_fd = fd[0]; // Garder le côté lecture pour la prochaine commande
+        }
+        else
+        {
+            close(fd[0]); // Pas de commande suivante, fermer les descripteurs restants
+        }
+
+        (*current_pipe) = (*current_pipe)->next;
+        while ((*current_pipe) && (*current_pipe)->token != TOKEN_CMD)
+            (*current_pipe) = (*current_pipe)->next;
+    }
+    while (wait(NULL) > 0)
+        ;
+}
+
 
 void exec_without_pipe(struct s_shell *current)
 {
@@ -270,7 +314,10 @@ void parse_execution(struct s_shell *head)
 				{
 					//current = current->next;
 					//cmd_execution(current);
-					pipe_handling(&current_pipe, current);
+					//if (is_pipe(current_pipe) == 1)
+					//	pipe_handling(&current_pipe, current);
+					//else
+						multi_pipe_handling(&current_pipe);
 				}
 			}
 			current = current->next;
