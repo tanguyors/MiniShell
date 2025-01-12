@@ -51,16 +51,19 @@ int is_space(int c)
 
 int is_pipe(struct s_shell *current)
 {
+	int n;
+
+	n = 0;
 	while (current)
 	{
 		if (current->token)
 		{
 			if (current->token == TOKEN_PIPE)
 			{
-				return (1);
+				n++;
 			}
 		}
 		current = current->next;
 	}
-	return (0);
+	return (n);
 }
