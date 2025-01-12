@@ -88,3 +88,9 @@ void update_pwd(void)
         setenv("PWD", cwd, 1);              // Met à jour PWD avec le chemin actuel
     }
 }
+
+void exit_with_error(const char *str_error)
+{
+    perror(str_error);
+    exit(EXIT_FAILURE);
+}
