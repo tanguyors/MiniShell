@@ -2,6 +2,11 @@
 #include "../include/minishell.h"
 # include <unistd.h> 
 
+/* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées. 
+			 -Intégration des redirections.
+			 -Checker les leaks.
+			 -Remise à la norme. */
+
 static void ascii_art()
 {
     printf("\n\n\n ███▄ ▄███▓ ██▓ ███▄    █  ██▓  ██████  ██░ ██ ▓█████  ██▓     ██▓ \n");
