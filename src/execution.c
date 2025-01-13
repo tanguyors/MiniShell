@@ -158,6 +158,7 @@ void redirection_execution(struct s_shell *current)
 	}
 }
 
+/* Devenu obsolète après l'ajout de multi_pipe_handling() */
 void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 {
 	int fd[2];
@@ -261,7 +262,7 @@ void multi_pipe_handling(struct s_shell **current)
 			child_process(fd, prev_fd, *current);
         // Parent : Gérer les descripteurs
         if (prev_fd != -1)
-            close(prev_fd); // Fermer le descripteur précédent
+            close(prev_fd);
  		if ((*current)->next)
         {
             close(fd[1]);    // Fermer le côté écriture du pipe actuel
@@ -307,7 +308,8 @@ void parse_execution(struct s_shell *head)
 	current = head;
 	if (!is_pipe(current))
 	{
-		exec_without_pipe(current);
+		//exec_without_pipe(current);
+		multi_pipe_handling(&current);
 	}
 	else
 	{
