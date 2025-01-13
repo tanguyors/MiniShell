@@ -204,11 +204,11 @@ void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 		exit_with_error("waitpid error");
 }
 
-static void child_process(int fd[2], int prev_fd, struct s_shell *current_pipe)
+static void child_process(int fd[2], int prev_fd, struct s_shell *current)
 {
 	int nb_pipe;
 
-	nb_pipe = is_pipe(current_pipe);
+	nb_pipe = is_pipe(current);
 	// Si un pipe précédent existe, connectez-le à STDIN
 	if (prev_fd != -1)
 	{
@@ -218,7 +218,7 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current_pipe)
 	}
 
 	// Si un pipe suivant existe, connectez-le à STDOUT
-	//printf("test current token: %s\n", get_token_name(current_pipe->token));
+	//printf("test current token: %s\n", get_token_name(current->token));
 	//printf("nb_pipe: %d\n", nb_pipe);
 	if (nb_pipe)
 	{
@@ -229,45 +229,49 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current_pipe)
 	}
 	close(fd[0]);
 	close(fd[1]);
-	extract_data(current_pipe);
+	extract_data(current);
 	exit(EXIT_SUCCESS);
 }
 
-static void pipe_and_fork(int fd[2], int pid)
+static void pipe_and_fork(int fd[2], int *pid)
 {
 	if (pipe(fd) == -1)
 		exit_with_error("pipe error");
 
-	pid = fork();
-	if (pid < 0)
+	*pid = fork();
+	if (*pid < 0)
 		exit_with_error("fork error");
 }
 
-void multi_pipe_handling(struct s_shell **current_pipe)
+/* Permet de gérer le cas où un pipe est présent dans la liste. 
+	Utilisation de fork afin de créer un processus enfant, 
+	celui ci va redirigé la sortie de la commande en fonction des pipes. 
+	Ici le double pointeur current représente la liste chaînée complète*/
+void multi_pipe_handling(struct s_shell **current)
 {
     int fd[2];
     int prev_fd;
     int pid;
 
 	prev_fd = -1;
-    while ((*current_pipe))
+    while ((*current))
     {
-        pipe_and_fork(fd, pid);
+        pipe_and_fork(fd, &pid);
         if (pid == 0)
-			child_process(fd, prev_fd, *current_pipe);
+			child_process(fd, prev_fd, *current);
         // Parent : Gérer les descripteurs
         if (prev_fd != -1)
             close(prev_fd); // Fermer le descripteur précédent
- 		if ((*current_pipe)->next)
+ 		if ((*current)->next)
         {
             close(fd[1]);    // Fermer le côté écriture du pipe actuel
             prev_fd = fd[0]; // Garder le côté lecture pour la prochaine commande
         }
         else
             close(fd[0]); // Pas de commande suivante, fermer les descripteurs restants
-        (*current_pipe) = (*current_pipe)->next;
-        while ((*current_pipe) && (*current_pipe)->token != TOKEN_CMD)
-            (*current_pipe) = (*current_pipe)->next;
+        (*current) = (*current)->next;
+        while ((*current) && (*current)->token != TOKEN_CMD)
+            (*current) = (*current)->next;
     }
     while (wait(NULL) > 0)
         continue;
@@ -295,30 +299,18 @@ void exec_without_pipe(struct s_shell *current)
 
 /* Permet de trier les executions des commandes,
 	en parcourant les tokens de la liste chaînée */
-/* Les pipes sont encore a implémenter, et le passage par référence,
-	de current aux fonctions d'éxécution sera peut être necessaire */
+/* Passage par référence necessaire ? */
 void parse_execution(struct s_shell *head)
 {
 	struct s_shell *current;
-	struct s_shell *current_pipe;
 
 	current = head;
-	current_pipe = head;
-	
 	if (!is_pipe(current))
 	{
 		exec_without_pipe(current);
 	}
 	else
 	{
-		while (current)
-		{
-			if (current->token)
-			{
-				if (current->token == TOKEN_PIPE) // rappel a la fonction lié a TOKEN_CMD	
-						multi_pipe_handling(&current_pipe);
-			}
-			current = current->next;
-		}
+		multi_pipe_handling(&current);
 	}
 }
