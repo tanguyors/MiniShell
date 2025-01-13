@@ -102,7 +102,7 @@ void cmd_execution(struct s_shell *current, char **data)
         i++;
     }
 	// Si aucune commande builtin ne correspond
-	std_execution(current, data);
+	std_execution(current);
     //ft_printf("minishell: %s: command not found\n", current->data);
 }
 
