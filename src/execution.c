@@ -14,7 +14,75 @@ static void initialize_builtin(t_builtin *builtin)
     builtin[6] = (t_builtin){"exit", ft_exit};
 	builtin[7] = (t_builtin){NULL, NULL};
 }
+/* implémenter strtok */
+char *get_absolute_path(char *command)
+{
+    static char path[1024];
+	char path_copy[1024];
+    char *path_env;
+    char *dir;
 
+    if (path_env == NULL) 
+	{
+        perror("Error PATH not found\n");
+        return (NULL);
+    }
+    // Copier PATH pour éviter de modifier l'original
+	path_env = getenv("PATH");
+    ft_strncpy(path_copy, path_env, sizeof(path_copy));
+    path_copy[sizeof(path_copy) - 1] = '\0';
+
+    // Parcourir chaque répertoire dans PATH
+	// Utilisation de strtok pour clear le PATH
+    dir = strtok(path_copy, ":");
+    while (dir != NULL) 
+	{
+        // Construire le chemin à partir de 'dir' et 'command'
+        ft_strcpy(path, dir);
+        strcat(path, "/");
+        strcat(path, command);
+
+        if (access(path, X_OK) == 0) 
+            return (path);
+
+        dir = strtok(NULL, ":");
+    }
+    return (NULL);
+}
+
+void std_execution(struct s_shell *current)
+{
+	pid_t pid;
+	char *command;
+	char **args;
+
+    pid = fork();
+    if (pid == -1) 
+	{
+        perror("Erreur lors de fork");
+        exit(EXIT_FAILURE);
+    } 
+	else if (pid == 0) 
+	{
+        command = get_absolute_path(current->data);
+        args = get_all_data(current);
+        char *env[] = { NULL };
+
+        if (execve(command, args, env) == -1) 
+		{
+            perror("Erreur lors de l'exécution de la commande");
+			free_array(args);
+            exit(EXIT_FAILURE);
+        }
+		free_array(args);
+    } 
+	else 
+        waitpid(pid, NULL, 0);
+}
+
+/* Initialise les builtin et parcourt l'array builtin afin de trouver la commande correspondante
+	si la commande reste introuver cela signifie qu'il s'agit d'une commande système
+	std_execution() sera donc appelé */
 void cmd_execution(struct s_shell *current, char **data)
 {
 	t_builtin builtin[8];
@@ -33,8 +101,67 @@ void cmd_execution(struct s_shell *current, char **data)
         }
         i++;
     }
-    // Si aucune commande builtin ne correspond
-    ft_printf("minishell: %s: command not found\n", current->data);
+	// Si aucune commande builtin ne correspond
+	std_execution(current, data);
+    //ft_printf("minishell: %s: command not found\n", current->data);
+}
+
+/* Data des arguments des commandes uniquement 
+	mémoire alloué au char ** */
+char **get_arg_data(struct s_shell *current)
+{
+	int i;
+	struct s_shell *p_arg;
+	char **data;
+
+	data = malloc(sizeof(char *) * 1024);
+	if (!data)
+		exit_with_error("allocation error");
+	i = 0;
+	p_arg = current;
+	//printf("p_arg: %s\n", p_arg->data);
+	while (p_arg)
+	{
+		if (p_arg->token == TOKEN_ARG || p_arg->token == TOKEN_SIMPLE_QUOTE || p_arg->token == TOKEN_DOUBLE_QUOTE)
+		{
+			data[i] = p_arg->data;
+			printf("data[%d]: %s\n", i, data[i]);
+			i++;
+		}
+		if (p_arg->token == TOKEN_PIPE)
+			break;
+		p_arg = p_arg->next;
+	}
+	return (data);
+}
+
+/* Data des commandes + leurs arguments 
+	mémoire alloué au char ** */
+char **get_all_data(struct s_shell *current)
+{
+    int i;
+	struct s_shell *p_arg;
+	char **data;
+
+	data = malloc(sizeof(char *) * 1024);
+	if (!data)
+		exit_with_error("allocation error");
+	i = 0;
+	p_arg = current;
+	//printf("p_arg: %s\n", p_arg->data);
+	while (p_arg)
+	{
+		if (p_arg->token == TOKEN_CMD || p_arg->token == TOKEN_ARG)
+		{
+			data[i] = p_arg->data;
+			printf("data[%d]: %s\n", i, data[i]);
+			i++;
+		}
+		if (p_arg->token == TOKEN_PIPE)
+			break;
+		p_arg = p_arg->next;
+	}
+	return (data);
 }
 
 /* Version adapté de ta fonction parse_command() pour la liste chaînée 
@@ -48,52 +175,13 @@ void cmd_execution(struct s_shell *current, char **data)
 
 /* cmd_execution() passe des tests classiques mais il y aura certainement des changement a faire par la suite
 	dans celle ci mais aussi les builtin */
-void extract_all_data(struct s_shell *current)
-{
-    int i;
-	struct s_shell *p_arg;
-	char *data[1024];
-
-	i = 0;
-	p_arg = current;
-	//printf("p_arg: %s\n", p_arg->data);
-	while (p_arg)
-	{
-		if (p_arg->token == TOKEN_ARG || p_arg->token == TOKEN_SIMPLE_QUOTE || p_arg->token == TOKEN_DOUBLE_QUOTE)
-		{
-			data[i] = p_arg->data;
-			//printf("data[%d]: %s\n", i, data[i]);
-			i++;
-		}
-		if (p_arg->token == TOKEN_PIPE)
-			break;
-		p_arg = p_arg->next;
-	}
-	cmd_execution(current, data);
-}
-
 void extract_data(struct s_shell *current)
 {
-    int i;
-	struct s_shell *p_arg;
-	char *data[1024];
+	char **data;
 
-	i = 0;
-	p_arg = current;
-	//printf("p_arg: %s\n", p_arg->data);
-	while (p_arg)
-	{
-		if (p_arg->token == TOKEN_ARG || p_arg->token == TOKEN_SIMPLE_QUOTE || p_arg->token == TOKEN_DOUBLE_QUOTE)
-		{
-			data[i] = p_arg->data;
-			//printf("data[%d]: %s\n", i, data[i]);
-			i++;
-		}
-		if (p_arg->token == TOKEN_PIPE)
-			break;
-		p_arg = p_arg->next;
-	}
+	data = get_arg_data(current);
 	cmd_execution(current, data);
+	free_array(data);
 }
 
 static void redir_input(struct s_shell *current)
@@ -252,7 +340,7 @@ void multi_pipe_handling(struct s_shell **current)
 {
     int fd[2];
     int prev_fd;
-    int pid;
+    pid_t pid;
 
 	prev_fd = -1;
     while ((*current))
@@ -287,7 +375,7 @@ void exec_without_pipe(struct s_shell *current)
 		{
 			if (current->token == TOKEN_CMD) // relié a TOKEN_ARG, cherche un token ARG
 			{
-				extract_all_data(current);
+				extract_data(current);
 			}
 			else if (current->token == is_token_red(current->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
 			{
