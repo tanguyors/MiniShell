@@ -186,8 +186,193 @@ void extract_data(struct s_shell *current)
 	free_array(data);
 }
 
+/**
+ * @brief Gestion de la redirection d'entrée (<)
+ * Redirige l'entrée standard vers un fichier
+ */
+static void redir_input(struct s_shell *current)
+{
+    int fd;
+
+    if (!current || !current->next || current->next->token != TOKEN_FILE)
+        return;
+    
+    current = current->next; // Déplacement vers le TOKEN_FILE
+    fd = open(current->data, O_RDONLY);
+    if (fd == -1)
+    {
+        ft_printf("minishell: %s: No such file or directory\n", current->data);
+        return;
+    }
+
+    // Sauvegarde de l'entrée standard originale
+    int saved_stdin = dup(STDIN_FILENO);
+    if (saved_stdin == -1)
+    {
+        close(fd);
+        return;
+    }
+
+    // Redirection de l'entrée standard
+    if (dup2(fd, STDIN_FILENO) == -1)
+    {
+        close(fd);
+        close(saved_stdin);
+        return;
+    }
+
+    // Exécution de la commande si présente
+    if (current->next && current->next->token == TOKEN_CMD)
+        extract_data(current->next);
+
+    // Restauration de l'entrée standard
+    dup2(saved_stdin, STDIN_FILENO);
+    close(saved_stdin);
+    close(fd);
+}
+
+/**
+ * @brief Gestion de la redirection de sortie (>)
+ * Redirige la sortie standard vers un fichier
+ */
+static void redir_output(struct s_shell *current)
+{
+    int fd;
+
+    if (!current || !current->next || current->next->token != TOKEN_FILE)
+        return;
+
+    current = current->next;
+    fd = open(current->data, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1)
+    {
+        ft_printf("minishell: %s: Permission denied\n", current->data);
+        return;
+    }
+
+    int saved_stdout = dup(STDOUT_FILENO);
+    if (saved_stdout == -1)
+    {
+        close(fd);
+        return;
+    }
+
+    if (dup2(fd, STDOUT_FILENO) == -1)
+    {
+        close(fd);
+        close(saved_stdout);
+        return;
+    }
+
+    if (current->next && current->next->token == TOKEN_CMD)
+        extract_data(current->next);
+
+    dup2(saved_stdout, STDOUT_FILENO);
+    close(saved_stdout);
+    close(fd);
+}
+
+/**
+ * @brief Gestion de la redirection en mode append (>>)
+ * Ajoute la sortie à la fin du fichier
+ */
+static void redir_append(struct s_shell *current)
+{
+    int fd;
+
+    if (!current || !current->next || current->next->token != TOKEN_FILE)
+        return;
+
+    current = current->next;
+    fd = open(current->data, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if (fd == -1)
+    {
+        ft_printf("minishell: %s: Permission denied\n", current->data);
+        return;
+    }
+
+    int saved_stdout = dup(STDOUT_FILENO);
+    if (saved_stdout == -1)
+    {
+        close(fd);
+        return;
+    }
+
+    if (dup2(fd, STDOUT_FILENO) == -1)
+    {
+        close(fd);
+        close(saved_stdout);
+        return;
+    }
+
+    if (current->next && current->next->token == TOKEN_CMD)
+        extract_data(current->next);
+
+    dup2(saved_stdout, STDOUT_FILENO);
+    close(saved_stdout);
+    close(fd);
+}
+
+/**
+ * @brief Gestion du heredoc (<<)
+ * Lit l'entrée jusqu'à ce que le délimiteur soit rencontré
+ */
+static void redir_heredoc(struct s_shell *current)
+{
+    int pipefd[2];
+    char *line;
+    
+    if (!current || !current->next || current->next->token != TOKEN_FILE)
+        return;
+
+    current = current->next;
+    if (pipe(pipefd) == -1)
+        return;
+
+    while (1)
+    {
+        ft_printf("> ");
+        line = get_next_line(STDIN_FILENO); // Assurez-vous d'avoir get_next_line
+        if (!line)
+            break;
+
+        // Suppression du newline à la fin
+        size_t len = strlen(line);
+        if (len > 0 && line[len-1] == '\n')
+            line[len-1] = '\0';
+
+        // Vérification du délimiteur
+        if (strcmp(line, current->data) == 0)
+        {
+            free(line);
+            break;
+        }
+
+        // Écriture dans le pipe
+        write(pipefd[1], line, strlen(line));
+        write(pipefd[1], "\n", 1);
+        free(line);
+    }
+
+    // Redirection de l'entrée standard vers le pipe
+    int saved_stdin = dup(STDIN_FILENO);
+    close(pipefd[1]);
+    
+    if (dup2(pipefd[0], STDIN_FILENO) != -1)
+    {
+        if (current->next && current->next->token == TOKEN_CMD)
+            extract_data(current->next);
+    }
+
+    // Restauration
+    dup2(saved_stdin, STDIN_FILENO);
+    close(saved_stdin);
+    close(pipefd[0]);
+}
+
+
 /* Redirige vers le bon token de redirection */
-/*void redirection_execution(struct s_shell *current)
+void redirection_execution(struct s_shell *current)
 {
 	if (current->token == REDIR_INPUT)
 	{
@@ -205,7 +390,7 @@ void extract_data(struct s_shell *current)
 	{
 		redir_heredoc(current);
 	}
-}*/
+}
 
 /* Devenu obsolète après l'ajout de multi_pipe_handling() */
 void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
@@ -308,7 +493,7 @@ void multi_pipe_handling(struct s_shell **current)
     while ((*current))
     {
 		printf("MULTI_PIPE_HANDLING !\n");
-        pipe_and_fork(fd, &pid);
+        /*pipe_and_fork(fd, &pid);
         if (pid == 0)
 			child_process(fd, prev_fd, *current);
         // Parent : Gérer les descripteurs
@@ -320,11 +505,11 @@ void multi_pipe_handling(struct s_shell **current)
             prev_fd = fd[0]; // Garder le côté lecture pour la prochaine commande
         }
         else
-            close(fd[0]); // Pas de commande suivante, fermer les descripteurs restants
+            close(fd[0]); // Pas de commande suivante, fermer les descripteurs restants */
         (*current) = (*current)->next;
         while ((*current) && (*current)->token != TOKEN_CMD)
 		{
-			//redirection_execution(*current);
+			redirection_execution(*current);
 			(*current) = (*current)->next;	
 		}
     }
@@ -345,7 +530,7 @@ void exec_without_pipe(struct s_shell *current)
 			}
 			else if (current->token == is_token_red(current->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
 			{
-				//redirection_execution(current);
+				redirection_execution(current);
 			}
 		}
 		current = current->next;
