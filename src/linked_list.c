@@ -13,7 +13,7 @@ void print_list(struct s_shell *current)
 }
 
 /* fonction de test */
-static const char *get_token_name(enum e_tokens token) 
+const char *get_token_name(enum e_tokens token) 
 {
    switch (token) 
    {

@@ -48,3 +48,24 @@ int is_space(int c)
         return (1);
     return (0);
 }
+
+/* Détermine s'il y a un pipe dans la liste chaînée 
+	auquel cas renvois le nombre de pipe total */
+int is_pipe(struct s_shell *current)
+{
+	int n;
+
+	n = 0;
+	while (current)
+	{
+		if (current->token)
+		{
+			if (current->token == TOKEN_PIPE)
+			{
+				n++;
+			}
+		}
+		current = current->next;
+	}
+	return (n);
+}
