@@ -14,7 +14,7 @@ static void initialize_builtin(t_builtin *builtin)
     builtin[6] = (t_builtin){"exit", ft_exit};
 	builtin[7] = (t_builtin){NULL, NULL};
 }
-/* implémenter strtok */
+/* implémenter strtok, strncpy et strcat */
 char *get_absolute_path(char *command)
 {
     static char path[1024];
@@ -29,7 +29,7 @@ char *get_absolute_path(char *command)
     }
     // Copier PATH pour éviter de modifier l'original
 	path_env = getenv("PATH");
-    ft_strncpy(path_copy, path_env, sizeof(path_copy));
+    strncpy(path_copy, path_env, sizeof(path_copy));
     path_copy[sizeof(path_copy) - 1] = '\0';
 
     // Parcourir chaque répertoire dans PATH
