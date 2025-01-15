@@ -328,8 +328,8 @@ void multi_pipe_handling(struct s_shell **current)
 			(*current) = (*current)->next;	
 		}
     }
-    //while (wait(NULL) > 0)
-        //continue;
+    while (wait(NULL) > 0)
+        continue;
 }
 
 

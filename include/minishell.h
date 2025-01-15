@@ -91,6 +91,7 @@ int is_redirect(int c);
 int is_alnum(int c);
 int is_space(int c);
 int is_token_red(enum e_tokens token);
+int is_redirection_in_list(struct s_shell *head);
 int is_pipe(struct s_shell *current);
 /*-- Executions --*/
 void parse_execution(struct s_shell *head);
