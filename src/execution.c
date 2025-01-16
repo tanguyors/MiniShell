@@ -22,13 +22,13 @@ char *get_absolute_path(char *command)
     char *path_env;
     char *dir;
 
+	// Copier PATH pour éviter de modifier l'original
+	path_env = getenv("PATH");
     if (path_env == NULL) 
 	{
         perror("Error PATH not found\n");
         return (NULL);
     }
-    // Copier PATH pour éviter de modifier l'original
-	path_env = getenv("PATH");
     strncpy(path_copy, path_env, sizeof(path_copy));
     path_copy[sizeof(path_copy) - 1] = '\0';
 

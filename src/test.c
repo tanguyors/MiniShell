@@ -22,16 +22,16 @@ char *get_absolute_path(char *command)
     char *path_env;
     char *dir;
 
+    // Copier PATH pour éviter de modifier l'original
+	path_env = getenv("PATH");
     if (path_env == NULL) 
 	{
         perror("Error PATH not found\n");
         return (NULL);
     }
-    // Copier PATH pour éviter de modifier l'original
-	path_env = getenv("PATH");
+
     strncpy(path_copy, path_env, sizeof(path_copy));
     path_copy[sizeof(path_copy) - 1] = '\0';
-
     // Parcourir chaque répertoire dans PATH
 	// Utilisation de strtok pour clear le PATH
     dir = strtok(path_copy, ":");
@@ -103,8 +103,8 @@ void cmd_execution(struct s_shell *current, char **data)
         i++;
     }
 	// Si aucune commande builtin ne correspond
-	//std_execution(current);
-    ft_printf("minishell: %s: command not found\n", current->data);
+	std_execution(current);
+    //ft_printf("minishell: %s: command not found\n", current->data);
 }
 
 /* Data des arguments des commandes uniquement 
@@ -441,7 +441,9 @@ void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 static void child_process(int fd[2], int prev_fd, struct s_shell *current)
 {
 	int nb_pipe;
+	struct s_shell *current_redir;
 
+	current_redir = current;
 	nb_pipe = is_pipe(current);
 	// Si un pipe précédent existe, connectez-le à STDIN
 	if (prev_fd != -1)
@@ -450,16 +452,17 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current)
 			exit_with_error("dup2 error prev_fd");
 		close(prev_fd);
 	}
-	if (current->next)
+	if (current_redir->next)
 	{
-		while(!is_token_red(current->next->token)) // ajouter is_token_red(current->next->next->token)
+		while(!is_token_red(current_redir->next->token)) // ajouter is_token_red(current->next->next->token)
 		{
-			current = current->next;
+			current_redir = current_redir->next;
 		}
-		redirection_execution(current);
+		if (is_token_red(current_redir->token))
+			redirection_execution(current_redir);
 	}
 	// Si un pipe suivant existe, connectez-le à STDOUT
-	//printf("test current next token: %s\n", get_token_name(current->next->token));
+	printf("test current token: %s\n", get_token_name(current->token));
 	//printf("nb_pipe: %d\n", nb_pipe);
 	if (nb_pipe)
 	{
