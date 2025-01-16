@@ -324,6 +324,7 @@ void parse_commands(char **tokens)
         {"export", ft_export},
         {"unset", ft_unset},
         {"cd", ft_cd},
+		{"ls", ft_ls},
         {NULL, NULL}
     };
     int i = 0;

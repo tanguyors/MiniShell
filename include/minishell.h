@@ -14,6 +14,8 @@
 # include <stdio.h>
 # include <readline/readline.h>
 # include <readline/history.h>
+#include <dirent.h>
+#include <sys/types.h>
 # define ARG_MAX 2097152 // Arg max de la plupart des systèmes linux // getconf ARG_MAX
 # define NAME_MAX 255 // Name max d'un nom de fichier // getconf NAME_MAX /
 # define B_BLUE "\033[1;36m"
@@ -103,6 +105,7 @@ int	ft_export(char **argv);
 int	is_valid_identifier(const char *str);
 int ft_unset(char **argv);
 int ft_cd(char **argv);
+int ft_ls(char **argv);
 static char *construct_path(const char *base, const char *input);
 void push_dir(const char *dir);
 char *pop_dir(void);

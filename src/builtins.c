@@ -335,4 +335,30 @@ int ft_cd(char **argv)
     update_pwd();     // Met à jour PWD et OLDPWD
     return (0);
 }
+//-------------------------------------------------------------------------------------------------------------------------------------------------------LS--------------------------------------------------------------------------------------------------------------------------------------------
 
+int ft_ls(char **argv)
+{
+    DIR *dir;
+    struct dirent *entry;
+    char *path = ".";  // Par défaut, liste le répertoire courant
+
+    if (argv[1])
+        path = argv[1];
+
+    dir = opendir(path);
+    if (!dir)
+    {
+        perror("ls");
+        return 1;
+    }
+
+    while ((entry = readdir(dir)) != NULL)
+    {
+        if (entry->d_name[0] != '.')  // Ignore les fichiers cachés
+            ft_printf("%s\n", entry->d_name);
+    }
+
+    closedir(dir);
+    return 0;
+}
