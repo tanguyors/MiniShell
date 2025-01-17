@@ -6,7 +6,7 @@
 #    By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/28 10:00:09 by root              #+#    #+#              #
-#    Updated: 2025/01/15 15:51:42 by lmonsat          ###   ########.fr        #
+#    Updated: 2025/01/17 15:40:02 by lmonsat          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ LIBFT = $(LIBFT_DIR)/libft.a
 LDLIBS = -lreadline
 
 # Fichiers source et objets
-SRC = main.c parsing.c test.c builtins.c signal.c utils.c is_utils.c linked_list.c
+SRC = main.c parsing.c execution.c builtins.c signal.c utils.c is_utils.c linked_list.c
 SRCS = $(addprefix $(SRC_DIR)/, $(SRC))
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
