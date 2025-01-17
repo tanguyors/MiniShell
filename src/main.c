@@ -4,7 +4,7 @@
 
 /* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées. 
 			 -Intégration des redirections. <-- actuellement en cours
-			 -Intégration des commandes classique système (ls, awk, grep, ...).
+			 -Tester la robustesse du code, faire un rapport des erreurs.
 			 -Checker les leaks.
 			 -Remise à la norme. */
 
