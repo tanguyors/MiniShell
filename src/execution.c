@@ -192,11 +192,14 @@ static void redir_input(struct s_shell *current)
 {
     int fd;
 	int saved_stdin;
+	struct s_shell *head;
 
-    if (!current || !current->next || current->next->token != TOKEN_FILE)
+	head = current;
+    if (!current || !current->next)
         return;
     
-    current = current->next; // Déplacement vers le TOKEN_FILE
+    while (current && current->token != TOKEN_FILE)
+		current = current->next;					 // Déplacement vers le TOKEN_FILE
     fd = open(current->data, O_RDONLY);
     if (fd == -1)
     {
@@ -218,8 +221,8 @@ static void redir_input(struct s_shell *current)
         return;
     }
     // Exécution de la commande si présente
-    //if (current->next && current->next->token == TOKEN_CMD)
-        //extract_data(current->next);
+    if (head && head->token == TOKEN_CMD)
+        extract_data(head);
     // Restauration de l'entrée standard
     dup2(saved_stdin, STDIN_FILENO);
     close(saved_stdin);
@@ -240,7 +243,9 @@ static void redir_output(struct s_shell *current)
     if (!current || !current->next)
         return;
 
-    current = current->next->next;
+    //current = current->next;
+	while (current && current->token != TOKEN_FILE)
+		current = current->next;
     fd = open(current->data, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd == -1)
     {
@@ -366,21 +371,26 @@ static void redir_heredoc(struct s_shell *current)
 /* Redirige vers le bon token de redirection */
 void redirection_execution(struct s_shell *current)
 {
+	struct s_shell *which_redir;
+
+	which_redir = current;
 	printf("REDIRECTION !\n");
 	print_list(current);
-	if (current->next->token == REDIR_INPUT)
+	while (!is_token_red(which_redir->token))
+		which_redir = which_redir->next;
+	if (which_redir->token == REDIR_INPUT)
 	{
 		redir_input(current);
 	}
-	else if (current->next->token == REDIR_OUTPUT)
+	else if (which_redir->token == REDIR_OUTPUT)
 	{
 		redir_output(current);
 	}
-	else if (current->next->token == REDIR_APPEND)
+	else if (which_redir->token == REDIR_APPEND)
 	{
 		//redir_append(current);
 	}
-	else if (current->next->token == REDIR_HEREDOC)
+	else if (which_redir->token == REDIR_HEREDOC)
 	{
 		//redir_heredoc(current);
 	}
@@ -437,7 +447,10 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current)
 {
 	int nb_pipe;
 	struct s_shell *current_redir;
+	struct s_shell *first_arg;
+	int flag;
 
+	flag = 0;
 	current_redir = current;
 	nb_pipe = is_pipe(current);
 	// Si un pipe précédent existe, connectez-le à STDIN
@@ -449,12 +462,17 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current)
 	}
 	if (current_redir->next)
 	{
-		while(current_redir->next && !is_token_red(current_redir->next->token)) // ajouter is_token_red(current->next->next->token)
+		while(current_redir->next && !is_token_red(current_redir->token)) // ajouter is_token_red(current->next->next->token)
 		{
+			if (current_redir->next->token == TOKEN_ARG && !flag)
+			{
+				first_arg = current_redir;
+				flag = 1;
+			}
 			current_redir = current_redir->next;
 		}
 		if (is_token_red(current_redir->token))
-			redirection_execution(current_redir);
+			redirection_execution(first_arg);
 	}
 	// Si un pipe suivant existe, connectez-le à STDOUT
 	printf("test current token: %s\n", get_token_name(current->token));
@@ -525,15 +543,24 @@ void multi_pipe_handling(struct s_shell *current)
 
 void exec_without_pipe(struct s_shell *current)
 {
+	int flag;
+	struct s_shell *first_arg;
+
+	flag = 0;
 	while (current)
 	{
 		if (is_redirection_in_list(current))
 		{
+			if (current->next->token == TOKEN_ARG && !flag)
+			{
+				first_arg = current;
+				flag = 1;
+			}
 			if (current->next->token)
 			{
 				if (is_token_red(current->next->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
 				{
-					redirection_execution(current);
+					redirection_execution(first_arg);
 				}
 			}
 			current = current->next;
