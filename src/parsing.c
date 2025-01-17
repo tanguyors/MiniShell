@@ -226,28 +226,40 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 	p_double_quotes(i, str, tail);
 }
 
+struct s_shell *post_parsing_condition(struct s_shell *current, int *break_flag)
+{
+	if (current->token == TOKEN_CMD && current->next->token == TOKEN_CMD)
+		current->next->token = TOKEN_ARG;
+	if (current->token != TOKEN_PIPE && current->next->token == TOKEN_CMD)
+		current->next->token = TOKEN_ARG;
+	if (current->token == TOKEN_PIPE && current->next->token == TOKEN_PIPE 
+	|| current->token == TOKEN_PIPE && current->next->token != TOKEN_CMD)
+	{
+		perror("bash: syntax error near unexpected token `|'");
+		*break_flag = 1;
+	}
+	return (current);
+}
+
 /* Second parsing corrige la succession de 2 commandes,
 	succession d'une prochaine commande sans pipe  */
 struct s_shell *p_post_parsing(struct s_shell *head)
 {
 	struct s_shell *current;
+	int break_flag;
 
+	break_flag = 0;
 	current = head;
 	while (current)
 	{
 		if (current && current->next)
 		{
-			if (current->token == TOKEN_CMD && current->next->token == TOKEN_CMD)
-				current->next->token = TOKEN_ARG;
-			if (current->token != TOKEN_PIPE && current->next->token == TOKEN_CMD)
-				current->next->token = TOKEN_ARG;
-			if (current->token == TOKEN_PIPE && current->next->token == TOKEN_PIPE 
-			|| current->token == TOKEN_PIPE && current->next->token != TOKEN_CMD)
-			{
-				perror("bash: syntax error near unexpected token `|'");
+			current = post_parsing_condition(current, &break_flag);
+			if (break_flag)
 				break;
-			}
 		}
+		if (current->token == TOKEN_DOUBLE_QUOTE || current->token == TOKEN_SIMPLE_QUOTE)
+			current->token = TOKEN_ARG;
 		if (current->token == TOKEN_PIPE && !current->next)
 		{
 			perror("bash: syntax error near unexpected token `|'");
@@ -285,7 +297,7 @@ void directory_parsing(int *i, char *str, int *stop_flag)
 
 /* Parsing principale permettant de parcourir l'entièreté de la string
 	et y crée une liste chainé avec les différentes valeurs et tokens */
-struct s_shell *parsing(char *str, struct s_shell *head) 
+struct s_shell *parsing(char *str, struct s_shell *head)
 {
     int i;
 	int stop_flag;
@@ -313,38 +325,4 @@ struct s_shell *parsing(char *str, struct s_shell *head)
     }
 	head = p_post_parsing(head);
     return (head);
-}
-
-void parse_commands(char **tokens)
-{
-    t_builtin builtins[] = {
-        {"pwd", ft_pwd},
-        {"echo", ft_echo},
-        {"env", ft_env},
-        {"export", ft_export},
-        {"unset", ft_unset},
-        {"cd", ft_cd},
-        {NULL, NULL}
-    };
-    int i = 0;
-
-    if (!tokens[0]) // Commande vide
-    {
-        ft_printf("Error: Empty command\n");
-        return;
-    }
-
-    // Parcourt la table des commandes internes
-    while (builtins[i].name != NULL)
-    {
-        if (ft_strcmp(tokens[0], builtins[i].name) == 0)
-        {
-            builtins[i].func(tokens); // Appelle la fonction correspondante
-            return;
-        }
-        i++;
-    }
-
-    // Si aucune commande builtin ne correspond
-    ft_printf("minishell: %s: command not found\n", tokens[0]);
 }
