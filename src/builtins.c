@@ -303,7 +303,7 @@ int ft_cd(char **argv)
         return (1);
     }
 
-    if (!argv[1] || ft_strcmp(argv[1], "~") == 0) // "cd" ou "cd ~"
+    if (!argv[0] || ft_strcmp(argv[0], "~") == 0) // "cd" ou "cd ~"
     {
         path = getenv("HOME");
         if (!path || !*path)
@@ -312,7 +312,7 @@ int ft_cd(char **argv)
             return (1);
         }
     }
-    else if (ft_strcmp(argv[1], "-") == 0) // "cd -"
+    else if (ft_strcmp(argv[0], "-") == 0) // "cd -"
     {
         previous_dir = pop_dir();
         if (!previous_dir)
@@ -324,7 +324,7 @@ int ft_cd(char **argv)
         path = previous_dir;
     }
     else
-        path = argv[1]; // Sinon, utilise le chemin donné
+        path = argv[0]; // Sinon, utilise le chemin donné
 
     if (chdir(path) == -1)
     {
