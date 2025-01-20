@@ -14,7 +14,7 @@ static void initialize_builtin(t_builtin *builtin)
     builtin[6] = (t_builtin){"exit", ft_exit};
 	builtin[7] = (t_builtin){NULL, NULL};
 }
-/* implémenter strtok, strncpy et strcat */
+/* implémenter strtok, strcpy et strcat */
 char *get_absolute_path(char *command)
 {
     static char path[1024];
@@ -66,9 +66,7 @@ void std_execution(struct s_shell *current)
 	{
         command = get_absolute_path(current->data);
         args = get_all_data(current);
-        char *env[] = { NULL };
-
-        if (execve(command, args, env) == -1) 
+        if (execve(command, args, NULL) == -1) 
 		{
             perror("Erreur lors de l'exécution de la commande");
 			free_array(args);
@@ -187,7 +185,8 @@ void extract_data(struct s_shell *current)
 }
 
 /* Gestion de la redirection d'entrée (<)
-	Redirige l'entrée standard vers un fichier */
+	Redirige l'entrée standard vers un fichier 
+	resultat < file affiché sur la console même avant un pipe ( a regler ) */
 static void redir_input(struct s_shell *current)
 {
     int fd;
@@ -242,8 +241,6 @@ static void redir_output(struct s_shell *current)
 	print_list(head);
     if (!current || !current->next)
         return;
-
-    //current = current->next;
 	while (current && current->token != TOKEN_FILE)
 		current = current->next;
     fd = open(current->data, O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -563,7 +560,6 @@ void exec_without_pipe(struct s_shell *current)
 					redirection_execution(first_arg);
 				}
 			}
-			current = current->next;
 		}
 		else
 		{
@@ -574,8 +570,8 @@ void exec_without_pipe(struct s_shell *current)
 					extract_data(current);
 				}
 			}
-			current = current->next;
 		}
+		current = current->next;
 	}
 }
 

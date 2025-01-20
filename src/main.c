@@ -8,6 +8,7 @@
 			 -Checker les leaks.
 			 -Remise à la norme. */
 
+/* Erreur : - */
 static void ascii_art()
 {
     printf("\n\n\n ███▄ ▄███▓ ██▓ ███▄    █  ██▓  ██████  ██░ ██ ▓█████  ██▓     ██▓ \n");
