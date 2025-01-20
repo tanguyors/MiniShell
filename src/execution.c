@@ -272,16 +272,17 @@ static void redir_output(struct s_shell *current)
 
 /* Gestion de la redirection en mode append (>>)
 	Ajoute la sortie à la fin du fichier */
-/*
 static void redir_append(struct s_shell *current)
 {
     int fd;
 	int saved_stdout;
+	struct s_shell *head;
 
-    if (!current || !current->next || current->next->token != TOKEN_FILE)
+	head = current;
+    if (!current || !current->next)
         return;
-
-    current = current->next;
+	while (current && current->token != TOKEN_FILE)
+		current = current->next;
     fd = open(current->data, O_WRONLY | O_CREAT | O_APPEND, 0644);
     if (fd == -1)
     {
@@ -300,14 +301,13 @@ static void redir_append(struct s_shell *current)
         close(saved_stdout);
         return;
     }
-    if (current->next && current->next->token == TOKEN_CMD)
-        extract_data(current->next);
+    if (head && head->token == TOKEN_CMD)
+        extract_data(head);
 
     dup2(saved_stdout, STDOUT_FILENO);
     close(saved_stdout);
     close(fd);
 }
-*/
 
 /* Gestion du heredoc (<<)
 	Lit l'entrée jusqu'à ce que le délimiteur soit rencontré */
@@ -385,7 +385,7 @@ void redirection_execution(struct s_shell *current)
 	}
 	else if (which_redir->token == REDIR_APPEND)
 	{
-		//redir_append(current);
+		redir_append(current);
 	}
 	else if (which_redir->token == REDIR_HEREDOC)
 	{
