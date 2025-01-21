@@ -58,7 +58,7 @@ void std_execution(struct s_shell *current)
 
     pid = fork();
     if (pid == -1) 
-		exit_with_error("fork error");
+		exit_with_error("fork error", NULL);
 	else if (pid == 0) 
 	{
         command = get_absolute_path(current->data);
@@ -116,7 +116,7 @@ char **get_arg_data(struct s_shell *current)
 
 	data = malloc(sizeof(char *) * 1024);
 	if (!data)
-		exit_with_error("allocation error");
+		exit_with_error("allocation error", NULL);
 	i = 0;
 	p_arg = current;
 	//printf("p_arg: %s\n", p_arg->data);
@@ -145,7 +145,7 @@ char **get_all_data(struct s_shell *current)
 
 	data = malloc(sizeof(char *) * 1024);
 	if (!data)
-		exit_with_error("allocation error");
+		exit_with_error("allocation error", NULL);
 	i = 0;
 	p_arg = current;
 	//printf("p_arg: %s\n", p_arg->data);
@@ -402,14 +402,14 @@ void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 	int pid2;
 
 	if (pipe(fd) == -1)
-		exit_with_error("pipe error");
+		exit_with_error("pipe error", NULL);
 	pid1 = fork();
 	if (pid1 < 0)
-		exit_with_error("fork error");
+		exit_with_error("fork error", NULL);
 	if (pid1 == 0)
 	{
 		if (dup2(fd[1], STDOUT_FILENO) < 0)
-			exit_with_error("dup2 error fd[1]");
+			exit_with_error("dup2 error fd[1]", NULL);
 		close(fd[0]);
 		close(fd[1]);
 		extract_data(*current_pipe);
@@ -423,11 +423,11 @@ void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 	//printf("current: %s\n", get_token_name((*current_pipe)->token));
 	pid2 = fork();
 	if (pid2 < 0)
-	exit_with_error("fork error");
+	exit_with_error("fork error", NULL);
 	if (pid2 == 0)
 	{
 		if (dup2(fd[0], STDIN_FILENO) < 0)
-			exit_with_error("dup2 error fd[0]");
+			exit_with_error("dup2 error fd[0]", NULL);
 		close(fd[0]);
 		close(fd[1]);
 		extract_data(*current_pipe);
@@ -436,9 +436,9 @@ void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 	close(fd[0]);
 	close(fd[1]);
 	if (waitpid(pid1, NULL, 0) == -1)
-		exit_with_error("waitpid error");
+		exit_with_error("waitpid error", NULL);
 	if (waitpid(pid2, NULL, 0) == -1)
-		exit_with_error("waitpid error");
+		exit_with_error("waitpid error", NULL);
 }
 
 static void child_process(int fd[2], int prev_fd, struct s_shell *current)
@@ -455,7 +455,7 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current)
 	if (prev_fd != -1)
 	{
 		if (dup2(prev_fd, STDIN_FILENO) < 0)
-			exit_with_error("dup2 error prev_fd");
+			exit_with_error("dup2 error prev_fd", NULL);
 		close(prev_fd);
 	}
 	if (current_redir->next)
@@ -480,7 +480,7 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current)
 		nb_pipe--;
 		printf("PASS\n");
 		if (dup2(fd[1], STDOUT_FILENO) < 0)
-			exit_with_error("dup2 error fd[1]");
+			exit_with_error("dup2 error fd[1]", NULL);
 	}
 	close(fd[0]);
 	close(fd[1]);
@@ -491,11 +491,11 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current)
 static void pipe_and_fork(int fd[2], int *pid)
 {
 	if (pipe(fd) == -1)
-		exit_with_error("pipe error");
+		exit_with_error("pipe error", NULL);
 
 	*pid = fork();
 	if (*pid < 0)
-		exit_with_error("fork error");
+		exit_with_error("fork error", NULL);
 }
 
 /* Permet de gérer le cas où un pipe est présent dans la liste. 
