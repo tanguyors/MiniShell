@@ -58,19 +58,20 @@ void std_execution(struct s_shell *current)
 
     pid = fork();
     if (pid == -1) 
-	{
-        perror("Erreur lors de fork");
-        exit(EXIT_FAILURE);
-    } 
+		exit_with_error("fork error");
 	else if (pid == 0) 
 	{
         command = get_absolute_path(current->data);
+		if (!command)
+			command = current->data; // cas de ./
         args = get_all_data(current);
         if (execve(command, args, NULL) == -1) 
 		{
-            perror("Erreur lors de l'exécution de la commande");
-			free_array(args);
-            exit(EXIT_FAILURE);
+			if(ft_strchr(current->data, '/'))
+				printf("bash: %s: Is a redictory\n", current->data);
+			else
+            	printf("%s: command not found\n", current->data);
+			exit_with_error(NULL, args);
         }
 		free_array(args);
     } 
