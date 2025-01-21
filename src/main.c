@@ -8,7 +8,7 @@
 			 -Checker les leaks.
 			 -Remise à la norme. */
 
-/* Erreur : - */
+/* Erreur : -Clear (TERM environment variable not set.) */
 static void ascii_art()
 {
     printf("\n\n\n ███▄ ▄███▓ ██▓ ███▄    █  ██▓  ██████  ██░ ██ ▓█████  ██▓     ██▓ \n");
@@ -28,20 +28,17 @@ int main(void)
     struct s_shell *head;
     struct sigaction sa;
     char **tokens;
-    
+    char *input;
+
     sa.sa_sigaction = &handle_signal;
 	sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_SIGINFO;
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGQUIT, &sa, NULL);
-    int i;
-    i = 0;
     ascii_art();
     while (1)
     {
-        char *input;
         head = NULL;
-        printf("test while %d\n", i);
         input = readline("minishell> ");
         if (input != NULL)       // Permet d'avoir un historique cmd
             add_history(input);

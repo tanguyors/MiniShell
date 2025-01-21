@@ -29,7 +29,6 @@ char *get_absolute_path(char *command)
         perror("Error PATH not found\n");
         return (NULL);
     }
-
     strncpy(path_copy, path_env, sizeof(path_copy));
     path_copy[sizeof(path_copy) - 1] = '\0';
     // Parcourir chaque répertoire dans PATH
@@ -55,6 +54,7 @@ void std_execution(struct s_shell *current)
 	pid_t pid;
 	char *command;
 	char **args;
+	extern char **environ;
 
     pid = fork();
     if (pid == -1) 
@@ -65,7 +65,7 @@ void std_execution(struct s_shell *current)
 		if (!command)
 			command = current->data; // cas de ./
         args = get_all_data(current);
-        if (execve(command, args, NULL) == -1) 
+        if (execve(command, args, environ) == -1) 
 		{
 			if(ft_strchr(current->data, '/'))
 				printf("bash: %s: Is a redictory\n", current->data);
@@ -498,7 +498,7 @@ static void pipe_and_fork(int fd[2], int *pid)
 		exit_with_error("fork error", NULL);
 }
 
-/* Permet de gérer le cas où un pipe est présent dans la liste. 
+/* Permet de gérer first_arg cas où un pipe est présent dans la liste. 
 	Utilisation de fork afin de créer un processus enfant, 
 	celui ci va redirigé la sortie de la commande en fonction des pipes. 
 	Ici le double pointeur current représente la liste chaînée complète*/
