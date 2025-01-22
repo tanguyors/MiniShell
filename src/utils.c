@@ -89,8 +89,11 @@ void update_pwd(void)
     }
 }
 
-void exit_with_error(const char *str_error)
+void exit_with_error(const char *str_error, char **array)
 {
-    perror(str_error);
+    if (str_error)
+        perror(str_error);
+    if (array)
+        free_array(array);
     exit(EXIT_FAILURE);
 }

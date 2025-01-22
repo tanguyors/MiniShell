@@ -14,8 +14,6 @@
 # include <stdio.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-#include <dirent.h>
-#include <sys/types.h>
 # define ARG_MAX 2097152 // Arg max de la plupart des systèmes linux // getconf ARG_MAX
 # define NAME_MAX 255 // Name max d'un nom de fichier // getconf NAME_MAX /
 # define B_BLUE "\033[1;36m"
@@ -82,7 +80,7 @@ char *remove_quotes(char *str);
 char *ft_strndup(const char *s, size_t n);
 void update_pwd(void);
 const char *get_token_name(enum e_tokens token);
-void exit_with_error(const char *str_error);
+void exit_with_error(const char *str_error, char **array);
 char **get_all_data(struct s_shell *current);
 char **get_arg_data(struct s_shell *current);
 /*-- Is_Utils --*/
@@ -93,6 +91,7 @@ int is_redirect(int c);
 int is_alnum(int c);
 int is_space(int c);
 int is_token_red(enum e_tokens token);
+int is_redirection_in_list(struct s_shell *head);
 int is_pipe(struct s_shell *current);
 /*-- Executions --*/
 void parse_execution(struct s_shell *head);
@@ -105,7 +104,6 @@ int	ft_export(char **argv);
 int	is_valid_identifier(const char *str);
 int ft_unset(char **argv);
 int ft_cd(char **argv);
-int ft_ls(char **argv);
 static char *construct_path(const char *base, const char *input);
 void push_dir(const char *dir);
 char *pop_dir(void);

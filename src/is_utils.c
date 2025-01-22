@@ -69,3 +69,14 @@ int is_pipe(struct s_shell *current)
 	}
 	return (n);
 }
+
+int is_redirection_in_list(struct s_shell *head)
+{
+	while (head && head->token)
+	{
+		if (is_token_red(head->token))
+			return (1);
+		head = head->next;
+	}
+	return (0);
+}
