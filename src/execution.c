@@ -40,7 +40,6 @@ char *get_absolute_path(char *command)
         ft_strcpy(path, dir);
         strcat(path, "/");
         strcat(path, command);
-
         if (access(path, X_OK) == 0) 
             return (path);
 
@@ -185,6 +184,24 @@ void extract_data(struct s_shell *current)
 	free(data);
 }
 
+static int setup_redirection(struct s_shell *current, int flag, int file_access)
+{
+	int fd;
+
+	if (!current || !current->next)
+        return (-1);
+    
+    while (current && current->token != TOKEN_FILE)
+		current = current->next;					 // Déplacement vers le TOKEN_FILE
+    fd = open(current->data, flag, file_access);
+    if (fd == -1)
+    {
+        printf("minishell: %s: No such file or directory\n", current->data);
+        return (-1);
+    }
+	return(fd);
+}
+
 /* Gestion de la redirection d'entrée (<)
 	Redirige l'entrée standard vers un fichier 
 	resultat < file affiché sur la console même avant un pipe ( a regler ) */
@@ -195,30 +212,22 @@ static void redir_input(struct s_shell *current)
 	struct s_shell *head;
 
 	head = current;
-    if (!current || !current->next)
-        return;
-    
-    while (current && current->token != TOKEN_FILE)
-		current = current->next;					 // Déplacement vers le TOKEN_FILE
-    fd = open(current->data, O_RDONLY);
-    if (fd == -1)
-    {
-        printf("minishell: %s: No such file or directory\n", current->data);
-        return;
-    }
+	fd = setup_redirection(current, O_RDONLY, 0);
+	if (fd == -1)
+		return ;
     // Sauvegarde de l'entrée standard originale
     saved_stdin = dup(STDIN_FILENO);
     if (saved_stdin == -1)
     {
         close(fd);
-        return;
+        return ;
     }
     // Redirection de l'entrée standard
     if (dup2(fd, STDIN_FILENO) == -1)
     {
         close(fd);
         close(saved_stdin);
-        return;
+        return ;
     }
     // Exécution de la commande si présente
     if (head && head->token == TOKEN_CMD)
@@ -238,34 +247,24 @@ static void redir_output(struct s_shell *current)
 	struct s_shell *head;
 
 	head = current;
-	printf("OUTPUT\n");
-	print_list(head);
-    if (!current || !current->next)
-        return;
-	while (current && current->token != TOKEN_FILE)
-		current = current->next;
-    fd = open(current->data, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (fd == -1)
-    {
-        printf("minishell: %s: Permission denied\n", current->data);
-        return;
-    }
+	fd = setup_redirection(current, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd == -1)
+		return ;
     saved_stdout = dup(STDOUT_FILENO);
     if (saved_stdout == -1)
     {
         close(fd);
-        return;
+        return ;
     }
     if (dup2(fd, STDOUT_FILENO) == -1)
     {
         close(fd);
         close(saved_stdout);
-        return;
+        return ;
     }
 	//printf("redir_output current token: %s\n", get_token_name(current->token));
     if (head && head->token == TOKEN_CMD)
         extract_data(head);
-
     dup2(saved_stdout, STDOUT_FILENO);
     close(saved_stdout);
     close(fd);
@@ -280,91 +279,117 @@ static void redir_append(struct s_shell *current)
 	struct s_shell *head;
 
 	head = current;
-    if (!current || !current->next)
-        return;
-	while (current && current->token != TOKEN_FILE)
-		current = current->next;
-    fd = open(current->data, O_WRONLY | O_CREAT | O_APPEND, 0644);
-    if (fd == -1)
-    {
-        ft_printf("minishell: %s: Permission denied\n", current->data);
-        return;
-    }
+	fd = setup_redirection(current, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	if (fd == -1)
+		return ;
     saved_stdout = dup(STDOUT_FILENO);
     if (saved_stdout == -1)
     {
         close(fd);
-        return;
+        return ;
     }
     if (dup2(fd, STDOUT_FILENO) == -1)
     {
         close(fd);
         close(saved_stdout);
-        return;
+        return ;
     }
     if (head && head->token == TOKEN_CMD)
         extract_data(head);
-
     dup2(saved_stdout, STDOUT_FILENO);
     close(saved_stdout);
     close(fd);
 }
 
-/* Gestion du heredoc (<<)
-	Lit l'entrée jusqu'à ce que le délimiteur soit rencontré */
-/*
-static void redir_heredoc(struct s_shell *current)
+void setup_heredoc(struct s_shell **current, int (*pipe_fd)[2])
 {
-    int pipefd[2];
-    char *line;
-    size_t len;
-	int saved_stdin;
+	if (!*current || !(*current)->next)
+        return ;
+	while (*current && (*current)->token != TOKEN_FILE)
+		*current = (*current)->next;
+    if (pipe(*pipe_fd) == -1)
+        return ;
+}
 
-    if (!current || !current->next || current->next->token != TOKEN_FILE)
-        return;
+void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
+{
+	char *line;
+	size_t len;
 
-    current = current->next;
-    if (pipe(pipefd) == -1)
-        return;
-
+	printf("loop heredoc: %s\n", current->data);
     while (1)
     {
-        printf("> ");
+        ft_printf("heredoc> ");
         line = get_next_line(STDIN_FILENO);
         if (!line)
             break;
-
         // Suppression du newline à la fin
-        len = strlen(line);
-        if (len > 0 && line[len-1] == '\n')
-            line[len-1] = '\0';
-
+        len = ft_strlen(line);
+        if (len > 0 && line[len - 1] == '\n')
+            line[len - 1] = '\0';
         // Vérification du délimiteur
-        if (strcmp(line, current->data) == 0)
+        if (ft_strcmp(line, current->data) == 0)
         {
             free(line);
             break;
         }
-
         // Écriture dans le pipe
-        write(pipefd[1], line, strlen(line));
-        write(pipefd[1], "\n", 1);
+        write(*pipe_fd[1], line, ft_strlen(line));
+        write(*pipe_fd[1], "\n", 1);
         free(line);
-    }
+    }	
+}
+
+/* Gestion du heredoc (<<)
+	Lit l'entrée jusqu'à ce que le délimiteur soit rencontré */
+static void redir_heredoc(struct s_shell *current)
+{
+    int pipe_fd[2];
+    //char *line;
+    //size_t len;
+	int saved_stdin;
+	struct s_shell *head;
+	head = current;
+
+	setup_heredoc(&current, &pipe_fd);
+	if (*pipe_fd == -1)
+		return ;
+	loop_heredoc(current, &pipe_fd);
+    /*while (1)
+    {
+        ft_printf("heredoc> ");
+        line = get_next_line(STDIN_FILENO);
+        if (!line)
+            break;
+        // Suppression du newline à la fin
+        len = ft_strlen(line);
+        if (len > 0 && line[len - 1] == '\n')
+            line[len - 1] = '\0';
+        // Vérification du délimiteur
+        if (ft_strcmp(line, current->data) == 0)
+        {
+            free(line);
+            break;
+        }
+        // Écriture dans le pipe
+        write(pipe_fd[1], line, ft_strlen(line));
+        write(pipe_fd[1], "\n", 1);
+        free(line);
+    }*/
     // Redirection de l'entrée standard vers le pipe
     saved_stdin = dup(STDIN_FILENO);
-    close(pipefd[1]);
-    if (dup2(pipefd[0], STDIN_FILENO) != -1)
+    close(pipe_fd[1]);
+    if (dup2(pipe_fd[0], STDIN_FILENO) != -1)
     {
-        if (current->next && current->next->token == TOKEN_CMD)
-            extract_data(current->next);
+        if (head && head->token == TOKEN_CMD)
+            extract_data(head);
     }
     // Restauration
     dup2(saved_stdin, STDIN_FILENO);
     close(saved_stdin);
-    close(pipefd[0]);
+    close(pipe_fd[0]);
 }
-*/
+
 
 /* Redirige vers le bon token de redirection */
 void redirection_execution(struct s_shell *current)
@@ -390,7 +415,7 @@ void redirection_execution(struct s_shell *current)
 	}
 	else if (which_redir->token == REDIR_HEREDOC)
 	{
-		//redir_heredoc(current);
+		redir_heredoc(current);
 	}
 }
 
