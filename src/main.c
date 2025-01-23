@@ -3,12 +3,11 @@
 # include <unistd.h> 
 
 /* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées. 
-			 -Intégration des redirections. <-- actuellement en cours
 			 -Tester la robustesse du code, faire un rapport des erreurs.
-			 -Checker les leaks.
+			 -Checker les leaks. <-- actuellement en cours
 			 -Remise à la norme. */
 
-/* Erreur : -Clear (TERM environment variable not set.) */
+/* Erreur :  */
 static void ascii_art()
 {
     printf("\n\n\n ███▄ ▄███▓ ██▓ ███▄    █  ██▓  ██████  ██░ ██ ▓█████  ██▓     ██▓ \n");
@@ -22,19 +21,24 @@ static void ascii_art()
     printf("       ░    ░           ░  ░        ░   ░  ░  ░   ░  ░    ░  ░    ░  ░\n\n\n");
 }
 
-int main(void)
+static void signals()
 {
-    struct s_shell value;
-    struct s_shell *head;
     struct sigaction sa;
-    char **tokens;
-    char *input;
 
     sa.sa_sigaction = &handle_signal;
 	sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_SIGINFO;
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGQUIT, &sa, NULL);
+}
+
+int main(void)
+{
+    struct s_shell value;
+    struct s_shell *head;
+    char *input;
+
+    signals();
     ascii_art();
     while (1)
     {
