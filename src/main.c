@@ -7,7 +7,7 @@
 			 -Checker les leaks. <-- actuellement en cours
 			 -Remise à la norme. */
 
-/* Erreur :  */
+/* Erreur :  -gérer le free(input) avec les signaux + ft_exit() */
 static void ascii_art()
 {
     printf("\n\n\n ███▄ ▄███▓ ██▓ ███▄    █  ██▓  ██████  ██░ ██ ▓█████  ██▓     ██▓ \n");
@@ -50,13 +50,14 @@ int main(void)
             exit(EXIT_SUCCESS);
         head = parsing(input, head);
 		parse_execution(head);
+        printf("test exit\n");
+        free(input);
         if (head)
         {
             print_list(head);
 			print_token(head);
             free_list(head);
         }
-        free(input);
     }
     return (0);
 }

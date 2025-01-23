@@ -397,7 +397,7 @@ void redirection_execution(struct s_shell *current)
 }
 
 /* Devenu obsolète après l'ajout de multi_pipe_handling() */
-void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
+/*void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 {
 	int fd[2];
 	int pid1;
@@ -441,7 +441,7 @@ void pipe_handling(struct s_shell **current_pipe, struct s_shell *current)
 		exit_with_error("waitpid error", NULL);
 	if (waitpid(pid2, NULL, 0) == -1)
 		exit_with_error("waitpid error", NULL);
-}
+}*/
 
 static void child_process(int fd[2], int prev_fd, struct s_shell *current)
 {
