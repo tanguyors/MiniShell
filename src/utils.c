@@ -7,7 +7,7 @@
  * free_array - Libère un tableau de chaînes de caractères.
  * @array: Le tableau à libérer.
  */
-void free_array(char **array) 
+void free_array(char **array)
 {
     int i;
     
@@ -51,7 +51,7 @@ char *ft_strcpy(char *dest, char *src)
 	return (dest);
 }
 
-int ft_strcmp(const char *s1, const char *s2) 
+int ft_strcmp(const char *s1, const char *s2)
 {
     while (*s1 && (*s1 == *s2)) 
     {
@@ -65,7 +65,7 @@ int ft_strcmp(const char *s1, const char *s2)
  * trim_newline - Supprime le '\n' à la fin de la chaîne, si présent.
  * @line: La chaîne à nettoyer.
  */
-void trim_newline(char *line) 
+void trim_newline(char *line)
 {
     size_t len;
 
