@@ -1,7 +1,0 @@
-EXTRACT_DATA !
-data[0]: ceci
-data[1]: est
-data[2]: un
-data[3]: test
-CMD_EXECUTION !
-ceci est un test
