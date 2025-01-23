@@ -113,7 +113,7 @@ char **get_arg_data(struct s_shell *current)
 	struct s_shell *p_arg;
 	char **data;
 
-	data = malloc(sizeof(char *) * 1024);
+	data = ft_calloc(1024, sizeof(char *));
 	if (!data)
 		exit_with_error("allocation error", NULL);
 	i = 0;
@@ -142,7 +142,7 @@ char **get_all_data(struct s_shell *current)
 	struct s_shell *p_arg;
 	char **data;
 
-	data = malloc(sizeof(char *) * 1024);
+	data = ft_calloc(1024, sizeof(char *));
 	if (!data)
 		exit_with_error("allocation error", NULL);
 	i = 0;
@@ -305,7 +305,7 @@ void setup_heredoc(struct s_shell **current, int (*pipe_fd)[2])
 {
 	if (!*current || !(*current)->next)
         return ;
-	while (*current && (*current)->token != TOKEN_FILE)
+	while (*current && (*current)->next && (*current)->token != TOKEN_FILE)
 		*current = (*current)->next;
     if (pipe(*pipe_fd) == -1)
         return ;
@@ -334,8 +334,8 @@ void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
             break;
         }
         // Écriture dans le pipe
-        write(*pipe_fd[1], line, ft_strlen(line));
-        write(*pipe_fd[1], "\n", 1);
+        write(pipe_fd[0][1], line, ft_strlen(line));
+        write(pipe_fd[0][1], "\n", 1);
         free(line);
     }	
 }
@@ -345,37 +345,14 @@ void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
 static void redir_heredoc(struct s_shell *current)
 {
     int pipe_fd[2];
-    //char *line;
-    //size_t len;
 	int saved_stdin;
 	struct s_shell *head;
+	
 	head = current;
-
 	setup_heredoc(&current, &pipe_fd);
 	if (*pipe_fd == -1)
 		return ;
 	loop_heredoc(current, &pipe_fd);
-    /*while (1)
-    {
-        ft_printf("heredoc> ");
-        line = get_next_line(STDIN_FILENO);
-        if (!line)
-            break;
-        // Suppression du newline à la fin
-        len = ft_strlen(line);
-        if (len > 0 && line[len - 1] == '\n')
-            line[len - 1] = '\0';
-        // Vérification du délimiteur
-        if (ft_strcmp(line, current->data) == 0)
-        {
-            free(line);
-            break;
-        }
-        // Écriture dans le pipe
-        write(pipe_fd[1], line, ft_strlen(line));
-        write(pipe_fd[1], "\n", 1);
-        free(line);
-    }*/
     // Redirection de l'entrée standard vers le pipe
     saved_stdin = dup(STDIN_FILENO);
     close(pipe_fd[1]);
@@ -570,6 +547,7 @@ void exec_without_pipe(struct s_shell *current)
 	struct s_shell *first_arg;
 
 	flag = 0;
+	first_arg = current;
 	while (current)
 	{
 		if (is_redirection_in_list(current))
@@ -589,7 +567,7 @@ void exec_without_pipe(struct s_shell *current)
 		}
 		else
 		{
-			if (current->token)
+			if (current && current->token)
 			{
 				if (current->token == TOKEN_CMD) // relié a TOKEN_ARG, cherche un token ARG
 				{
