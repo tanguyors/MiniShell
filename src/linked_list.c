@@ -6,7 +6,8 @@ void print_list(struct s_shell *current)
 	ft_printf("Liste chainé : ");
 	while (current != NULL)
 	{
-		ft_printf("%s -> ", current->data);
+		if (current->data)
+			ft_printf("%s -> ", current->data);
 		current = current->next;
 	}
 	ft_printf("NULL\n");
