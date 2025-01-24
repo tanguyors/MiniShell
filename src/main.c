@@ -36,22 +36,25 @@ int main(void)
 {
     struct s_shell value;
     struct s_shell *head;
-    char *input;
+    char *rl_input;
 
     signals();
     ascii_art();
     while (1)
     {
         head = NULL;
-        input = readline("minishell> ");
-        if (input != NULL)       // Permet d'avoir un historique cmd
-            add_history(input);
-        if (input == NULL)  // Permet d'exit le shell (ctrl + D)
+        rl_input = readline("minishell> ");
+        if (rl_input != NULL)       // Permet d'avoir un historique cmd
+            add_history(rl_input);
+        if (rl_input == NULL)  // Permet d'exit le shell (ctrl + D)
+        {
+            free(rl_input);
             exit(EXIT_SUCCESS);
-        head = parsing(input, head);
-		parse_execution(head);
+        }
+        head = parsing(rl_input, head);
+		parse_execution(head, rl_input);
         printf("test exit\n");
-        free(input);
+        free(rl_input);
         if (head)
         {
             print_list(head);

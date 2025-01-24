@@ -6,14 +6,14 @@
 #    By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/28 10:00:09 by root              #+#    #+#              #
-#    Updated: 2025/01/23 18:13:00 by lmonsat          ###   ########.fr        #
+#    Updated: 2025/01/24 17:19:46 by lmonsat          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # Variables
 NAME = minishell
 CC = cc
-CFLAGS = #-Wall -Wextra -Werror
+CFLAGS = -g #-Wall -Wextra -Werror
 SRC_DIR = src
 OBJ_DIR = obj
 INCLUDE = include

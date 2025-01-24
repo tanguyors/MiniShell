@@ -35,10 +35,16 @@ enum e_tokens
 	TOKEN_DOUBLE_QUOTE
 };
 
+struct s_data_shared
+{
+    char *input;
+};
+
 struct s_shell
 {
     struct s_shell *next;
     struct s_shell *prev;
+    struct s_data_shared *share;
     enum e_tokens token;
     char *data;
 };
@@ -53,7 +59,7 @@ typedef struct s_dir_stack
 typedef struct s_builtin
 {
     char *name;
-    int (*func)(char **);
+    int (*func)(char **, char *);
 } t_builtin;
 
 
@@ -94,9 +100,9 @@ int is_token_red(enum e_tokens token);
 int is_redirection_in_list(struct s_shell *head);
 int is_pipe(struct s_shell *current);
 /*-- Executions --*/
-void parse_execution(struct s_shell *head);
+void parse_execution(struct s_shell *head, char *rl_input);
 /*-- Built-in --*/
-int ft_exit(char **argv);
+int ft_exit(char **argv, char *rl_input);
 int ft_echo(char **argv);
 int ft_pwd(char **argv);
 int ft_env(char **argv);

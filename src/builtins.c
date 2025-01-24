@@ -2,8 +2,9 @@
 //Implementations des commandes interne
 #include "../include/minishell.h"
 
-int ft_exit(char **argv)
+int ft_exit(char **argv, char *rl_input)
 {
+    free(rl_input);
 	exit(EXIT_SUCCESS);
 }
 
