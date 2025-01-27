@@ -7,10 +7,11 @@
 			 -Checker les leaks. <-- actuellement en cours
 			 -Remise à la norme. */
 
-/* Erreur :  -gérer le free(input) avec les signaux + ft_exit() */
+/* Erreur :  -gérer "cat << end | grep a" */
 static void ascii_art()
 {
-    printf("\n\n\n ███▄ ▄███▓ ██▓ ███▄    █  ██▓  ██████  ██░ ██ ▓█████  ██▓     ██▓ \n");
+    printf("\n\n\n");
+    printf("███▄ ▄███▓ ██▓ ███▄    █  ██▓  ██████  ██░ ██ ▓█████  ██▓     ██▓     \n");
     printf("▓██▒▀█▀ ██▒▓██▒ ██ ▀█   █ ▓██▒▒██    ▒ ▓██░ ██▒▓█   ▀ ▓██▒    ▓██▒    \n");
     printf("▓██    ▓██░▒██▒▓██  ▀█ ██▒▒██▒░ ▓██▄   ▒██▀▀██░▒███   ▒██░    ▒██░    \n");
     printf("▒██    ▒██ ░██░▓██▒  ▐▌██▒░██░  ▒   ██▒░▓█ ░██ ▒▓█  ▄ ▒██░    ▒██░    \n");
@@ -53,7 +54,6 @@ int main(void)
         }
         head = parsing(rl_input, head);
 		parse_execution(head, rl_input);
-        printf("test exit\n");
         free(rl_input);
         if (head)
         {

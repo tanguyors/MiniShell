@@ -526,13 +526,12 @@ void multi_pipe_handling(struct s_shell *current, char *rl_input)
             prev_fd = fd[0]; // Garder le côté lecture pour la prochaine commande
         }
         else
-            close(fd[0]); // Pas de commande suivante, fermer les descripteurs restants
-		
+			close(fd[0]); // Pas de commande suivante, fermer les descripteurs restants
         current = current->next;
         while (current && current->token != TOKEN_CMD)
 		{
-			//redirection_execution(current);
-			current = current->next;	
+			//redirection_execution(current, rl_input);
+			current = current->next;
 		}
     }
     while (wait(NULL) > 0)
