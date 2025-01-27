@@ -228,12 +228,12 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 
 struct s_shell *post_parsing_condition(struct s_shell *current, int *break_flag)
 {
+
 	if (current->token == TOKEN_CMD && current->next->token == TOKEN_CMD)
 		current->next->token = TOKEN_ARG;
 	if (current->token != TOKEN_PIPE && current->next->token == TOKEN_CMD)
 		current->next->token = TOKEN_ARG;
-	if (current->token == TOKEN_PIPE && current->next->token == TOKEN_PIPE 
-	|| current->token == TOKEN_PIPE && current->next->token != TOKEN_CMD)
+	if (current->token == TOKEN_PIPE && current->next->token == TOKEN_PIPE)
 	{
 		perror("bash: syntax error near unexpected token `|'");
 		*break_flag = 1;
@@ -243,10 +243,13 @@ struct s_shell *post_parsing_condition(struct s_shell *current, int *break_flag)
 
 /* Second parsing corrige la succession de 2 commandes,
 	succession d'une prochaine commande sans pipe  */
+/* Appel récursif a parsing afin de gérer le cas ou 
+	une commande n'a pas été fourni après un pipe */
 struct s_shell *p_post_parsing(struct s_shell *head)
 {
 	struct s_shell *current;
 	int break_flag;
+	char *rl_input;
 
 	break_flag = 0;
 	current = head;
@@ -258,13 +261,14 @@ struct s_shell *p_post_parsing(struct s_shell *head)
 			if (break_flag)
 				break;
 		}
-		if (current->token == TOKEN_DOUBLE_QUOTE || current->token == TOKEN_SIMPLE_QUOTE)
-			current->token = TOKEN_ARG;
 		if (current->token == TOKEN_PIPE && !current->next)
 		{
-			perror("bash: syntax error near unexpected token `|'");
-			break;
+			printf("new readline\n");
+			rl_input = readline("> ");
+			current = parsing(rl_input, current);
 		}
+		if (current->token == TOKEN_DOUBLE_QUOTE || current->token == TOKEN_SIMPLE_QUOTE)
+			current->token = TOKEN_ARG;
 		current = current->next;
 	}
 	return (head);
