@@ -443,23 +443,14 @@ void redirection_execution(struct s_shell *current, char *rl_input)
 		exit_with_error("waitpid error", NULL);
 }*/
 
-static void child_process(int fd[2], int prev_fd, struct s_shell *current, char *rl_input)
+static void child_redir(struct s_shell *current, char *rl_input)
 {
-	int nb_pipe;
 	struct s_shell *current_redir;
 	struct s_shell *first_arg;
 	int flag;
 
 	flag = 0;
 	current_redir = current;
-	nb_pipe = is_pipe(current);
-	// Si un pipe précédent existe, connectez-le à STDIN
-	if (prev_fd != -1)
-	{
-		if (dup2(prev_fd, STDIN_FILENO) < 0)
-			exit_with_error("dup2 error prev_fd", NULL);
-		close(prev_fd);
-	}
 	if (current_redir->next)
 	{
 		while(current_redir->next && !is_token_red(current_redir->token)) // ajouter is_token_red(current->next->next->token)
@@ -473,7 +464,22 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current, char 
 		}
 		if (is_token_red(current_redir->token))
 			redirection_execution(first_arg, rl_input);
+	}	
+}
+
+static void child_process(int fd[2], int prev_fd, struct s_shell *current, char *rl_input)
+{
+	int nb_pipe;
+
+	nb_pipe = is_pipe(current);
+	// Si un pipe précédent existe, connectez-le à STDIN
+	if (prev_fd != -1)
+	{
+		if (dup2(prev_fd, STDIN_FILENO) < 0)
+			exit_with_error("dup2 error prev_fd", NULL);
+		close(prev_fd);
 	}
+	child_redir(current, rl_input);
 	// Si un pipe suivant existe, connectez-le à STDOUT
 	printf("test current token: %s\n", get_token_name(current->token));
 	//printf("nb_pipe: %d\n", nb_pipe);
@@ -529,10 +535,7 @@ void multi_pipe_handling(struct s_shell *current, char *rl_input)
 			close(fd[0]); // Pas de commande suivante, fermer les descripteurs restants
         current = current->next;
         while (current && current->token != TOKEN_CMD)
-		{
-			//redirection_execution(current, rl_input);
 			current = current->next;
-		}
     }
     while (wait(NULL) > 0)
         continue;
