@@ -4,10 +4,12 @@
 
 /* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées. 
 			 -Tester la robustesse du code, faire un rapport des erreurs.
-			 -Checker les leaks. <-- actuellement en cours
+             -Integrer une fonction pour la substitution.
+			 -Checker les leaks. (free(input) lors des erreurs en parsing) <-- actuellement en cours
 			 -Remise à la norme. */
 
-/* Erreur :  -gérer "cat << end | grep a" */
+/* Erreur :  -gérer "cat << end | grep a" 
+             -gérer "<< end" */
 static void ascii_art()
 {
     printf("\n\n\n");
