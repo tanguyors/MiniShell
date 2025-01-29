@@ -147,3 +147,41 @@ size_t	ft_strspn(const char *s, const char *accept)
     }
     return (i);
 }
+
+char *ft_strtok(char *str, const char *delim) 
+{
+    static char *save_ptr = NULL; // Le post-it magique
+    char *token_start;
+    char *token_end;
+    // Si on a fini, on retourne NULL
+    if (str == NULL && (save_ptr == NULL || *save_ptr == '\0'))
+        return NULL;
+    // Début de la chaîne ou suite
+    if (str != NULL)
+        save_ptr = str;
+    else
+        str = save_ptr;
+    // Saute les délimiteurs au début ("   bonjour" → "bonjour")
+    str += ft_strspn(str, delim);
+    // Plus rien à découper ?
+    if (*str == '\0') 
+    {
+        save_ptr = str;
+        return NULL;
+    }
+    // Trouve la fin du token
+    token_start = str;
+    token_end = token_start + ft_strcspn(token_start, delim);
+    // Coupe et sauvegarde
+    if (*token_end != '\0') 
+    {
+        *token_end = '\0';
+        save_ptr = token_end + 1;
+    } 
+    else 
+    {
+        save_ptr = token_end;
+    }
+    return token_start;
+}
+

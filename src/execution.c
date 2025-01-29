@@ -33,7 +33,7 @@ char *get_absolute_path(char *command)
     path_copy[sizeof(path_copy) - 1] = '\0';
     // Parcourir chaque répertoire dans PATH
 	// Utilisation de strtok pour clear le PATH
-    dir = strtok(path_copy, ":");
+    dir = ft_strtok(path_copy, ":");
     while (dir != NULL) 
 	{
         // Construire le chemin à partir de 'dir' et 'command'
@@ -43,7 +43,7 @@ char *get_absolute_path(char *command)
         if (access(path, X_OK) == 0) 
             return (path);
 
-        dir = strtok(NULL, ":");
+        dir = ft_strtok(NULL, ":");
     }
     return (NULL);
 }

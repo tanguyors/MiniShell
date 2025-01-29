@@ -93,6 +93,9 @@ int is_space(int c);
 int is_token_red(enum e_tokens token);
 int is_redirection_in_list(struct s_shell *head);
 int is_pipe(struct s_shell *current);
+char *ft_strtok(char *str, const char *delim);
+size_t	ft_strspn(const char *s, const char *accept);
+size_t ft_strcspn(const char *s, const char *reject);
 /*-- Executions --*/
 void parse_execution(struct s_shell *head);
 /*-- Built-in --*/
