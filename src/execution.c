@@ -50,32 +50,38 @@ char *get_absolute_path(char *command)
 
 void std_execution(struct s_shell *current)
 {
-	pid_t pid;
-	char *command;
-	char **args;
-	extern char **environ;
+    pid_t pid;
+    char *command;
+    char **args;
+    extern char **environ;
+    int status; // Variable pour stocker le code de sortie
 
     pid = fork();
-    if (pid == -1) 
-		exit_with_error("fork error", NULL);
-	else if (pid == 0) 
-	{
+    if (pid == -1)
+        exit_with_error("fork error", NULL);
+    else if (pid == 0)
+    {
         command = get_absolute_path(current->data);
-		if (!command)
-			command = current->data; // cas de ./
+        if (!command)
+            command = current->data; // cas de ./
         args = get_all_data(current);
-        if (execve(command, args, environ) == -1) 
-		{
-			if(ft_strchr(current->data, '/'))
-				printf("bash: %s: Is a redictory\n", current->data);
-			else
-            	printf("%s: command not found\n", current->data);
-			exit_with_error(NULL, args);
+        if (execve(command, args, environ) == -1)
+        {
+            if(ft_strchr(current->data, '/'))
+                printf("bash: %s: Is a directory\n", current->data);
+            else
+                printf("%s: command not found\n", current->data);
+            exit_with_error(NULL, args);
         }
-		free_array(args);
-    } 
-	else 
-        waitpid(pid, NULL, 0);
+        free_array(args);
+    }
+    else
+    {
+        if (waitpid(pid, &status, 0) == -1) // Attendre le processus enfant
+            exit_with_error("waitpid error", NULL);
+        if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
+            g_exit_status = WEXITSTATUS(status); // Mettre à jour le code de sortie
+    }
 }
 
 /* Initialise les builtin et parcourt l'array builtin afin de trouver la commande correspondante
@@ -83,16 +89,17 @@ void std_execution(struct s_shell *current)
 	std_execution() sera donc appelé */
 void cmd_execution(struct s_shell *current, char **data)
 {
-	t_builtin builtin[8];
-	int i;
+    t_builtin builtin[8];
+    int i;
 
-	i = 0;
-	printf("CMD_EXECUTION !\n");
-	initialize_builtin(builtin);
+    i = 0;
+    printf("CMD_EXECUTION !\n");
+    initialize_builtin(builtin);
+
     // Parcourt la table des commandes internes
     while (builtin[i].name != NULL)
     {
-		//printf("current data: %s\n", current->data);
+        //printf("current data: %s\n", current->data);
         if (ft_strcmp(current->data, builtin[i].name) == 0)
         {
             builtin[i].func(data); // Appelle la fonction correspondante.
@@ -100,10 +107,19 @@ void cmd_execution(struct s_shell *current, char **data)
         }
         i++;
     }
-	// Si aucune commande builtin ne correspond
-	std_execution(current);
+
+    // Gérer la commande $?
+    if (ft_strcmp(current->data, "$?") == 0)
+    {
+        printf("%d\n", g_exit_status);
+        return;
+    }
+
+    // Si aucune commande builtin ne correspond
+    std_execution(current);
     //ft_printf("minishell: %s: command not found\n", current->data);
 }
+
 
 /* Data des arguments des commandes uniquement 
 	mémoire alloué au char ** */

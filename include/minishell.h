@@ -56,6 +56,8 @@ typedef struct s_builtin
     int (*func)(char **);
 } t_builtin;
 
+extern int g_exit_status; // Déclaration de la variable globale
+
 
 /*-- Parsing --*/
 char **parse_tokens(char *input);
@@ -96,6 +98,8 @@ int is_pipe(struct s_shell *current);
 char *ft_strtok(char *str, const char *delim);
 size_t	ft_strspn(const char *s, const char *accept);
 size_t ft_strcspn(const char *s, const char *reject);
+char *expand_exit_status(char *input);
+char *ft_strreplace(const char *str, const char *old, const char *new);
 /*-- Executions --*/
 void parse_execution(struct s_shell *head);
 /*-- Built-in --*/
@@ -110,6 +114,7 @@ int ft_cd(char **argv);
 static char *construct_path(const char *base, const char *input);
 void push_dir(const char *dir);
 char *pop_dir(void);
+void execute_command(char *input);
 /*-- Signal --*/
 void handle_signal(int sig, siginfo_t *info, void *context);
 

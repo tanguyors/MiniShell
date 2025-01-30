@@ -21,6 +21,8 @@ static void ascii_art()
     printf("       ░    ░           ░  ░        ░   ░  ░  ░   ░  ░    ░  ░    ░  ░\n\n\n");
 }
 
+int g_exit_status = 0; // Définition de la variable globale
+
 static void signals()
 {
     struct sigaction sa;
