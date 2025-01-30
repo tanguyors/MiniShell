@@ -29,21 +29,21 @@ char *get_absolute_path(char *command)
         perror("Error PATH not found\n");
         return (NULL);
     }
-    strncpy(path_copy, path_env, sizeof(path_copy));
+    ft_strncpy(path_copy, path_env, sizeof(path_copy));
     path_copy[sizeof(path_copy) - 1] = '\0';
     // Parcourir chaque répertoire dans PATH
 	// Utilisation de strtok pour clear le PATH
-    dir = strtok(path_copy, ":");
+    dir = ft_strtok(path_copy, ":");
     while (dir != NULL) 
 	{
         // Construire le chemin à partir de 'dir' et 'command'
         ft_strcpy(path, dir);
-        strcat(path, "/");
-        strcat(path, command);
+        ft_strcat(path, "/");
+        ft_strcat(path, command);
         if (access(path, X_OK) == 0) 
             return (path);
 
-        dir = strtok(NULL, ":");
+        dir = ft_strtok(NULL, ":");
     }
     return (NULL);
 }
@@ -54,6 +54,7 @@ void std_execution(struct s_shell *current)
 	char *command;
 	char **args;
 	extern char **environ;
+	int status; // Variable pour stocker le code de sortie
 
     pid = fork();
     if (pid == -1) 
@@ -74,8 +75,13 @@ void std_execution(struct s_shell *current)
         }
 		free_array(args);
     } 
-	else 
-        waitpid(pid, NULL, 0);
+    else
+    {
+        if (waitpid(pid, &status, 0) == -1) // Attendre le processus enfant
+            exit_with_error("waitpid error", NULL);
+        /*if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
+            g_exit_status = WEXITSTATUS(status); // Mettre à jour le code de sortie*/
+    }
 }
 
 /* Initialise les builtin et parcourt l'array builtin afin de trouver la commande correspondante
@@ -100,6 +106,12 @@ void cmd_execution(struct s_shell *current, char **data, char *rl_input)
         }
         i++;
     }
+	// Gérer la commande $?
+    /*if (ft_strcmp(current->data, "$?") == 0)
+    {
+        printf("%d\n", g_exit_status);
+        return;
+    }*/
 	// Si aucune commande builtin ne correspond
 	std_execution(current);
     //ft_printf("minishell: %s: command not found\n", current->data);
@@ -558,9 +570,9 @@ void exec_without_pipe(struct s_shell *current, char *rl_input)
 				first_arg = current;
 				flag = 1;
 			}
-			if (current->next->token)
+			if (current->next->token || current->token)
 			{
-				if (is_token_red(current->next->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
+				if (is_token_red(current->next->token) || is_token_red(current->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
 				{
 					redirection_execution(first_arg, rl_input);
 				}

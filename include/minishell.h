@@ -19,6 +19,7 @@
 # define B_BLUE "\033[1;36m"
 # define RESET "\033[0m"
 
+
 enum e_tokens
 {
     TOKEN_UNDEFINED, 
@@ -89,6 +90,9 @@ const char *get_token_name(enum e_tokens token);
 void exit_with_error(const char *str_error, char **array);
 char **get_all_data(struct s_shell *current);
 char **get_arg_data(struct s_shell *current);
+char *ft_strtok(char *str, const char *delim);
+char *ft_strncpy(char *dest, const char *src, size_t n);
+char *ft_strcat(char *dest, const char *src);
 /*-- Is_Utils --*/
 int is_spec_char(int c);
 int is_ignored_char(int c);

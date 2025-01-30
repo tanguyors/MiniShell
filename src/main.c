@@ -8,8 +8,8 @@
 			 -Checker les leaks. (free(input) lors des erreurs en parsing) <-- actuellement en cours
 			 -Remise à la norme. */
 
-/* Erreur :  -gérer "cat << end | grep a" 
-             -gérer "<< end" */
+/* Erreur :  -gérer "cat << eof | grep a" 
+             -gérer "<< eof" */
 static void ascii_art()
 {
     printf("\n\n\n");

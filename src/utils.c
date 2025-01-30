@@ -98,7 +98,7 @@ void exit_with_error(const char *str_error, char **array)
     exit(EXIT_FAILURE);
 }
 
-size_t ft_strcspn(const char *s, const char *reject)
+static size_t ft_strcspn(const char *s, const char *reject)
 {
     int i;
     int j;
@@ -120,7 +120,7 @@ size_t ft_strcspn(const char *s, const char *reject)
     return (i);
 }
 
-size_t	ft_strspn(const char *s, const char *accept)
+static size_t	ft_strspn(const char *s, const char *accept)
 {
     int i;
     int j;
@@ -146,4 +146,75 @@ size_t	ft_strspn(const char *s, const char *accept)
         i++;
     }
     return (i);
+}
+
+char *ft_strtok(char *str, const char *delim)
+{
+    static char *save_ptr = NULL; // Le post-it magique
+    char *token_start;
+    char *token_end;
+    // Si on a fini, on retourne NULL
+    if (str == NULL && (save_ptr == NULL || *save_ptr == '\0'))
+        return NULL;
+    // Début de la chaîne ou suite
+    if (str != NULL)
+        save_ptr = str;
+    else
+        str = save_ptr;
+    // Saute les délimiteurs au début ("   bonjour" → "bonjour")
+    str += ft_strspn(str, delim);
+    // Plus rien à découper ?
+    if (*str == '\0') 
+    {
+        save_ptr = str;
+        return NULL;
+    }
+    // Trouve la fin du token
+    token_start = str;
+    token_end = token_start + ft_strcspn(token_start, delim);
+    // Coupe et sauvegarde
+    if (*token_end != '\0') 
+    {
+        *token_end = '\0';
+        save_ptr = token_end + 1;
+    } 
+    else 
+    {
+        save_ptr = token_end;
+    }
+    return token_start;
+}
+
+char *ft_strncpy(char *dest, const char *src, size_t n)
+{
+    size_t i;
+
+    i = 0;
+    while (src[i] && i < n)
+    {
+        dest[i] = src[i];
+        i++;
+    }
+    while (i < n)
+    {
+        dest[i] = '\0';
+        i++;
+    }
+    return (dest);
+}
+
+char *ft_strcat(char *dest, const char *src)
+{
+    size_t dest_len;
+    size_t i;
+
+    dest_len = ft_strlen(dest);
+    i = 0;
+    while (src[i] != '\0')
+    {
+        dest[dest_len + i] = src[i];
+        i++;
+    }
+    dest[dest_len + i] = '\0';
+    return dest;
 }
