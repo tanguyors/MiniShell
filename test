@@ -1,8 +1,0 @@
-EXTRACT_DATA !
-data[0]: test
-CMD_EXECUTION !
-test
-EXTRACT_DATA !
-data[0]: test2
-CMD_EXECUTION !
-test2
