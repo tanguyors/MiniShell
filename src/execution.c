@@ -326,6 +326,7 @@ void setup_heredoc(struct s_shell **current, int (*pipe_fd)[2])
 void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
 {
 	char *line;
+	char *sub_line;
 	size_t len;
 
 	printf("loop heredoc: %s\n", current->data);
@@ -333,8 +334,14 @@ void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
     {
         ft_printf("heredoc> ");
         line = get_next_line(STDIN_FILENO);
-        if (!line)
+		if (!line)
             break;
+		/*if (ft_strchr(line, '$'))
+		{
+			sub_line = expand_variable(line + 1);
+			free(line);
+			line = ft_strcpy(line, sub_line);
+		}*/
         // Suppression du newline à la fin
         len = ft_strlen(line);
         if (len > 0 && line[len - 1] == '\n')
@@ -404,6 +411,7 @@ void redirection_execution(struct s_shell *current, char *rl_input)
 	}
 	else if (which_redir->token == REDIR_HEREDOC)
 	{
+		printf("HEREDOC !\n");
 		redir_heredoc(current, rl_input);
 	}
 }
@@ -475,7 +483,9 @@ static void child_redir(struct s_shell *current, char *rl_input)
 			current_redir = current_redir->next;
 		}
 		if (is_token_red(current_redir->token))
+		{
 			redirection_execution(first_arg, rl_input);
+		}
 	}	
 }
 
@@ -529,9 +539,9 @@ void multi_pipe_handling(struct s_shell *current, char *rl_input)
     pid_t pid;
 
 	prev_fd = -1;
+	printf("MULTI_PIPE_HANDLING !\n");
     while (current)
     {
-		printf("MULTI_PIPE_HANDLING !\n");
         pipe_and_fork(fd, &pid);
         if (pid == 0)
 			child_process(fd, prev_fd, current, rl_input);
@@ -575,6 +585,7 @@ void exec_without_pipe(struct s_shell *current, char *rl_input)
 				if (is_token_red(current->next->token) || is_token_red(current->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
 				{
 					redirection_execution(first_arg, rl_input);
+					current = current->next;
 				}
 			}
 		}

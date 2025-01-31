@@ -93,6 +93,7 @@ char **get_arg_data(struct s_shell *current);
 char *ft_strtok(char *str, const char *delim);
 char *ft_strncpy(char *dest, const char *src, size_t n);
 char *ft_strcat(char *dest, const char *src);
+char *expand_variable(const char *var);
 /*-- Is_Utils --*/
 int is_spec_char(int c);
 int is_ignored_char(int c);
