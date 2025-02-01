@@ -36,16 +36,10 @@ enum e_tokens
 	TOKEN_DOUBLE_QUOTE
 };
 
-struct s_data_shared
-{
-    char *input;
-};
-
 struct s_shell
 {
     struct s_shell *next;
     struct s_shell *prev;
-    struct s_data_shared *share;
     enum e_tokens token;
     char *data;
 };

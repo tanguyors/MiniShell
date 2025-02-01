@@ -80,7 +80,7 @@ void std_execution(struct s_shell *current)
         if (waitpid(pid, &status, 0) == -1) // Attendre le processus enfant
             exit_with_error("waitpid error", NULL);
         /*if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
-            g_exit_status = WEXITSTATUS(status); // Mettre à jour le code de sortie*/
+            current->share->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie*/
     }
 }
 

@@ -37,7 +37,7 @@ static void signals()
 
 int main(void)
 {
-    struct s_shell value;
+    struct s_shell shell;
     struct s_shell *head;
     char *rl_input;
 
