@@ -16,12 +16,21 @@ int ft_exit(char **argv, char *rl_input)
  * Retourne 0 en cas de succès.
  */
 
-/* Passage de l'index i a 0 car data[0] correspond au premier argument,
-	alors qu'avant token[0] correspondait au type de commande */
+/* Parse et récupère la variable d'environnement */
 char *expand_variable(const char *var)
 {
-    char *value = getenv(var);
-    return (value ? value : ""); // Retourne la valeur ou une chaîne vide
+    size_t len = 0;
+    char *var_name;
+    char *value;
+
+    while (var[len] && (ft_isalnum(var[len]) || var[len] == '_'))
+        len++;
+    var_name = ft_substr(var, 0, len);
+    value = getenv(var_name);
+    free(var_name);
+    if (value)
+        return (value);
+    return ("");
 }
 
 int ft_echo(char **argv)
