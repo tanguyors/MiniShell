@@ -323,26 +323,51 @@ void setup_heredoc(struct s_shell **current, int (*pipe_fd)[2])
         return ;
 }
 
+/* Permet de gérer le cas ou une variable d'environnement
+	doit être interprêté */
+char *h_expand_var(char *line, char **new_line, char **end_line)
+{
+	char *expanded_var;
+	char *dollar_pos;
+	char *before_dollar;
+	char *after_dollar;
+
+	dollar_pos = ft_strchr(line, '$');
+	if (dollar_pos)
+	{
+		expanded_var = expand_variable(dollar_pos + 1);
+		//ft_printf("test newline: %s\n", new_line);
+		before_dollar = ft_substr(line, 0, dollar_pos - line);
+		*new_line = ft_strjoin(before_dollar, expanded_var);
+		free(before_dollar);
+		while (*dollar_pos != ' ' && *dollar_pos)
+			dollar_pos++;
+		after_dollar = ft_substr(line, dollar_pos - line, expanded_var - line);
+		*end_line = ft_strjoin(*new_line, after_dollar);
+		free(line);
+		free(after_dollar);
+		line = *end_line;
+		//free(end_line);
+		free(*new_line);
+	}
+	return (line);
+}
+
 void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
 {
 	char *line;
-	char *sub_line;
+	char *new_line;
+	char *end_line;
 	size_t len;
 
 	//printf("loop heredoc: %s\n", current->data);
     while (1)
     {
-        //ft_printf("heredoc> ");
 		write(1, "heredoc> ", 9);
         line = get_next_line(STDIN_FILENO);
 		if (!line)
             break;
-		/*if (ft_strchr(line, '$'))
-		{
-			sub_line = expand_variable(line + 1);
-			free(line);
-			line = ft_strcpy(line, sub_line);
-		}*/
+		line = h_expand_var(line, &new_line, &end_line);
         // Suppression du newline à la fin
         len = ft_strlen(line);
         if (len > 0 && line[len - 1] == '\n')
@@ -357,7 +382,7 @@ void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
         write(pipe_fd[0][1], line, ft_strlen(line));
         write(pipe_fd[0][1], "\n", 1);
         free(line);
-    }	
+    }
 }
 
 /* Gestion du heredoc (<<)
