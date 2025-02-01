@@ -21,7 +21,6 @@ static void ascii_art()
     printf("       ░    ░           ░  ░        ░   ░  ░  ░   ░  ░    ░  ░    ░  ░\n\n\n");
 }
 
-int g_exit_status = 0; // Définition de la variable globale
 
 static void signals()
 {
@@ -38,7 +37,10 @@ int main(void)
 {
     struct s_shell value;
     struct s_shell *head;
+    struct s_shell shell;
+
     char *input;
+    shell.exit_code = 0;
 
     signals();
     ascii_art();
@@ -51,7 +53,7 @@ int main(void)
         if (input == NULL)  // Permet d'exit le shell (ctrl + D)
             exit(EXIT_SUCCESS);
         head = parsing(input, head);
-		parse_execution(head);
+		parse_execution(&shell, head);
         printf("test exit\n");
         free(input);
         if (head)

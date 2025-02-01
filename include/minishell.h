@@ -41,6 +41,7 @@ struct s_shell
     struct s_shell *prev;
     enum e_tokens token;
     char *data;
+    int exit_code; // gestion des code erreur
 };
 
 typedef struct s_dir_stack
@@ -101,7 +102,7 @@ size_t ft_strcspn(const char *s, const char *reject);
 char *expand_exit_status(char *input);
 char *ft_strreplace(const char *str, const char *old, const char *new);
 /*-- Executions --*/
-void parse_execution(struct s_shell *head);
+void parse_execution(struct s_shell *shell, struct s_shell *head);
 /*-- Built-in --*/
 int ft_exit(char **argv);
 int ft_echo(char **argv);
@@ -117,6 +118,7 @@ char *pop_dir(void);
 void execute_command(char *input);
 /*-- Signal --*/
 void handle_signal(int sig, siginfo_t *info, void *context);
+
 
 
 #endif

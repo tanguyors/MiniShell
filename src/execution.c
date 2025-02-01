@@ -48,7 +48,7 @@ char *get_absolute_path(char *command)
     return (NULL);
 }
 
-void std_execution(struct s_shell *current)
+void std_execution(struct s_shell *shell, struct s_shell *current)
 {
     pid_t pid;
     char *command;
@@ -80,14 +80,14 @@ void std_execution(struct s_shell *current)
         if (waitpid(pid, &status, 0) == -1) // Attendre le processus enfant
             exit_with_error("waitpid error", NULL);
         if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
-            g_exit_status = WEXITSTATUS(status); // Mettre à jour le code de sortie
+            shell->exit_code = WIFEXITED(status);
     }
 }
 
 /* Initialise les builtin et parcourt l'array builtin afin de trouver la commande correspondante
 	si la commande reste introuver cela signifie qu'il s'agit d'une commande système
 	std_execution() sera donc appelé */
-void cmd_execution(struct s_shell *current, char **data)
+void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
 {
     t_builtin builtin[8];
     int i;
@@ -111,12 +111,12 @@ void cmd_execution(struct s_shell *current, char **data)
     // Gérer la commande $?
     if (ft_strcmp(current->data, "$?") == 0)
     {
-        printf("%d\n", g_exit_status);
+        printf("%d\n", shell->exit_code);
         return;
     }
 
     // Si aucune commande builtin ne correspond
-    std_execution(current);
+    std_execution(shell, current);
     //ft_printf("minishell: %s: command not found\n", current->data);
 }
 
@@ -190,14 +190,11 @@ char **get_all_data(struct s_shell *current)
 
 /* cmd_execution() passe des tests classiques mais il y aura certainement des changement a faire par la suite
 	dans celle ci mais aussi les builtin */
-void extract_data(struct s_shell *current)
+void extract_data(struct s_shell *shell, struct s_shell *current)
 {
-	char **data;
-
-	printf("EXTRACT_DATA !\n");
-	data = get_arg_data(current);
-	cmd_execution(current, data);
-	free(data);
+    char **data = get_arg_data(current);
+    cmd_execution(shell, current, data); // Propagation du shell
+    free(data);
 }
 
 static int setup_redirection(struct s_shell *current, int flag, int file_access)
@@ -247,7 +244,7 @@ static void redir_input(struct s_shell *current)
     }
     // Exécution de la commande si présente
     if (head && head->token == TOKEN_CMD)
-        extract_data(head);
+        extract_data(shell, head);
     // Restauration de l'entrée standard
     dup2(saved_stdin, STDIN_FILENO);
     close(saved_stdin);
@@ -280,7 +277,7 @@ static void redir_output(struct s_shell *current)
     }
 	//printf("redir_output current token: %s\n", get_token_name(current->token));
     if (head && head->token == TOKEN_CMD)
-        extract_data(head);
+        extract_data(shell, head);
     dup2(saved_stdout, STDOUT_FILENO);
     close(saved_stdout);
     close(fd);
@@ -311,7 +308,7 @@ static void redir_append(struct s_shell *current)
         return ;
     }
     if (head && head->token == TOKEN_CMD)
-        extract_data(head);
+        extract_data(shell, head);
     dup2(saved_stdout, STDOUT_FILENO);
     close(saved_stdout);
     close(fd);
@@ -375,7 +372,7 @@ static void redir_heredoc(struct s_shell *current)
     if (dup2(pipe_fd[0], STDIN_FILENO) != -1)
     {
         if (head && head->token == TOKEN_CMD)
-            extract_data(head);
+            extract_data(shell, head);
     }
     // Restauration
     dup2(saved_stdin, STDIN_FILENO);
@@ -459,7 +456,7 @@ void redirection_execution(struct s_shell *current)
 		exit_with_error("waitpid error", NULL);
 }*/
 
-static void child_process(int fd[2], int prev_fd, struct s_shell *current)
+static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct s_shell *current)
 {
 	int nb_pipe;
 	struct s_shell *current_redir;
@@ -502,7 +499,7 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current)
 	}
 	close(fd[0]);
 	close(fd[1]);
-	extract_data(current);
+	extract_data(shell, current);
 	exit(EXIT_SUCCESS);
 }
 
@@ -520,7 +517,7 @@ static void pipe_and_fork(int fd[2], int *pid)
 	Utilisation de fork afin de créer un processus enfant, 
 	celui ci va redirigé la sortie de la commande en fonction des pipes. 
 	Ici le double pointeur current représente la liste chaînée complète*/
-void multi_pipe_handling(struct s_shell *current)
+void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
 {
     int fd[2];
     int prev_fd;
@@ -532,7 +529,7 @@ void multi_pipe_handling(struct s_shell *current)
 		printf("MULTI_PIPE_HANDLING !\n");
         pipe_and_fork(fd, &pid);
         if (pid == 0)
-			child_process(fd, prev_fd, current);
+			child_process(shell, fd, prev_fd, current);
         // Parent : Gérer les descripteurs
         if (prev_fd != -1)
             close(prev_fd);
@@ -557,7 +554,7 @@ void multi_pipe_handling(struct s_shell *current)
 }
 
 
-void exec_without_pipe(struct s_shell *current)
+void exec_without_pipe(struct s_shell *shell, struct s_shell *current)
 {
 	int flag;
 	struct s_shell *first_arg;
@@ -587,7 +584,7 @@ void exec_without_pipe(struct s_shell *current)
 			{
 				if (current->token == TOKEN_CMD) // relié a TOKEN_ARG, cherche un token ARG
 				{
-					extract_data(current);
+					extract_data(shell, current);
 				}
 			}
 		}
@@ -598,17 +595,14 @@ void exec_without_pipe(struct s_shell *current)
 /* Permet de trier les executions des commandes,
 	en parcourant les tokens de la liste chaînée */
 /* Passage par référence necessaire ? */
-void parse_execution(struct s_shell *head)
+void parse_execution(struct s_shell *shell, struct s_shell *head)
 {
-	struct s_shell *current;
-
-	current = head;
-	if (!is_pipe(current))
-	{
-		exec_without_pipe(current);
-	}
-	else
-	{
-		multi_pipe_handling(current);
-	}
+    struct s_shell *current = head;
+    
+    if (!is_pipe(current)) {
+        exec_without_pipe(shell, current); // Ajout du paramètre shell
+    }
+    else {
+        multi_pipe_handling(shell, current); // Ajout du paramètre shell
+    }
 }
