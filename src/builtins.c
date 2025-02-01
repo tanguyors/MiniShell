@@ -2,8 +2,9 @@
 //Implementations des commandes interne
 #include "../include/minishell.h"
 
-int ft_exit(char **argv)
+int ft_exit(char **argv, struct s_shell *shell)
 {
+    free(shell->rl_input);
 	exit(EXIT_SUCCESS);
 }
 
@@ -15,15 +16,24 @@ int ft_exit(char **argv)
  * Retourne 0 en cas de succès.
  */
 
-/* Passage de l'index i a 0 car data[0] correspond au premier argument,
-	alors qu'avant token[0] correspondait au type de commande */
+/* Parse et récupère la variable d'environnement */
 char *expand_variable(const char *var)
 {
-    char *value = getenv(var);
-    return (value ? value : ""); // Retourne la valeur ou une chaîne vide
+    size_t len = 0;
+    char *var_name;
+    char *value;
+
+    while (var[len] && (ft_isalnum(var[len]) || var[len] == '_'))
+        len++;
+    var_name = ft_substr(var, 0, len);
+    value = getenv(var_name);
+    free(var_name);
+    if (value)
+        return (value);
+    return ("");
 }
 
-int ft_echo(char **argv)
+int ft_echo(char **argv, struct s_shell *shell)
 {
     int i = 0;
     int newline = 1;
@@ -58,7 +68,7 @@ int ft_echo(char **argv)
     return (0);
 }
  //--------------------------------------------------------------------------------------PWD------------------------------------------------------------------------
-int ft_pwd(char **argv)
+int ft_pwd(char **argv, struct s_shell *shell)
 {
 	(void)argv;
     char cwd[1024]; // Buffer pour stocker le chemin
@@ -85,7 +95,7 @@ extern char **environ; // Déclare la variable globale environ qui se trouve dan
  *
  * Retourne 0 en cas de succès, 1 si des arguments sont passés.
  */
-int ft_env(char **argv) 
+int ft_env(char **argv, struct s_shell *shell) 
 {
     int i = 0;
 
@@ -141,7 +151,7 @@ int	is_valid_identifier(const char *str)
  *
  * Retourne 0 en cas de succès, 1 en cas d'erreur.
  */
-int	ft_export(char **argv)
+int	ft_export(char **argv, struct s_shell *shell)
 {
 	int		i;      // Index pour parcourir les arguments
 	char	*name;   // Stocke le nom de la variable
@@ -196,7 +206,7 @@ int	ft_export(char **argv)
 
 //--------------------------------------------------------------------------------------------------------------------------UNSET---------------------------------------------------------------------------------------------
 // Version definitive a revoir pour mettre a la norme !!!!!
-int	ft_unset(char **argv)
+int	ft_unset(char **argv, struct s_shell *shell)
 {
 	int	i;
 	int	j;
@@ -291,7 +301,7 @@ char *pop_dir(void)
  * Retourne 0 en cas de succès, 1 en cas d'erreur.
  */
 
-int ft_cd(char **argv)
+int ft_cd(char **argv, struct s_shell *shell)
 {
     char cwd[1024];
     char *path;

@@ -29,7 +29,7 @@ char *get_absolute_path(char *command)
         perror("Error PATH not found\n");
         return (NULL);
     }
-    strncpy(path_copy, path_env, sizeof(path_copy));
+    ft_strncpy(path_copy, path_env, sizeof(path_copy));
     path_copy[sizeof(path_copy) - 1] = '\0';
     // Parcourir chaque répertoire dans PATH
 	// Utilisation de strtok pour clear le PATH
@@ -38,8 +38,8 @@ char *get_absolute_path(char *command)
 	{
         // Construire le chemin à partir de 'dir' et 'command'
         ft_strcpy(path, dir);
-        strcat(path, "/");
-        strcat(path, command);
+        ft_strcat(path, "/");
+        ft_strcat(path, command);
         if (access(path, X_OK) == 0) 
             return (path);
 
@@ -50,37 +50,37 @@ char *get_absolute_path(char *command)
 
 void std_execution(struct s_shell *shell, struct s_shell *current)
 {
-    pid_t pid;
-    char *command;
-    char **args;
-    extern char **environ;
-    int status; // Variable pour stocker le code de sortie
+	pid_t pid;
+	char *command;
+	char **args;
+	extern char **environ;
+	int status; // Variable pour stocker le code de sortie
 
     pid = fork();
-    if (pid == -1)
-        exit_with_error("fork error", NULL);
-    else if (pid == 0)
-    {
+    if (pid == -1) 
+		exit_with_error("fork error", NULL, 1);
+	else if (pid == 0) 
+	{
         command = get_absolute_path(current->data);
-        if (!command)
-            command = current->data; // cas de ./
+		if (!command)
+			command = current->data; // cas de ./
         args = get_all_data(current);
-        if (execve(command, args, environ) == -1)
-        {
-            if(ft_strchr(current->data, '/'))
-                printf("bash: %s: Is a directory\n", current->data);
-            else
-                printf("%s: command not found\n", current->data);
-            exit_with_error(NULL, args);
+        if (execve(command, args, environ) == -1) 
+		{
+			if(ft_strchr(current->data, '/'))
+				printf("bash: %s: Is a redictory\n", current->data);
+			else
+            	printf("%s: command not found\n", current->data);
+			exit_with_error(NULL, args, 1);
         }
-        free_array(args);
-    }
+		free_array(args);
+    } 
     else
     {
         if (waitpid(pid, &status, 0) == -1) // Attendre le processus enfant
-            exit_with_error("waitpid error", NULL);
-        if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
-            shell->exit_code = WIFEXITED(status);
+            exit_with_error("waitpid error", NULL, 1);
+        /*if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
+            current->share->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie*/
     }
 }
 
@@ -89,37 +89,33 @@ void std_execution(struct s_shell *shell, struct s_shell *current)
 	std_execution() sera donc appelé */
 void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
 {
-    t_builtin builtin[8];
-    int i;
+	t_builtin builtin[8];
+	int i;
 
-    i = 0;
-    printf("CMD_EXECUTION !\n");
-    initialize_builtin(builtin);
-
+	i = 0;
+	printf("CMD_EXECUTION !\n");
+	initialize_builtin(builtin);
     // Parcourt la table des commandes internes
     while (builtin[i].name != NULL)
     {
-        //printf("current data: %s\n", current->data);
+		//printf("current data: %s\n", current->data);
         if (ft_strcmp(current->data, builtin[i].name) == 0)
         {
-            builtin[i].func(data); // Appelle la fonction correspondante.
+            builtin[i].func(data, shell); // Appelle la fonction correspondante.
             return;
         }
         i++;
     }
-
-    // Gérer la commande $?
-    if (ft_strcmp(current->data, "$?") == 0)
+	// Gérer la commande $?
+    /*if (ft_strcmp(current->data, "$?") == 0)
     {
-        printf("%d\n", shell->exit_code);
+        printf("%d\n", g_exit_status);
         return;
-    }
-
-    // Si aucune commande builtin ne correspond
-    std_execution(shell, current);
+    }*/
+	// Si aucune commande builtin ne correspond
+	std_execution(shell, current);
     //ft_printf("minishell: %s: command not found\n", current->data);
 }
-
 
 /* Data des arguments des commandes uniquement 
 	mémoire alloué au char ** */
@@ -131,7 +127,7 @@ char **get_arg_data(struct s_shell *current)
 
 	data = ft_calloc(1024, sizeof(char *));
 	if (!data)
-		exit_with_error("allocation error", NULL);
+		exit_with_error("allocation error", NULL, 1);
 	i = 0;
 	p_arg = current;
 	//printf("p_arg: %s\n", p_arg->data);
@@ -160,7 +156,7 @@ char **get_all_data(struct s_shell *current)
 
 	data = ft_calloc(1024, sizeof(char *));
 	if (!data)
-		exit_with_error("allocation error", NULL);
+		exit_with_error("allocation error", NULL, 1);
 	i = 0;
 	p_arg = current;
 	//printf("p_arg: %s\n", p_arg->data);
@@ -192,9 +188,12 @@ char **get_all_data(struct s_shell *current)
 	dans celle ci mais aussi les builtin */
 void extract_data(struct s_shell *shell, struct s_shell *current)
 {
-    char **data = get_arg_data(current);
-    cmd_execution(shell, current, data); // Propagation du shell
-    free(data);
+	char **data;
+
+	printf("EXTRACT_DATA !\n");
+	data = get_arg_data(current);
+	cmd_execution(shell, current, data);
+	free(data);
 }
 
 static int setup_redirection(struct s_shell *current, int flag, int file_access)
@@ -324,18 +323,51 @@ void setup_heredoc(struct s_shell **current, int (*pipe_fd)[2])
         return ;
 }
 
+/* Permet de gérer le cas ou une variable d'environnement
+	doit être interprêté */
+char *h_expand_var(char *line, char **new_line, char **end_line)
+{
+	char *expanded_var;
+	char *dollar_pos;
+	char *before_dollar;
+	char *after_dollar;
+
+	dollar_pos = ft_strchr(line, '$');
+	if (dollar_pos)
+	{
+		expanded_var = expand_variable(dollar_pos + 1);
+		//ft_printf("test newline: %s\n", new_line);
+		before_dollar = ft_substr(line, 0, dollar_pos - line);
+		*new_line = ft_strjoin(before_dollar, expanded_var);
+		free(before_dollar);
+		while (*dollar_pos != ' ' && *dollar_pos)
+			dollar_pos++;
+		after_dollar = ft_substr(line, dollar_pos - line, expanded_var - line);
+		*end_line = ft_strjoin(*new_line, after_dollar);
+		free(line);
+		free(after_dollar);
+		line = *end_line;
+		//free(end_line);
+		free(*new_line);
+	}
+	return (line);
+}
+
 void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
 {
 	char *line;
+	char *new_line;
+	char *end_line;
 	size_t len;
 
-	printf("loop heredoc: %s\n", current->data);
+	//printf("loop heredoc: %s\n", current->data);
     while (1)
     {
-        ft_printf("heredoc> ");
+		write(1, "heredoc> ", 9);
         line = get_next_line(STDIN_FILENO);
-        if (!line)
+		if (!line)
             break;
+		line = h_expand_var(line, &new_line, &end_line);
         // Suppression du newline à la fin
         len = ft_strlen(line);
         if (len > 0 && line[len - 1] == '\n')
@@ -350,7 +382,7 @@ void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
         write(pipe_fd[0][1], line, ft_strlen(line));
         write(pipe_fd[0][1], "\n", 1);
         free(line);
-    }	
+    }
 }
 
 /* Gestion du heredoc (<<)
@@ -381,13 +413,14 @@ static void redir_heredoc(struct s_shell *shell, struct s_shell *current)
 }
 
 
-/* Redirige vers le bon token de redirection */
+/* Redirige vers le bon token de redirection 
+	SUPPR PRINTF erreur heredoc */
 void redirection_execution(struct s_shell *shell, struct s_shell *current)
 {
 	struct s_shell *which_redir;
 
 	which_redir = current;
-	printf("REDIRECTION !\n");
+	printf("REDIRECTION !, current data: %s\n", which_redir->data);
 	print_list(current);
 	while (!is_token_red(which_redir->token))
 		which_redir = which_redir->next;
@@ -405,6 +438,7 @@ void redirection_execution(struct s_shell *shell, struct s_shell *current)
 	}
 	else if (which_redir->token == REDIR_HEREDOC)
 	{
+		printf("HEREDOC !\n");
 		redir_heredoc(shell, current);
 	}
 }
@@ -456,23 +490,14 @@ void redirection_execution(struct s_shell *shell, struct s_shell *current)
 		exit_with_error("waitpid error", NULL);
 }*/
 
-static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct s_shell *current)
+static void child_redir(struct s_shell *shell, struct s_shell *current)
 {
-	int nb_pipe;
 	struct s_shell *current_redir;
 	struct s_shell *first_arg;
 	int flag;
 
 	flag = 0;
 	current_redir = current;
-	nb_pipe = is_pipe(current);
-	// Si un pipe précédent existe, connectez-le à STDIN
-	if (prev_fd != -1)
-	{
-		if (dup2(prev_fd, STDIN_FILENO) < 0)
-			exit_with_error("dup2 error prev_fd", NULL);
-		close(prev_fd);
-	}
 	if (current_redir->next)
 	{
 		while(current_redir->next && !is_token_red(current_redir->token)) // ajouter is_token_red(current->next->next->token)
@@ -485,17 +510,51 @@ static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct 
 			current_redir = current_redir->next;
 		}
 		if (is_token_red(current_redir->token))
-			redirection_execution(shell, first_arg);
+		{
+			redirection_execution(shell, current_redir);
+		}
+	}	
+}
+
+static void child_redir2(struct s_shell *shell, struct s_shell *current)
+{
+	struct s_shell *current_redir;
+	struct s_shell *first_arg;
+
+	current_redir = current;
+	current_redir = current_redir->next;
+	if (current_redir->next)
+	{
+		while(current_redir->next && current_redir->token != TOKEN_CMD) // ajouter is_token_red(current->next->next->token)
+		{
+			current_redir = current_redir->next;
+		}
+		redirection_execution(shell, current_redir);
+	}	
+}
+
+static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct s_shell *current)
+{
+	int nb_pipe;
+
+	nb_pipe = is_pipe(current);
+	// Si un pipe précédent existe, connectez-le à STDIN
+	if (prev_fd != -1)
+	{
+		if (dup2(prev_fd, STDIN_FILENO) < 0)
+			exit_with_error("dup2 error prev_fd", NULL, 1);
+		close(prev_fd);
 	}
+	child_redir2(shell, current);
 	// Si un pipe suivant existe, connectez-le à STDOUT
-	printf("test current token: %s\n", get_token_name(current->token));
+	//printf("test current token: %s\n", get_token_name(current->token));
 	//printf("nb_pipe: %d\n", nb_pipe);
 	if (nb_pipe)
 	{
 		nb_pipe--;
 		printf("PASS\n");
 		if (dup2(fd[1], STDOUT_FILENO) < 0)
-			exit_with_error("dup2 error fd[1]", NULL);
+			exit_with_error("dup2 error fd[1]", NULL, 1);
 	}
 	close(fd[0]);
 	close(fd[1]);
@@ -506,11 +565,11 @@ static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct 
 static void pipe_and_fork(int fd[2], int *pid)
 {
 	if (pipe(fd) == -1)
-		exit_with_error("pipe error", NULL);
+		exit_with_error("pipe error", NULL, 1);
 
 	*pid = fork();
 	if (*pid < 0)
-		exit_with_error("fork error", NULL);
+		exit_with_error("fork error", NULL, 1);
 }
 
 /* Permet de gérer first_arg cas où un pipe est présent dans la liste. 
@@ -524,9 +583,9 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
     pid_t pid;
 
 	prev_fd = -1;
+	printf("MULTI_PIPE_HANDLING !\n");
     while (current)
     {
-		printf("MULTI_PIPE_HANDLING !\n");
         pipe_and_fork(fd, &pid);
         if (pid == 0)
 			child_process(shell, fd, prev_fd, current);
@@ -539,15 +598,10 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
             prev_fd = fd[0]; // Garder le côté lecture pour la prochaine commande
         }
         else
-            close(fd[0]); // Pas de commande suivante, fermer les descripteurs restants
-		
+			close(fd[0]); // Pas de commande suivante, fermer les descripteurs restants
         current = current->next;
         while (current && current->token != TOKEN_CMD)
-		{
-			//redirection_execution(current);
-			current = current->next;	
-		}
-		
+			current = current->next;
     }
     while (wait(NULL) > 0)
         continue;
@@ -570,11 +624,12 @@ void exec_without_pipe(struct s_shell *shell, struct s_shell *current)
 				first_arg = current;
 				flag = 1;
 			}
-			if (current->next->token)
+			if (current->next->token || current->token)
 			{
-				if (is_token_red(current->next->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
+				if (is_token_red(current->next->token) || is_token_red(current->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
 				{
 					redirection_execution(shell, first_arg);
+					current = current->next;
 				}
 			}
 		}
@@ -597,12 +652,15 @@ void exec_without_pipe(struct s_shell *shell, struct s_shell *current)
 /* Passage par référence necessaire ? */
 void parse_execution(struct s_shell *shell, struct s_shell *head)
 {
-    struct s_shell *current = head;
-    
-    if (!is_pipe(current)) {
-        exec_without_pipe(shell, current); // Ajout du paramètre shell
-    }
-    else {
-        multi_pipe_handling(shell, current); // Ajout du paramètre shell
-    }
+	struct s_shell *current;
+
+	current = head;
+	if (!is_pipe(current))
+	{
+		exec_without_pipe(shell, current);
+	}
+	else
+	{
+		multi_pipe_handling(shell, current);
+	}
 }

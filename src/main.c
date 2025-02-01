@@ -2,15 +2,16 @@
 #include "../include/minishell.h"
 # include <unistd.h> 
 
-/* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées. 
+/* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées. <-- actuellement en cours
 			 -Tester la robustesse du code, faire un rapport des erreurs.
-			 -Checker les leaks. <-- actuellement en cours
+			 -Checker les leaks.
 			 -Remise à la norme. */
 
-/* Erreur :  -gérer le free(input) avec les signaux + ft_exit() */
+/* Erreur :  -gérer "cat << eof | grep a" */
 static void ascii_art()
 {
-    printf("\n\n\n ███▄ ▄███▓ ██▓ ███▄    █  ██▓  ██████  ██░ ██ ▓█████  ██▓     ██▓ \n");
+    printf("\n\n\n");
+    printf("███▄ ▄███▓ ██▓ ███▄    █  ██▓  ██████  ██░ ██ ▓█████  ██▓     ██▓     \n");
     printf("▓██▒▀█▀ ██▒▓██▒ ██ ▀█   █ ▓██▒▒██    ▒ ▓██░ ██▒▓█   ▀ ▓██▒    ▓██▒    \n");
     printf("▓██    ▓██░▒██▒▓██  ▀█ ██▒▒██▒░ ▓██▄   ▒██▀▀██░▒███   ▒██░    ▒██░    \n");
     printf("▒██    ▒██ ░██░▓██▒  ▐▌██▒░██░  ▒   ██▒░▓█ ░██ ▒▓█  ▄ ▒██░    ▒██░    \n");
@@ -20,7 +21,6 @@ static void ascii_art()
     printf("░      ░    ▒ ░   ░   ░ ░  ▒ ░░  ░  ░   ░  ░░ ░   ░     ░ ░     ░ ░   \n");
     printf("       ░    ░           ░  ░        ░   ░  ░  ░   ░  ░    ░  ░    ░  ░\n\n\n");
 }
-
 
 static void signals()
 {
@@ -35,27 +35,25 @@ static void signals()
 
 int main(void)
 {
-    struct s_shell value;
-    struct s_shell *head;
     struct s_shell shell;
-
-    char *input;
-    shell.exit_code = 0;
+    struct s_shell *head;
 
     signals();
     ascii_art();
     while (1)
     {
         head = NULL;
-        input = readline("minishell> ");
-        if (input != NULL)       // Permet d'avoir un historique cmd
-            add_history(input);
-        if (input == NULL)  // Permet d'exit le shell (ctrl + D)
+        shell.rl_input = readline("minishell> ");
+        if (shell.rl_input != NULL)       // Permet d'avoir un historique cmd
+            add_history(shell.rl_input);
+        if (shell.rl_input == NULL)  // Permet d'exit le shell (ctrl + D)
+        {
+            free(shell.rl_input);
             exit(EXIT_SUCCESS);
-        head = parsing(input, head);
+        }
+        head = parsing(shell.rl_input, head);
 		parse_execution(&shell, head);
-        printf("test exit\n");
-        free(input);
+        free(shell.rl_input);
         if (head)
         {
             print_list(head);

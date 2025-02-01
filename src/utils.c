@@ -89,16 +89,16 @@ void update_pwd(void)
     }
 }
 
-void exit_with_error(const char *str_error, char **array)
+void exit_with_error(const char *str_error, char **array, int exit_code)
 {
     if (str_error)
         perror(str_error);
     if (array)
         free_array(array);
-    exit(EXIT_FAILURE);
+    exit(exit_code);
 }
 
-size_t ft_strcspn(const char *s, const char *reject)
+static size_t ft_strcspn(const char *s, const char *reject)
 {
     int i;
     int j;
@@ -120,7 +120,7 @@ size_t ft_strcspn(const char *s, const char *reject)
     return (i);
 }
 
-size_t	ft_strspn(const char *s, const char *accept)
+static size_t	ft_strspn(const char *s, const char *accept)
 {
     int i;
     int j;
@@ -148,7 +148,7 @@ size_t	ft_strspn(const char *s, const char *accept)
     return (i);
 }
 
-char *ft_strtok(char *str, const char *delim) 
+char *ft_strtok(char *str, const char *delim)
 {
     static char *save_ptr = NULL; // Le post-it magique
     char *token_start;
@@ -185,3 +185,36 @@ char *ft_strtok(char *str, const char *delim)
     return token_start;
 }
 
+char *ft_strncpy(char *dest, const char *src, size_t n)
+{
+    size_t i;
+
+    i = 0;
+    while (src[i] && i < n)
+    {
+        dest[i] = src[i];
+        i++;
+    }
+    while (i < n)
+    {
+        dest[i] = '\0';
+        i++;
+    }
+    return (dest);
+}
+
+char *ft_strcat(char *dest, const char *src)
+{
+    size_t dest_len;
+    size_t i;
+
+    dest_len = ft_strlen(dest);
+    i = 0;
+    while (src[i] != '\0')
+    {
+        dest[dest_len + i] = src[i];
+        i++;
+    }
+    dest[dest_len + i] = '\0';
+    return dest;
+}

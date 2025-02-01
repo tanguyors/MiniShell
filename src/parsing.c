@@ -50,7 +50,9 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 	}
 	else
 	{
-		perror("syntax error near unexpected token `newline'\n");
+		perror("bash: syntax error near unexpected token `newline'\n");
+		free(str);
+		exit(EXIT_FAILURE);
 		*stop_flag = 1;
 	}
 	while (is_space(str[(*i)]))
@@ -226,16 +228,25 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 	p_double_quotes(i, str, tail);
 }
 
-struct s_shell *post_parsing_condition(struct s_shell *current, int *break_flag)
+struct s_shell *post_parsing_condition(struct s_shell *current, char *str, int *break_flag)
 {
+
 	if (current->token == TOKEN_CMD && current->next->token == TOKEN_CMD)
 		current->next->token = TOKEN_ARG;
 	if (current->token != TOKEN_PIPE && current->next->token == TOKEN_CMD)
 		current->next->token = TOKEN_ARG;
-	if (current->token == TOKEN_PIPE && current->next->token == TOKEN_PIPE 
-	|| current->token == TOKEN_PIPE && current->next->token != TOKEN_CMD)
+	if (current->token == TOKEN_PIPE && current->next->token == TOKEN_PIPE)
 	{
 		perror("bash: syntax error near unexpected token `|'");
+		free(str);
+		exit(EXIT_FAILURE);
+		*break_flag = 1;
+	}
+	if (is_token_red(current->token) && current->next->token != TOKEN_FILE)
+	{
+		perror("bash: syntax error near unexpected token `newline'");
+		free(str);
+		exit(EXIT_FAILURE);
 		*break_flag = 1;
 	}
 	return (current);
@@ -243,10 +254,13 @@ struct s_shell *post_parsing_condition(struct s_shell *current, int *break_flag)
 
 /* Second parsing corrige la succession de 2 commandes,
 	succession d'une prochaine commande sans pipe  */
-struct s_shell *p_post_parsing(struct s_shell *head)
+/* Appel récursif a parsing afin de gérer le cas ou 
+	une commande n'a pas été fourni après un pipe */
+struct s_shell *p_post_parsing(struct s_shell *head, char *str)
 {
 	struct s_shell *current;
 	int break_flag;
+	char *rl_input;
 
 	break_flag = 0;
 	current = head;
@@ -254,17 +268,18 @@ struct s_shell *p_post_parsing(struct s_shell *head)
 	{
 		if (current && current->next)
 		{
-			current = post_parsing_condition(current, &break_flag);
+			current = post_parsing_condition(current, str,  &break_flag);
 			if (break_flag)
 				break;
 		}
-		if (current->token == TOKEN_DOUBLE_QUOTE || current->token == TOKEN_SIMPLE_QUOTE)
-			current->token = TOKEN_ARG;
 		if (current->token == TOKEN_PIPE && !current->next)
 		{
-			perror("bash: syntax error near unexpected token `|'");
-			break;
+			printf("new readline\n");
+			rl_input = readline("> ");
+			current = parsing(rl_input, current);
 		}
+		if (current->token == TOKEN_DOUBLE_QUOTE || current->token == TOKEN_SIMPLE_QUOTE)
+			current->token = TOKEN_ARG;
 		current = current->next;
 	}
 	return (head);
@@ -313,6 +328,6 @@ struct s_shell *parsing(char *str, struct s_shell *head)
         else
             i++;
     }
-	head = p_post_parsing(head);
+	head = p_post_parsing(head, str);
     return (head);
 }
