@@ -37,12 +37,13 @@ static void signals()
 
 int main(void)
 {
-    struct s_shell shell;
+    struct s_shell value;
     struct s_shell *head;
     char *rl_input;
 
     signals();
     ascii_art();
+    value.exit_code = 0;
     while (1)
     {
         head = NULL;
@@ -55,7 +56,7 @@ int main(void)
             exit(EXIT_SUCCESS);
         }
         head = parsing(rl_input, head);
-		parse_execution(head, rl_input);
+		parse_execution(&value, head, rl_input);
         free(rl_input);
         if (head)
         {

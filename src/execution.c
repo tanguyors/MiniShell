@@ -651,7 +651,7 @@ void exec_without_pipe(struct s_shell *current, char *rl_input)
 /* Permet de trier les executions des commandes,
 	en parcourant les tokens de la liste chaînée */
 /* Passage par référence necessaire ? */
-void parse_execution(struct s_shell *head, char *rl_input)
+void parse_execution(struct s_shell *value, struct s_shell *head, char *rl_input)
 {
 	struct s_shell *current;
 
