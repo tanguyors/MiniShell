@@ -89,13 +89,13 @@ void update_pwd(void)
     }
 }
 
-void exit_with_error(const char *str_error, char **array)
+void exit_with_error(const char *str_error, char **array, int exit_code)
 {
     if (str_error)
         perror(str_error);
     if (array)
         free_array(array);
-    exit(EXIT_FAILURE);
+    exit(exit_code);
 }
 
 static size_t ft_strcspn(const char *s, const char *reject)

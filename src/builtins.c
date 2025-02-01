@@ -2,9 +2,9 @@
 //Implementations des commandes interne
 #include "../include/minishell.h"
 
-int ft_exit(char **argv, char *rl_input)
+int ft_exit(char **argv, struct s_shell *shell)
 {
-    free(rl_input);
+    free(shell->rl_input);
 	exit(EXIT_SUCCESS);
 }
 
@@ -33,7 +33,7 @@ char *expand_variable(const char *var)
     return ("");
 }
 
-int ft_echo(char **argv)
+int ft_echo(char **argv, struct s_shell *shell)
 {
     int i = 0;
     int newline = 1;
@@ -68,7 +68,7 @@ int ft_echo(char **argv)
     return (0);
 }
  //--------------------------------------------------------------------------------------PWD------------------------------------------------------------------------
-int ft_pwd(char **argv)
+int ft_pwd(char **argv, struct s_shell *shell)
 {
 	(void)argv;
     char cwd[1024]; // Buffer pour stocker le chemin
@@ -95,7 +95,7 @@ extern char **environ; // Déclare la variable globale environ qui se trouve dan
  *
  * Retourne 0 en cas de succès, 1 si des arguments sont passés.
  */
-int ft_env(char **argv) 
+int ft_env(char **argv, struct s_shell *shell) 
 {
     int i = 0;
 
@@ -151,7 +151,7 @@ int	is_valid_identifier(const char *str)
  *
  * Retourne 0 en cas de succès, 1 en cas d'erreur.
  */
-int	ft_export(char **argv)
+int	ft_export(char **argv, struct s_shell *shell)
 {
 	int		i;      // Index pour parcourir les arguments
 	char	*name;   // Stocke le nom de la variable
@@ -206,7 +206,7 @@ int	ft_export(char **argv)
 
 //--------------------------------------------------------------------------------------------------------------------------UNSET---------------------------------------------------------------------------------------------
 // Version definitive a revoir pour mettre a la norme !!!!!
-int	ft_unset(char **argv)
+int	ft_unset(char **argv, struct s_shell *shell)
 {
 	int	i;
 	int	j;
@@ -301,7 +301,7 @@ char *pop_dir(void)
  * Retourne 0 en cas de succès, 1 en cas d'erreur.
  */
 
-int ft_cd(char **argv)
+int ft_cd(char **argv, struct s_shell *shell)
 {
     char cwd[1024];
     char *path;

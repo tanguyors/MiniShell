@@ -48,7 +48,7 @@ char *get_absolute_path(char *command)
     return (NULL);
 }
 
-void std_execution(struct s_shell *current)
+void std_execution(struct s_shell *shell, struct s_shell *current)
 {
 	pid_t pid;
 	char *command;
@@ -58,7 +58,7 @@ void std_execution(struct s_shell *current)
 
     pid = fork();
     if (pid == -1) 
-		exit_with_error("fork error", NULL);
+		exit_with_error("fork error", NULL, 1);
 	else if (pid == 0) 
 	{
         command = get_absolute_path(current->data);
@@ -71,14 +71,14 @@ void std_execution(struct s_shell *current)
 				printf("bash: %s: Is a redictory\n", current->data);
 			else
             	printf("%s: command not found\n", current->data);
-			exit_with_error(NULL, args);
+			exit_with_error(NULL, args, 1);
         }
 		free_array(args);
     } 
     else
     {
         if (waitpid(pid, &status, 0) == -1) // Attendre le processus enfant
-            exit_with_error("waitpid error", NULL);
+            exit_with_error("waitpid error", NULL, 1);
         /*if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
             current->share->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie*/
     }
@@ -87,7 +87,7 @@ void std_execution(struct s_shell *current)
 /* Initialise les builtin et parcourt l'array builtin afin de trouver la commande correspondante
 	si la commande reste introuver cela signifie qu'il s'agit d'une commande système
 	std_execution() sera donc appelé */
-void cmd_execution(struct s_shell *current, char **data, char *rl_input)
+void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
 {
 	t_builtin builtin[8];
 	int i;
@@ -101,7 +101,7 @@ void cmd_execution(struct s_shell *current, char **data, char *rl_input)
 		//printf("current data: %s\n", current->data);
         if (ft_strcmp(current->data, builtin[i].name) == 0)
         {
-            builtin[i].func(data, rl_input); // Appelle la fonction correspondante.
+            builtin[i].func(data, shell); // Appelle la fonction correspondante.
             return;
         }
         i++;
@@ -113,7 +113,7 @@ void cmd_execution(struct s_shell *current, char **data, char *rl_input)
         return;
     }*/
 	// Si aucune commande builtin ne correspond
-	std_execution(current);
+	std_execution(shell, current);
     //ft_printf("minishell: %s: command not found\n", current->data);
 }
 
@@ -127,7 +127,7 @@ char **get_arg_data(struct s_shell *current)
 
 	data = ft_calloc(1024, sizeof(char *));
 	if (!data)
-		exit_with_error("allocation error", NULL);
+		exit_with_error("allocation error", NULL, 1);
 	i = 0;
 	p_arg = current;
 	//printf("p_arg: %s\n", p_arg->data);
@@ -156,7 +156,7 @@ char **get_all_data(struct s_shell *current)
 
 	data = ft_calloc(1024, sizeof(char *));
 	if (!data)
-		exit_with_error("allocation error", NULL);
+		exit_with_error("allocation error", NULL, 1);
 	i = 0;
 	p_arg = current;
 	//printf("p_arg: %s\n", p_arg->data);
@@ -186,13 +186,13 @@ char **get_all_data(struct s_shell *current)
 
 /* cmd_execution() passe des tests classiques mais il y aura certainement des changement a faire par la suite
 	dans celle ci mais aussi les builtin */
-void extract_data(struct s_shell *current, char *rl_input)
+void extract_data(struct s_shell *shell, struct s_shell *current)
 {
 	char **data;
 
 	printf("EXTRACT_DATA !\n");
 	data = get_arg_data(current);
-	cmd_execution(current, data, rl_input);
+	cmd_execution(shell, current, data);
 	free(data);
 }
 
@@ -217,7 +217,7 @@ static int setup_redirection(struct s_shell *current, int flag, int file_access)
 /* Gestion de la redirection d'entrée (<)
 	Redirige l'entrée standard vers un fichier 
 	resultat < file affiché sur la console même avant un pipe ( a regler ) */
-static void redir_input(struct s_shell *current, char *rl_input)
+static void redir_input(struct s_shell *shell, struct s_shell *current)
 {
     int fd;
 	int saved_stdin;
@@ -243,7 +243,7 @@ static void redir_input(struct s_shell *current, char *rl_input)
     }
     // Exécution de la commande si présente
     if (head && head->token == TOKEN_CMD)
-        extract_data(head, rl_input);
+        extract_data(shell, head);
     // Restauration de l'entrée standard
     dup2(saved_stdin, STDIN_FILENO);
     close(saved_stdin);
@@ -252,7 +252,7 @@ static void redir_input(struct s_shell *current, char *rl_input)
 
 /* Gestion de la redirection de sortie (>)
 	Redirige la sortie standard vers un fichier */
-static void redir_output(struct s_shell *current, char *rl_input)
+static void redir_output(struct s_shell *shell, struct s_shell *current)
 {
     int fd;
 	int saved_stdout;
@@ -276,7 +276,7 @@ static void redir_output(struct s_shell *current, char *rl_input)
     }
 	//printf("redir_output current token: %s\n", get_token_name(current->token));
     if (head && head->token == TOKEN_CMD)
-        extract_data(head, rl_input);
+        extract_data(shell, head);
     dup2(saved_stdout, STDOUT_FILENO);
     close(saved_stdout);
     close(fd);
@@ -284,7 +284,7 @@ static void redir_output(struct s_shell *current, char *rl_input)
 
 /* Gestion de la redirection en mode append (>>)
 	Ajoute la sortie à la fin du fichier */
-static void redir_append(struct s_shell *current, char *rl_input)
+static void redir_append(struct s_shell *shell, struct s_shell *current)
 {
     int fd;
 	int saved_stdout;
@@ -307,7 +307,7 @@ static void redir_append(struct s_shell *current, char *rl_input)
         return ;
     }
     if (head && head->token == TOKEN_CMD)
-        extract_data(head, rl_input);
+        extract_data(shell, head);
     dup2(saved_stdout, STDOUT_FILENO);
     close(saved_stdout);
     close(fd);
@@ -387,7 +387,7 @@ void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
 
 /* Gestion du heredoc (<<)
 	Lit l'entrée jusqu'à ce que le délimiteur soit rencontré */
-static void redir_heredoc(struct s_shell *current, char *rl_input)
+static void redir_heredoc(struct s_shell *shell, struct s_shell *current)
 {
     int pipe_fd[2];
 	int saved_stdin;
@@ -404,7 +404,7 @@ static void redir_heredoc(struct s_shell *current, char *rl_input)
     if (dup2(pipe_fd[0], STDIN_FILENO) != -1)
     {
         if (head && head->token == TOKEN_CMD)
-            extract_data(head, rl_input);
+            extract_data(shell, head);
     }
     // Restauration
     dup2(saved_stdin, STDIN_FILENO);
@@ -415,7 +415,7 @@ static void redir_heredoc(struct s_shell *current, char *rl_input)
 
 /* Redirige vers le bon token de redirection 
 	SUPPR PRINTF erreur heredoc */
-void redirection_execution(struct s_shell *current, char *rl_input)
+void redirection_execution(struct s_shell *shell, struct s_shell *current)
 {
 	struct s_shell *which_redir;
 
@@ -426,20 +426,20 @@ void redirection_execution(struct s_shell *current, char *rl_input)
 		which_redir = which_redir->next;
 	if (which_redir->token == REDIR_INPUT)
 	{
-		redir_input(current, rl_input);
+		redir_input(shell, current);
 	}
 	else if (which_redir->token == REDIR_OUTPUT)
 	{
-		redir_output(current, rl_input);
+		redir_output(shell, current);
 	}
 	else if (which_redir->token == REDIR_APPEND)
 	{
-		redir_append(current, rl_input);
+		redir_append(shell, current);
 	}
 	else if (which_redir->token == REDIR_HEREDOC)
 	{
 		printf("HEREDOC !\n");
-		redir_heredoc(current, rl_input);
+		redir_heredoc(shell, current);
 	}
 }
 
@@ -490,7 +490,7 @@ void redirection_execution(struct s_shell *current, char *rl_input)
 		exit_with_error("waitpid error", NULL);
 }*/
 
-static void child_redir(struct s_shell *current, char *rl_input)
+static void child_redir(struct s_shell *shell, struct s_shell *current)
 {
 	struct s_shell *current_redir;
 	struct s_shell *first_arg;
@@ -511,12 +511,12 @@ static void child_redir(struct s_shell *current, char *rl_input)
 		}
 		if (is_token_red(current_redir->token))
 		{
-			redirection_execution(current_redir, rl_input);
+			redirection_execution(shell, current_redir);
 		}
 	}	
 }
 
-static void child_redir2(struct s_shell *current, char *rl_input)
+static void child_redir2(struct s_shell *shell, struct s_shell *current)
 {
 	struct s_shell *current_redir;
 	struct s_shell *first_arg;
@@ -529,12 +529,11 @@ static void child_redir2(struct s_shell *current, char *rl_input)
 		{
 			current_redir = current_redir->next;
 		}
-		redirection_execution(current_redir, rl_input);
-
+		redirection_execution(shell, current_redir);
 	}	
 }
 
-static void child_process(int fd[2], int prev_fd, struct s_shell *current, char *rl_input)
+static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct s_shell *current)
 {
 	int nb_pipe;
 
@@ -543,10 +542,10 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current, char 
 	if (prev_fd != -1)
 	{
 		if (dup2(prev_fd, STDIN_FILENO) < 0)
-			exit_with_error("dup2 error prev_fd", NULL);
+			exit_with_error("dup2 error prev_fd", NULL, 1);
 		close(prev_fd);
 	}
-	child_redir2(current, rl_input);
+	child_redir2(shell, current);
 	// Si un pipe suivant existe, connectez-le à STDOUT
 	//printf("test current token: %s\n", get_token_name(current->token));
 	//printf("nb_pipe: %d\n", nb_pipe);
@@ -555,29 +554,29 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current, char 
 		nb_pipe--;
 		printf("PASS\n");
 		if (dup2(fd[1], STDOUT_FILENO) < 0)
-			exit_with_error("dup2 error fd[1]", NULL);
+			exit_with_error("dup2 error fd[1]", NULL, 1);
 	}
 	close(fd[0]);
 	close(fd[1]);
-	extract_data(current, rl_input);
+	extract_data(shell, current);
 	exit(EXIT_SUCCESS);
 }
 
 static void pipe_and_fork(int fd[2], int *pid)
 {
 	if (pipe(fd) == -1)
-		exit_with_error("pipe error", NULL);
+		exit_with_error("pipe error", NULL, 1);
 
 	*pid = fork();
 	if (*pid < 0)
-		exit_with_error("fork error", NULL);
+		exit_with_error("fork error", NULL, 1);
 }
 
 /* Permet de gérer first_arg cas où un pipe est présent dans la liste. 
 	Utilisation de fork afin de créer un processus enfant, 
 	celui ci va redirigé la sortie de la commande en fonction des pipes. 
 	Ici le double pointeur current représente la liste chaînée complète*/
-void multi_pipe_handling(struct s_shell *current, char *rl_input)
+void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
 {
     int fd[2];
     int prev_fd;
@@ -589,7 +588,7 @@ void multi_pipe_handling(struct s_shell *current, char *rl_input)
     {
         pipe_and_fork(fd, &pid);
         if (pid == 0)
-			child_process(fd, prev_fd, current, rl_input);
+			child_process(shell, fd, prev_fd, current);
         // Parent : Gérer les descripteurs
         if (prev_fd != -1)
             close(prev_fd);
@@ -609,7 +608,7 @@ void multi_pipe_handling(struct s_shell *current, char *rl_input)
 }
 
 
-void exec_without_pipe(struct s_shell *current, char *rl_input)
+void exec_without_pipe(struct s_shell *shell, struct s_shell *current)
 {
 	int flag;
 	struct s_shell *first_arg;
@@ -629,7 +628,7 @@ void exec_without_pipe(struct s_shell *current, char *rl_input)
 			{
 				if (is_token_red(current->next->token) || is_token_red(current->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
 				{
-					redirection_execution(first_arg, rl_input);
+					redirection_execution(shell, first_arg);
 					current = current->next;
 				}
 			}
@@ -640,7 +639,7 @@ void exec_without_pipe(struct s_shell *current, char *rl_input)
 			{
 				if (current->token == TOKEN_CMD) // relié a TOKEN_ARG, cherche un token ARG
 				{
-					extract_data(current, rl_input);
+					extract_data(shell, current);
 				}
 			}
 		}
@@ -651,17 +650,17 @@ void exec_without_pipe(struct s_shell *current, char *rl_input)
 /* Permet de trier les executions des commandes,
 	en parcourant les tokens de la liste chaînée */
 /* Passage par référence necessaire ? */
-void parse_execution(struct s_shell *value, struct s_shell *head, char *rl_input)
+void parse_execution(struct s_shell *shell, struct s_shell *head)
 {
 	struct s_shell *current;
 
 	current = head;
 	if (!is_pipe(current))
 	{
-		exec_without_pipe(current, rl_input);
+		exec_without_pipe(shell, current);
 	}
 	else
 	{
-		multi_pipe_handling(current, rl_input);
+		multi_pipe_handling(shell, current);
 	}
 }

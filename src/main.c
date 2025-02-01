@@ -2,14 +2,12 @@
 #include "../include/minishell.h"
 # include <unistd.h> 
 
-/* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées. 
+/* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées. <-- actuellement en cours
 			 -Tester la robustesse du code, faire un rapport des erreurs.
-             -Integrer une fonction pour la substitution. <-- actuellement en cours
 			 -Checker les leaks.
 			 -Remise à la norme. */
 
-/* Erreur :  -gérer "cat << eof | grep a"
-             -gérer "ls | cat << eof" */
+/* Erreur :  -gérer "cat << eof | grep a" */
 static void ascii_art()
 {
     printf("\n\n\n");
@@ -37,27 +35,25 @@ static void signals()
 
 int main(void)
 {
-    struct s_shell value;
+    struct s_shell shell;
     struct s_shell *head;
-    char *rl_input;
 
     signals();
     ascii_art();
-    value.exit_code = 0;
     while (1)
     {
         head = NULL;
-        rl_input = readline("minishell> ");
-        if (rl_input != NULL)       // Permet d'avoir un historique cmd
-            add_history(rl_input);
-        if (rl_input == NULL)  // Permet d'exit le shell (ctrl + D)
+        shell.rl_input = readline("minishell> ");
+        if (shell.rl_input != NULL)       // Permet d'avoir un historique cmd
+            add_history(shell.rl_input);
+        if (shell.rl_input == NULL)  // Permet d'exit le shell (ctrl + D)
         {
-            free(rl_input);
+            free(shell.rl_input);
             exit(EXIT_SUCCESS);
         }
-        head = parsing(rl_input, head);
-		parse_execution(&value, head, rl_input);
-        free(rl_input);
+        head = parsing(shell.rl_input, head);
+		parse_execution(&shell, head);
+        free(shell.rl_input);
         if (head)
         {
             print_list(head);

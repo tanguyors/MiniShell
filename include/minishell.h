@@ -43,6 +43,7 @@ struct s_shell
     enum e_tokens token;
     char *data;
     int exit_code;
+    char *rl_input;
 };
 
 typedef struct s_dir_stack
@@ -55,7 +56,7 @@ typedef struct s_dir_stack
 typedef struct s_builtin
 {
     char *name;
-    int (*func)(char **, char *);
+    int (*func)(char **, struct s_shell *);
 } t_builtin;
 
 
@@ -82,7 +83,7 @@ char *remove_quotes(char *str);
 char *ft_strndup(const char *s, size_t n);
 void update_pwd(void);
 const char *get_token_name(enum e_tokens token);
-void exit_with_error(const char *str_error, char **array);
+void exit_with_error(const char *str_error, char **array, int exit_code);
 char **get_all_data(struct s_shell *current);
 char **get_arg_data(struct s_shell *current);
 char *ft_strtok(char *str, const char *delim);
@@ -100,16 +101,16 @@ int is_token_red(enum e_tokens token);
 int is_redirection_in_list(struct s_shell *head);
 int is_pipe(struct s_shell *current);
 /*-- Executions --*/
-void parse_execution(struct s_shell *value, struct s_shell *head, char *rl_input);
+void parse_execution(struct s_shell *shell, struct s_shell *head);
 /*-- Built-in --*/
-int ft_exit(char **argv, char *rl_input);
-int ft_echo(char **argv);
-int ft_pwd(char **argv);
-int ft_env(char **argv);
-int	ft_export(char **argv);
+int ft_exit(char **argv, struct s_shell *shell);
+int ft_echo(char **argv, struct s_shell *shell);
+int ft_pwd(char **argv, struct s_shell *shell);
+int ft_env(char **argv, struct s_shell *shell);
+int	ft_export(char **argv, struct s_shell *shell);
 int	is_valid_identifier(const char *str);
-int ft_unset(char **argv);
-int ft_cd(char **argv);
+int ft_unset(char **argv, struct s_shell *shell);
+int ft_cd(char **argv, struct s_shell *shell);
 static char *construct_path(const char *base, const char *input);
 void push_dir(const char *dir);
 char *pop_dir(void);
