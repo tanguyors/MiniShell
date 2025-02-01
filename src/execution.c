@@ -329,10 +329,11 @@ void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
 	char *sub_line;
 	size_t len;
 
-	printf("loop heredoc: %s\n", current->data);
+	//printf("loop heredoc: %s\n", current->data);
     while (1)
     {
-        ft_printf("heredoc> ");
+        //ft_printf("heredoc> ");
+		write(1, "heredoc> ", 9);
         line = get_next_line(STDIN_FILENO);
 		if (!line)
             break;
@@ -387,13 +388,14 @@ static void redir_heredoc(struct s_shell *current, char *rl_input)
 }
 
 
-/* Redirige vers le bon token de redirection */
+/* Redirige vers le bon token de redirection 
+	SUPPR PRINTF erreur heredoc */
 void redirection_execution(struct s_shell *current, char *rl_input)
 {
 	struct s_shell *which_redir;
 
 	which_redir = current;
-	printf("REDIRECTION !\n");
+	printf("REDIRECTION !, current data: %s\n", which_redir->data);
 	print_list(current);
 	while (!is_token_red(which_redir->token))
 		which_redir = which_redir->next;
@@ -484,8 +486,26 @@ static void child_redir(struct s_shell *current, char *rl_input)
 		}
 		if (is_token_red(current_redir->token))
 		{
-			redirection_execution(first_arg, rl_input);
+			redirection_execution(current_redir, rl_input);
 		}
+	}	
+}
+
+static void child_redir2(struct s_shell *current, char *rl_input)
+{
+	struct s_shell *current_redir;
+	struct s_shell *first_arg;
+
+	current_redir = current;
+	current_redir = current_redir->next;
+	if (current_redir->next)
+	{
+		while(current_redir->next && current_redir->token != TOKEN_CMD) // ajouter is_token_red(current->next->next->token)
+		{
+			current_redir = current_redir->next;
+		}
+		redirection_execution(current_redir, rl_input);
+
 	}	
 }
 
@@ -501,9 +521,9 @@ static void child_process(int fd[2], int prev_fd, struct s_shell *current, char 
 			exit_with_error("dup2 error prev_fd", NULL);
 		close(prev_fd);
 	}
-	child_redir(current, rl_input);
+	child_redir2(current, rl_input);
 	// Si un pipe suivant existe, connectez-le à STDOUT
-	printf("test current token: %s\n", get_token_name(current->token));
+	//printf("test current token: %s\n", get_token_name(current->token));
 	//printf("nb_pipe: %d\n", nb_pipe);
 	if (nb_pipe)
 	{
