@@ -37,7 +37,7 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 
 	while (is_space(str[(*i)]))
 		(*i)++;
-	if (str[(*i)] && is_alnum(str[(*i)]))
+	if (str[(*i)] /*&& is_alnum(str[(*i)])*/)
 	{
 		insert_tail(head, NULL, "TOKEN_FILE");
 		tail = get_last_node(*head);
