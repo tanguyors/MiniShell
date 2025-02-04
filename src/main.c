@@ -7,7 +7,8 @@
 			 -Checker les leaks.
 			 -Remise à la norme. */
 
-/* Erreur :  -gérer "cat << eof | grep a" */
+/* Erreur :  -gérer "cat << eof | grep a" 
+             -résoudre "ls | ls" */
 static void ascii_art()
 {
     printf("\n\n\n");
