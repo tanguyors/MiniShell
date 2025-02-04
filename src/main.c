@@ -39,7 +39,7 @@ int main(void)
     struct s_shell *head;
 
     signals();
-    ascii_art();
+    //ascii_art();
     while (1)
     {
         head = NULL;
