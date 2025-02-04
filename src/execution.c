@@ -521,16 +521,19 @@ static void child_redir2(struct s_shell *shell, struct s_shell *current)
 	struct s_shell *current_redir;
 	struct s_shell *first_arg;
 
-	current_redir = current;
-	current_redir = current_redir->next;
-	if (current_redir->next)
+	if (is_redirection_in_list(current))
 	{
-		while(current_redir->next && current_redir->token != TOKEN_CMD) // ajouter is_token_red(current->next->next->token)
+		current_redir = current;
+		current_redir = current_redir->next;
+		if (current_redir->next)
 		{
-			current_redir = current_redir->next;
+			while(current_redir->next && current_redir->token != TOKEN_CMD) // ajouter is_token_red(current->next->next->token)
+			{
+				current_redir = current_redir->next;
+			}
+			redirection_execution(shell, current_redir);
 		}
-		redirection_execution(shell, current_redir);
-	}	
+	}
 }
 
 static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct s_shell *current)
@@ -552,7 +555,7 @@ static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct 
 	if (nb_pipe)
 	{
 		nb_pipe--;
-		printf("PASS\n");
+		ft_printf("PASS\n");
 		if (dup2(fd[1], STDOUT_FILENO) < 0)
 			exit_with_error("dup2 error fd[1]", NULL, 1);
 	}
