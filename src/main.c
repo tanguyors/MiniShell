@@ -56,8 +56,8 @@ int main(void)
         free(shell.rl_input);
         if (head)
         {
-            print_list(head);
-			print_token(head);
+            //print_list(head);
+			//print_token(head);
             free_list(head);
         }
     }

@@ -46,7 +46,6 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 		while (str[(*i)] != '\0' && !is_space(str[(*i)])) 
 			tail->data[j++] = str[(*i)++];
 		tail->data[j] = '\0';
-		printf("test :%s\n", tail->data);
 	}
 	else
 	{
@@ -62,7 +61,6 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 /* Fonction permettant de déterminer le type de redirection */
 enum e_tokens which_red(int *i, char *str)
 {
-	printf("token : %c\n", str[(*i)]);
     if (str[(*i)] == '<' && str[(*i) + 1] == '<') 
         return (REDIR_HEREDOC);
     else if (str[(*i)] == '>' && str[(*i) + 1] == '>') 
@@ -82,7 +80,6 @@ static void p_redirection(int *i, char *str, struct s_shell **head, int *stop_fl
 
 	if (is_redirect(str[(*i)])) 
 	{
-		printf("redirection:\n");
 		insert_tail(head, NULL, "TOKEN_RED");
 		tail = get_last_node(*head);
 		tail->token = which_red(i, str);
@@ -104,7 +101,6 @@ static int p_pipe(int *i, char *str, struct s_shell **head)
 
 	if (str[(*i)] == '|')
 	{
-		printf("pipe:\n");
 		insert_tail(head, NULL, NULL);
 		tail = get_last_node(*head);
 		tail->token = TOKEN_PIPE;
@@ -126,7 +122,6 @@ int p_command(int *i, char *str, struct s_shell **head, int *stop_flag)
 		(*i)++;
 	if (str[(*i)] && !is_spec_char(str[(*i)]) && !is_space(str[(*i)]))
 	{
-		printf("command:\n");
 		insert_tail(head, NULL, NULL);
 		tail = get_last_node(*head);
 		tail->token = TOKEN_CMD;
@@ -157,7 +152,6 @@ static int p_arg(int *i, char *str, struct s_shell **head)
 
 	if (str[(*i)] && str[(*i)] == '-')
 	{
-		printf("arg:\n");
 		insert_tail(head, NULL, NULL);
 		tail = get_last_node(*head);
 		tail->token = TOKEN_ARG;
@@ -209,8 +203,6 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 	insert_tail(head, NULL, "TOKEN_QUOTES");
 	tail = get_last_node(*head);
 	tail->token = TOKEN_CMD;
-	if (tail->token)
-		printf("tail exist, token: %d\n", tail->token);
 	if (str[(*i)] == 39)
 	{
 		(*i)++;
@@ -274,7 +266,6 @@ struct s_shell *p_post_parsing(struct s_shell *head, char *str)
 		}
 		if (current->token == TOKEN_PIPE && !current->next)
 		{
-			printf("new readline\n");
 			rl_input = readline("> ");
 			current = parsing(rl_input, current);
 		}

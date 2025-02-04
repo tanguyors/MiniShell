@@ -93,7 +93,6 @@ void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
 	int i;
 
 	i = 0;
-	printf("CMD_EXECUTION !\n");
 	initialize_builtin(builtin);
     // Parcourt la table des commandes internes
     while (builtin[i].name != NULL)
@@ -136,7 +135,6 @@ char **get_arg_data(struct s_shell *current)
 		if (p_arg->token == TOKEN_ARG || p_arg->token == TOKEN_SIMPLE_QUOTE || p_arg->token == TOKEN_DOUBLE_QUOTE)
 		{
 			data[i] = p_arg->data;
-			printf("data[%d]: %s\n", i, data[i]);
 			i++;
 		}
 		if (p_arg->token == TOKEN_PIPE)
@@ -165,7 +163,6 @@ char **get_all_data(struct s_shell *current)
 		if (p_arg->token == TOKEN_CMD || p_arg->token == TOKEN_ARG)
 		{
 			data[i] = p_arg->data;
-			printf("data[%d]: %s\n", i, data[i]);
 			i++;
 		}
 		if (p_arg->token == TOKEN_PIPE)
@@ -190,7 +187,6 @@ void extract_data(struct s_shell *shell, struct s_shell *current)
 {
 	char **data;
 
-	printf("EXTRACT_DATA !\n");
 	data = get_arg_data(current);
 	cmd_execution(shell, current, data);
 	free(data);
@@ -420,8 +416,6 @@ void redirection_execution(struct s_shell *shell, struct s_shell *current)
 	struct s_shell *which_redir;
 
 	which_redir = current;
-	printf("REDIRECTION !, current data: %s\n", which_redir->data);
-	print_list(current);
 	while (!is_token_red(which_redir->token))
 		which_redir = which_redir->next;
 	if (which_redir->token == REDIR_INPUT)
@@ -438,7 +432,6 @@ void redirection_execution(struct s_shell *shell, struct s_shell *current)
 	}
 	else if (which_redir->token == REDIR_HEREDOC)
 	{
-		printf("HEREDOC !\n");
 		redir_heredoc(shell, current);
 	}
 }
@@ -552,7 +545,6 @@ static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct 
 	if (nb_pipe)
 	{
 		nb_pipe--;
-		printf("PASS\n");
 		if (dup2(fd[1], STDOUT_FILENO) < 0)
 			exit_with_error("dup2 error fd[1]", NULL, 1);
 	}
@@ -583,7 +575,6 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
     pid_t pid;
 
 	prev_fd = -1;
-	printf("MULTI_PIPE_HANDLING !\n");
     while (current)
     {
         pipe_and_fork(fd, &pid);
