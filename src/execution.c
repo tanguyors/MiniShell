@@ -80,7 +80,7 @@ void std_execution(struct s_shell *shell, struct s_shell *current)
         if (waitpid(pid, &status, 0) == -1) // Attendre le processus enfant
             exit_with_error("waitpid error", NULL, 1);
         /*if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
-            current->share->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie*/
+            shell->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie*/
     }
 }
 
@@ -106,12 +106,6 @@ void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
         }
         i++;
     }
-	// Gérer la commande $?
-    /*if (ft_strcmp(current->data, "$?") == 0)
-    {
-        printf("%d\n", g_exit_status);
-        return;
-    }*/
 	// Si aucune commande builtin ne correspond
 	std_execution(shell, current);
     //ft_printf("minishell: %s: command not found\n", current->data);

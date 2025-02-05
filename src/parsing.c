@@ -2,32 +2,6 @@
 // parsing des commandes 
 #include "../include/minishell.h"
 
-/**
- * parse_command - Découpe la ligne en tokens (arguments).
- * @input: La ligne brute entrée par l'utilisateur.
- *
- * Retourne un tableau de chaînes de caractères (les arguments de la commande).
- */
-
-char **parse_tokens(char *input) 
-{
-    char **tokens;
-    
-    if (!input || *input == '\0') 
-    {
-        return (NULL);
-    }
-    // Découpe la ligne avec ft_split, en séparant par les espaces
-    tokens = ft_split(input, ' ');
-    // Vérifie si la commande a été correctement découpée
-    if (!tokens) 
-    {
-        perror("Parsing error"); // Affiche une erreur si la découpe échoue
-        exit(EXIT_FAILURE);
-    }
-    return (tokens); // Retourne le tableau de tokens
-}
-
 /* Fonction complémentaire de p_redirection elle permet de traiter
 	les fichier in file et out file et de les tokenizer */
 static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_flag)
@@ -50,9 +24,8 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 	}
 	else
 	{
-		perror("bash: syntax error near unexpected token `newline'\n");
 		free(str);
-		exit(EXIT_FAILURE);
+		exit_with_error("bash: syntax error near unexpected token `newline'\n", NULL, 1);
 		*stop_flag = 1;
 	}
 	while (is_space(str[(*i)]))
@@ -237,16 +210,14 @@ struct s_shell *post_parsing_condition(struct s_shell *current, char *str, int *
 		current->next->token = TOKEN_ARG;
 	if (current->token == TOKEN_PIPE && current->next->token == TOKEN_PIPE)
 	{
-		perror("bash: syntax error near unexpected token `|'");
 		free(str);
-		exit(EXIT_FAILURE);
+		exit_with_error("bash: syntax error near unexpected token `|'", NULL, 1);
 		*break_flag = 1;
 	}
 	if (is_token_red(current->token) && current->next->token != TOKEN_FILE)
 	{
-		perror("bash: syntax error near unexpected token `newline'");
 		free(str);
-		exit(EXIT_FAILURE);
+		exit_with_error("bash: syntax error near unexpected token `newline'", NULL, 1);
 		*break_flag = 1;
 	}
 	return (current);
