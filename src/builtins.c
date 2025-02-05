@@ -4,7 +4,24 @@
 
 int ft_exit(char **argv, struct s_shell *shell)
 {
+    int argc;
+
+    argc = 0;
+    while (argv[argc])
+        argc++;
+    if (argc > 1)
+    {
+        ft_putstr_fd("too many arguments", 2);
+        exit(1);
+    }
+    if (is_str(argv[0]))
+    {
+       ft_putstr_fd("numeric argument required", 2);
+       exit(2);
+    }
     free(shell->rl_input);
+    if (argv[0])
+        exit(ft_atoi(argv[0]));
 	exit(shell->exit_code);
 }
 

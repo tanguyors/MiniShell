@@ -94,6 +94,7 @@ char *expand_variable(const char *var);
 int is_spec_char(int c);
 int is_ignored_char(int c);
 int is_alpha(int c);
+int is_str(char *str);
 int is_redirect(int c);
 int is_alnum(int c);
 int is_space(int c);

@@ -28,6 +28,17 @@ int is_alpha(int c)
     return (0);
 }
 
+int is_str(char *str)
+{
+	while (*str)
+	{
+		if (!is_alpha(*str))
+			return (0);
+		str++;
+	}
+	return (1);
+}
+
 int is_redirect(int c)
 {
     if (c == '<' || c == '>')
