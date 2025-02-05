@@ -98,19 +98,19 @@ void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
     while (builtin[i].name != NULL)
     {
 		//printf("current data: %s\n", current->data);
-        if (ft_strcmp(current->data, builtin[i].name) == 0)
+        /*if (ft_strcmp(current->data, builtin[i].name) == 0)
         {
             builtin[i].func(data, shell); // Appelle la fonction correspondante.
             return;
         }
-        i++;
+        i++;*/
     }
 	// Gérer la commande $?
-    /*if (ft_strcmp(current->data, "$?") == 0)
+    if (ft_strcmp(current->data, "$?") == 0)
     {
-        printf("%d\n", g_exit_status);
+        printf("%d\n", shell->exit_code);
         return;
-    }*/
+    }
 	// Si aucune commande builtin ne correspond
 	std_execution(shell, current);
     //ft_printf("minishell: %s: command not found\n", current->data);

@@ -5,7 +5,7 @@
 int ft_exit(char **argv, struct s_shell *shell)
 {
     free(shell->rl_input);
-	exit(EXIT_SUCCESS);
+	exit(shell->exit_code);
 }
 
 //------------------------------------------------------------------------------------------ECHO----------------------------------------------------------------

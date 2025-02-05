@@ -42,6 +42,7 @@ int main(void)
     //ascii_art();
     while (1)
     {
+        shell.exit_code = 0;
         head = NULL;
         shell.rl_input = readline("minishell> ");
         if (shell.rl_input != NULL)       // Permet d'avoir un historique cmd
@@ -49,7 +50,7 @@ int main(void)
         if (shell.rl_input == NULL)  // Permet d'exit le shell (ctrl + D)
         {
             free(shell.rl_input);
-            exit(EXIT_SUCCESS);
+            exit(shell.exit_code);
         }
         head = parsing(shell.rl_input, head);
 		parse_execution(&shell, head);
