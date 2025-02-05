@@ -102,13 +102,10 @@ int ft_pwd(char **argv, struct s_shell *shell)
     else 
     {
         perror("pwd"); // Affiche une erreur si getcwd échoue
-        return (1);
+        shell->exit_code = 22;
     }
 }
-
-
-extern char **environ; // Déclare la variable globale environ qui se trouve dans le systeme 
-
+extern char **environ; 
 //-----------------------------------------------------------------------------------ENV---------------------------------------------------------------------------------
 /**
  * ft_env - Affiche toutes les variables d'environnement.
@@ -129,7 +126,7 @@ int ft_env(char **argv, struct s_shell *shell)
     // Parcourt la variable globale environ et affiche chaque variable
     while (environ[i]) 
     {
-        ft_printf("%s\n", environ[i]);
+        ft_printf("%s\n", environ);
         i++;
     }
     return (0);
@@ -366,4 +363,3 @@ int ft_cd(char **argv, struct s_shell *shell)
     update_pwd();     // Met à jour PWD et OLDPWD
     return (0);
 }
-
