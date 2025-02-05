@@ -30,7 +30,7 @@ int is_alpha(int c)
 
 int is_str(char *str)
 {
-	while (*str)
+	while (str)
 	{
 		if (!is_alpha(*str))
 			return (0);
