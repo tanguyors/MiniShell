@@ -69,6 +69,10 @@ int ft_echo(char **argv, struct s_shell *shell)
         {
             // Récupère et affiche la valeur de la variable (sans le '$')
             ft_putstr_fd(expand_variable(argv[i] + 1), 1);
+            if(argv[i][1] == '?')
+            {
+                ft_printf("%d\n", shell->exit_code);
+            }
         }
         else
         {

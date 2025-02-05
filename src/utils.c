@@ -92,7 +92,7 @@ void update_pwd(void)
 void exit_with_error(const char *str_error, char **array, int exit_code)
 {
     if (str_error)
-        ft_putstr_fd(str_error, 2);
+        ft_putstr_fd((char *)str_error, 2);
     if (array)
         free_array(array);
     exit(exit_code);

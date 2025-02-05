@@ -41,9 +41,9 @@ int main(void)
 
     signals();
     ascii_art();
+    shell.exit_code = 0;
     while (1)
     {
-        shell.exit_code = 0;
         head = NULL;
         shell.rl_input = readline("minishell> ");
         if (shell.rl_input != NULL)       // Permet d'avoir un historique cmd
