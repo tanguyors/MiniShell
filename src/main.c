@@ -40,7 +40,7 @@ int main(void)
     struct s_shell *head;
 
     signals();
-    ascii_art();
+    //ascii_art();
     shell.exit_code = 0;
     while (1)
     {
@@ -58,8 +58,8 @@ int main(void)
         free(shell.rl_input);
         if (head)
         {
-            print_list(head);
-			print_token(head);
+            //print_list(head);
+			//print_token(head);
             free_list(head);
         }
     }

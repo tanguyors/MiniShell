@@ -65,14 +65,14 @@ int ft_echo(char **argv, struct s_shell *shell)
     // Parcourt les arguments
     while (argv[i])
     {
-        if (argv[i][0] == '$') // Vérifie si c'est une variable d'environnement
+        if (argv[i][0] == '$' && argv[i][1] != '?') // Vérifie si c'est une variable d'environnement
         {
             // Récupère et affiche la valeur de la variable (sans le '$')
             ft_putstr_fd(expand_variable(argv[i] + 1), 1);
-            if(argv[i][1] == '?')
-            {
-                ft_printf("%d\n", shell->exit_code);
-            }
+        }
+        else if (argv[i][0] == '$' && argv[i][1] == '?')
+        {
+            ft_printf("%d", shell->exit_code);
         }
         else
         {
