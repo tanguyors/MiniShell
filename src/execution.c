@@ -74,13 +74,14 @@ void std_execution(struct s_shell *shell, struct s_shell *current)
 			exit_with_error(NULL, args, 1);
         }
 		free_array(args);
-    } 
+    }
     else
     {
         if (waitpid(pid, &status, 0) == -1) // Attendre le processus enfant
             exit_with_error("waitpid error", NULL, 1);
-        /*if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
-            current->share->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie*/
+        if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
+            shell->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie
+		ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
     }
 }
 
@@ -93,26 +94,22 @@ void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
 	int i;
 
 	i = 0;
+	printf("CMD_EXECUTION !\n");
 	initialize_builtin(builtin);
     // Parcourt la table des commandes internes
     while (builtin[i].name != NULL)
     {
 		//printf("current data: %s\n", current->data);
-        /*if (ft_strcmp(current->data, builtin[i].name) == 0)
+        if (ft_strcmp(current->data, builtin[i].name) == 0)
         {
             builtin[i].func(data, shell); // Appelle la fonction correspondante.
             return;
         }
-        i++;*/
-    }
-	// Gérer la commande $?
-    if (ft_strcmp(current->data, "$?") == 0)
-    {
-        printf("%d\n", shell->exit_code);
-        return;
+        i++;
     }
 	// Si aucune commande builtin ne correspond
 	std_execution(shell, current);
+	ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
     //ft_printf("minishell: %s: command not found\n", current->data);
 }
 
@@ -135,6 +132,7 @@ char **get_arg_data(struct s_shell *current)
 		if (p_arg->token == TOKEN_ARG || p_arg->token == TOKEN_SIMPLE_QUOTE || p_arg->token == TOKEN_DOUBLE_QUOTE)
 		{
 			data[i] = p_arg->data;
+			printf("data[%d]: %s\n", i, data[i]);
 			i++;
 		}
 		if (p_arg->token == TOKEN_PIPE)
@@ -163,6 +161,7 @@ char **get_all_data(struct s_shell *current)
 		if (p_arg->token == TOKEN_CMD || p_arg->token == TOKEN_ARG)
 		{
 			data[i] = p_arg->data;
+			printf("data[%d]: %s\n", i, data[i]);
 			i++;
 		}
 		if (p_arg->token == TOKEN_PIPE)
@@ -187,12 +186,14 @@ void extract_data(struct s_shell *shell, struct s_shell *current)
 {
 	char **data;
 
+	printf("EXTRACT_DATA !\n");
 	data = get_arg_data(current);
 	cmd_execution(shell, current, data);
+	ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
 	free(data);
 }
 
-static int setup_redirection(struct s_shell *current, int flag, int file_access)
+static int setup_redirection(struct s_shell *shell, struct s_shell *current, int flag, int file_access)
 {
 	int fd;
 
@@ -205,6 +206,7 @@ static int setup_redirection(struct s_shell *current, int flag, int file_access)
     if (fd == -1)
     {
         printf("minishell: %s: No such file or directory\n", current->data);
+		shell->exit_code = 1;
         return (-1);
     }
 	return(fd);
@@ -220,7 +222,7 @@ static void redir_input(struct s_shell *shell, struct s_shell *current)
 	struct s_shell *head;
 
 	head = current;
-	fd = setup_redirection(current, O_RDONLY, 0);
+	fd = setup_redirection(shell, current, O_RDONLY, 0);
 	if (fd == -1)
 		return ;
     // Sauvegarde de l'entrée standard originale
@@ -255,7 +257,7 @@ static void redir_output(struct s_shell *shell, struct s_shell *current)
 	struct s_shell *head;
 
 	head = current;
-	fd = setup_redirection(current, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	fd = setup_redirection(shell, current, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
 		return ;
     saved_stdout = dup(STDOUT_FILENO);
@@ -287,7 +289,7 @@ static void redir_append(struct s_shell *shell, struct s_shell *current)
 	struct s_shell *head;
 
 	head = current;
-	fd = setup_redirection(current, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	fd = setup_redirection(shell, current, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd == -1)
 		return ;
     saved_stdout = dup(STDOUT_FILENO);
@@ -416,6 +418,8 @@ void redirection_execution(struct s_shell *shell, struct s_shell *current)
 	struct s_shell *which_redir;
 
 	which_redir = current;
+	printf("REDIRECTION !, current data: %s\n", which_redir->data);
+	print_list(current);
 	while (!is_token_red(which_redir->token))
 		which_redir = which_redir->next;
 	if (which_redir->token == REDIR_INPUT)
@@ -432,6 +436,7 @@ void redirection_execution(struct s_shell *shell, struct s_shell *current)
 	}
 	else if (which_redir->token == REDIR_HEREDOC)
 	{
+		printf("HEREDOC !\n");
 		redir_heredoc(shell, current);
 	}
 }
@@ -514,16 +519,19 @@ static void child_redir2(struct s_shell *shell, struct s_shell *current)
 	struct s_shell *current_redir;
 	struct s_shell *first_arg;
 
-	current_redir = current;
-	current_redir = current_redir->next;
-	if (current_redir->next)
+	if (is_redirection_in_list(current))
 	{
-		while(current_redir->next && current_redir->token != TOKEN_CMD) // ajouter is_token_red(current->next->next->token)
+		current_redir = current;
+		current_redir = current_redir->next;
+		if (current_redir->next)
 		{
-			current_redir = current_redir->next;
+			while(current_redir->next && current_redir->token != TOKEN_CMD) // ajouter is_token_red(current->next->next->token)
+			{
+				current_redir = current_redir->next;
+			}
+			redirection_execution(shell, current_redir);
 		}
-		redirection_execution(shell, current_redir);
-	}	
+	}
 }
 
 static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct s_shell *current)
@@ -545,13 +553,15 @@ static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct 
 	if (nb_pipe)
 	{
 		nb_pipe--;
+		ft_printf("PASS\n");
 		if (dup2(fd[1], STDOUT_FILENO) < 0)
 			exit_with_error("dup2 error fd[1]", NULL, 1);
 	}
 	close(fd[0]);
 	close(fd[1]);
 	extract_data(shell, current);
-	exit(EXIT_SUCCESS);
+	ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
+	exit(shell->exit_code);
 }
 
 static void pipe_and_fork(int fd[2], int *pid)
@@ -575,11 +585,13 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
     pid_t pid;
 
 	prev_fd = -1;
+	printf("MULTI_PIPE_HANDLING !\n");
     while (current)
     {
         pipe_and_fork(fd, &pid);
         if (pid == 0)
 			child_process(shell, fd, prev_fd, current);
+		ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
         // Parent : Gérer les descripteurs
         if (prev_fd != -1)
             close(prev_fd);
@@ -596,6 +608,7 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
     }
     while (wait(NULL) > 0)
         continue;
+	ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
 }
 
 
@@ -653,5 +666,6 @@ void parse_execution(struct s_shell *shell, struct s_shell *head)
 	else
 	{
 		multi_pipe_handling(shell, current);
+		ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
 	}
 }

@@ -2,32 +2,6 @@
 // parsing des commandes 
 #include "../include/minishell.h"
 
-/**
- * parse_command - Découpe la ligne en tokens (arguments).
- * @input: La ligne brute entrée par l'utilisateur.
- *
- * Retourne un tableau de chaînes de caractères (les arguments de la commande).
- */
-
-char **parse_tokens(char *input) 
-{
-    char **tokens;
-    
-    if (!input || *input == '\0') 
-    {
-        return (NULL);
-    }
-    // Découpe la ligne avec ft_split, en séparant par les espaces
-    tokens = ft_split(input, ' ');
-    // Vérifie si la commande a été correctement découpée
-    if (!tokens) 
-    {
-        perror("Parsing error"); // Affiche une erreur si la découpe échoue
-        exit(EXIT_FAILURE);
-    }
-    return (tokens); // Retourne le tableau de tokens
-}
-
 /* Fonction complémentaire de p_redirection elle permet de traiter
 	les fichier in file et out file et de les tokenizer */
 static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_flag)
@@ -37,7 +11,7 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 
 	while (is_space(str[(*i)]))
 		(*i)++;
-	if (str[(*i)] /*&& is_alnum(str[(*i)])*/)
+	if (str[(*i)] /* && is_alnum(str[(*i)]) */)
 	{
 		insert_tail(head, NULL, "TOKEN_FILE");
 		tail = get_last_node(*head);
@@ -46,12 +20,12 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 		while (str[(*i)] != '\0' && !is_space(str[(*i)])) 
 			tail->data[j++] = str[(*i)++];
 		tail->data[j] = '\0';
+		printf("test :%s\n", tail->data);
 	}
 	else
 	{
-		perror("bash: syntax error near unexpected token `newline'\n");
 		free(str);
-		exit(EXIT_FAILURE);
+		exit_with_error("bash: syntax error near unexpected token `newline'\n", NULL, 1);
 		*stop_flag = 1;
 	}
 	while (is_space(str[(*i)]))
@@ -61,6 +35,7 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 /* Fonction permettant de déterminer le type de redirection */
 enum e_tokens which_red(int *i, char *str)
 {
+	printf("token : %c\n", str[(*i)]);
     if (str[(*i)] == '<' && str[(*i) + 1] == '<') 
         return (REDIR_HEREDOC);
     else if (str[(*i)] == '>' && str[(*i) + 1] == '>') 
@@ -80,6 +55,7 @@ static void p_redirection(int *i, char *str, struct s_shell **head, int *stop_fl
 
 	if (is_redirect(str[(*i)])) 
 	{
+		printf("redirection:\n");
 		insert_tail(head, NULL, "TOKEN_RED");
 		tail = get_last_node(*head);
 		tail->token = which_red(i, str);
@@ -101,6 +77,7 @@ static int p_pipe(int *i, char *str, struct s_shell **head)
 
 	if (str[(*i)] == '|')
 	{
+		printf("pipe:\n");
 		insert_tail(head, NULL, NULL);
 		tail = get_last_node(*head);
 		tail->token = TOKEN_PIPE;
@@ -122,6 +99,7 @@ int p_command(int *i, char *str, struct s_shell **head, int *stop_flag)
 		(*i)++;
 	if (str[(*i)] && !is_spec_char(str[(*i)]) && !is_space(str[(*i)]))
 	{
+		printf("command:\n");
 		insert_tail(head, NULL, NULL);
 		tail = get_last_node(*head);
 		tail->token = TOKEN_CMD;
@@ -152,6 +130,7 @@ static int p_arg(int *i, char *str, struct s_shell **head)
 
 	if (str[(*i)] && str[(*i)] == '-')
 	{
+		printf("arg:\n");
 		insert_tail(head, NULL, NULL);
 		tail = get_last_node(*head);
 		tail->token = TOKEN_ARG;
@@ -203,6 +182,8 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 	insert_tail(head, NULL, "TOKEN_QUOTES");
 	tail = get_last_node(*head);
 	tail->token = TOKEN_CMD;
+	if (tail->token)
+		printf("tail exist, token: %d\n", tail->token);
 	if (str[(*i)] == 39)
 	{
 		(*i)++;
@@ -229,16 +210,14 @@ struct s_shell *post_parsing_condition(struct s_shell *current, char *str, int *
 		current->next->token = TOKEN_ARG;
 	if (current->token == TOKEN_PIPE && current->next->token == TOKEN_PIPE)
 	{
-		perror("bash: syntax error near unexpected token `|'");
 		free(str);
-		exit(EXIT_FAILURE);
+		exit_with_error("bash: syntax error near unexpected token `|'", NULL, 1);
 		*break_flag = 1;
 	}
 	if (is_token_red(current->token) && current->next->token != TOKEN_FILE)
 	{
-		perror("bash: syntax error near unexpected token `newline'");
 		free(str);
-		exit(EXIT_FAILURE);
+		exit_with_error("bash: syntax error near unexpected token `newline'", NULL, 1);
 		*break_flag = 1;
 	}
 	return (current);
@@ -266,6 +245,7 @@ struct s_shell *p_post_parsing(struct s_shell *head, char *str)
 		}
 		if (current->token == TOKEN_PIPE && !current->next)
 		{
+			printf("new readline\n");
 			rl_input = readline("> ");
 			current = parsing(rl_input, current);
 		}

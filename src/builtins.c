@@ -4,7 +4,24 @@
 
 int ft_exit(char **argv, struct s_shell *shell)
 {
+    int argc;
+
+    argc = 0;
+    while (argv[argc])
+        argc++;
+    if (argc > 1)
+    {
+        ft_putstr_fd("too many arguments", 2);
+        exit(1);
+    }
+    if (is_str(argv[0]))
+    {
+       ft_putstr_fd("numeric argument required", 2);
+       exit(2);
+    }
     free(shell->rl_input);
+    if (argv[0])
+        exit(ft_atoi(argv[0]));
 	exit(shell->exit_code);
 }
 
@@ -52,6 +69,10 @@ int ft_echo(char **argv, struct s_shell *shell)
         {
             // Récupère et affiche la valeur de la variable (sans le '$')
             ft_putstr_fd(expand_variable(argv[i] + 1), 1);
+            if(argv[i][1] == '?')
+            {
+                ft_printf("%d\n", shell->exit_code);
+            }
         }
         else
         {
@@ -81,13 +102,10 @@ int ft_pwd(char **argv, struct s_shell *shell)
     else 
     {
         perror("pwd"); // Affiche une erreur si getcwd échoue
-        return (1);
+        shell->exit_code = 22;
     }
 }
-
-
-extern char **environ; // Déclare la variable globale environ qui se trouve dans le systeme 
-
+extern char **environ; 
 //-----------------------------------------------------------------------------------ENV---------------------------------------------------------------------------------
 /**
  * ft_env - Affiche toutes les variables d'environnement.
@@ -108,7 +126,7 @@ int ft_env(char **argv, struct s_shell *shell)
     // Parcourt la variable globale environ et affiche chaque variable
     while (environ[i]) 
     {
-        ft_printf("%s\n", environ[i]);
+        ft_printf("%s\n", environ);
         i++;
     }
     return (0);
@@ -345,4 +363,3 @@ int ft_cd(char **argv, struct s_shell *shell)
     update_pwd();     // Met à jour PWD et OLDPWD
     return (0);
 }
-

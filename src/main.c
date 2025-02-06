@@ -2,12 +2,13 @@
 #include "../include/minishell.h"
 # include <unistd.h> 
 
-/* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées. <-- actuellement en cours
-			 -Tester la robustesse du code, faire un rapport des erreurs.
+/* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées.
+			 -Tester la robustesse du code, faire un rapport des erreurs. <-- actuellement en cours
 			 -Checker les leaks.
 			 -Remise à la norme. */
 
-/* Erreur :  -gérer "cat << eof | grep a" */
+/* Erreur :  -gérer "cat << eof | grep a" 
+             -résoudre pipe error exit code */
 static void ascii_art()
 {
     printf("\n\n\n");
@@ -39,10 +40,10 @@ int main(void)
     struct s_shell *head;
 
     signals();
-    //ascii_art();
+    ascii_art();
+    shell.exit_code = 0;
     while (1)
     {
-        shell.exit_code = 0;
         head = NULL;
         shell.rl_input = readline("minishell> ");
         if (shell.rl_input != NULL)       // Permet d'avoir un historique cmd
@@ -57,8 +58,8 @@ int main(void)
         free(shell.rl_input);
         if (head)
         {
-            //print_list(head);
-			//print_token(head);
+            print_list(head);
+			print_token(head);
             free_list(head);
         }
     }
