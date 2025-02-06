@@ -2,13 +2,13 @@
 #include "../include/minishell.h"
 # include <unistd.h> 
 
-/* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées. <-- actuellement en cours
-			 -Tester la robustesse du code, faire un rapport des erreurs.
+/* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées.
+			 -Tester la robustesse du code, faire un rapport des erreurs. <-- actuellement en cours
 			 -Checker les leaks.
 			 -Remise à la norme. */
 
 /* Erreur :  -gérer "cat << eof | grep a" 
-             -résoudre "ls | ls" */
+             -résoudre pipe error exit code */
 static void ascii_art()
 {
     printf("\n\n\n");
