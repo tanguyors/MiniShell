@@ -97,6 +97,7 @@ int ft_pwd(char **argv, struct s_shell *shell)
     if (getcwd(cwd, sizeof(cwd)) != NULL) 
     {
         ft_printf("%s\n", cwd); // Affiche le répertoire courant avec un saut de ligne
+        shell->exit_code = 0;
         return (0);
     } 
     else 
@@ -131,7 +132,7 @@ int ft_env(char **argv, struct s_shell *shell)
         ft_printf("%s\n", environ[i]);
         i++;
     }
-
+    shell->exit_code = 0;
     return (0); // Toujours succès
 }
 
@@ -219,7 +220,7 @@ int ft_export(char **argv, struct s_shell *shell)
         }
         i++; // Passe au prochain argument
     }
-
+    shell->exit_code = 0;
     return (0); // Toujours succès
 }
 
@@ -264,7 +265,7 @@ int ft_unset(char **argv, struct s_shell *shell)
         }
         i++;
     }
-
+    shell->exit_code = 0;
     return (0); // Toujours succès
 }
 
@@ -367,7 +368,7 @@ int ft_cd(char **argv, struct s_shell *shell)
 
     push_dir(cwd); // Sauvegarde l'ancien répertoire
     update_pwd(); // Met à jour PWD et OLDPWD
-
+    shell->exit_code = 0;
     return (0); // Toujours succès
 }
 
