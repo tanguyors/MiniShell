@@ -71,7 +71,7 @@ int ft_echo(char **argv, struct s_shell *shell)
             ft_putstr_fd(expand_variable(argv[i] + 1), 1);
             if(argv[i][1] == '?')
             {
-                ft_printf("%d\n", shell->exit_code);
+                ft_printf("%d", shell->exit_code);
             }
         }
         else
@@ -98,14 +98,12 @@ int ft_pwd(char **argv, struct s_shell *shell)
     {
         ft_printf("%s\n", cwd); // Affiche le répertoire courant avec un saut de ligne
         shell->exit_code = 0;
-        exit(0);
         return (0);
     } 
     else 
     {
         perror("pwd"); // Affiche une erreur si getcwd échoue
         shell->exit_code = 22;
-        exit(22);
     }
 }
 extern char **environ; 
@@ -125,7 +123,6 @@ int ft_env(char **argv, struct s_shell *shell)
     {
         ft_printf("env: No such file or directory\n");
         shell->exit_code = 1; // Met à jour le code de sortie
-        exit(1);
         return (1); // Indique une erreur
     }
 
@@ -136,7 +133,6 @@ int ft_env(char **argv, struct s_shell *shell)
         i++;
     }
     shell->exit_code = 0;
-    exit(0);
     return (0); // Toujours succès
 }
 
@@ -226,7 +222,6 @@ int ft_export(char **argv, struct s_shell *shell)
         i++; // Passe au prochain argument
     }
     shell->exit_code = 0;
-    exit(0);
     return (0); // Toujours succès
 }
 
@@ -245,7 +240,6 @@ int ft_unset(char **argv, struct s_shell *shell)
         {
             ft_printf("unset: `%s': not a valid identifier\n", argv[i]);
             shell->exit_code = 1; // Met à jour le code de sortie
-            exit(1);
             return (1); // Indique une erreur
         }
         else
@@ -273,7 +267,6 @@ int ft_unset(char **argv, struct s_shell *shell)
         i++;
     }
     shell->exit_code = 0;
-    exit(0);
     return (0); // Toujours succès
 }
 
@@ -339,7 +332,6 @@ int ft_cd(char **argv, struct s_shell *shell)
     {
         perror("cd");
         shell->exit_code = 1; // Met à jour le code de sortie
-        exit(1);
         return (1); // Indique une erreur
     }
 
@@ -350,7 +342,6 @@ int ft_cd(char **argv, struct s_shell *shell)
         {
             ft_printf("cd: HOME not set\n");
             shell->exit_code = 1; // Met à jour le code de sortie
-            exit(1);
             return (1); // Indique une erreur
         }
     }
@@ -361,7 +352,6 @@ int ft_cd(char **argv, struct s_shell *shell)
         {
             ft_printf("cd: No previous directory\n");
             shell->exit_code = 1; // Met à jour le code de sortie
-            exit(1);
             return (1); // Indique une erreur
         }
         ft_printf("%s\n", previous_dir); // Affiche le répertoire précédent
@@ -374,13 +364,11 @@ int ft_cd(char **argv, struct s_shell *shell)
     {
         ft_printf("cd: %s: No such file or directory\n", path);
         shell->exit_code = 1; // Met à jour le code de sortie
-        exit(1);
         return (1); // Indique une erreur
     }
 
     push_dir(cwd); // Sauvegarde l'ancien répertoire
     update_pwd(); // Met à jour PWD et OLDPWD
     shell->exit_code = 0;
-    exit(0);
     return (0); // Toujours succès
 }
