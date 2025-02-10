@@ -197,7 +197,8 @@ int ft_export(char **argv, struct s_shell *shell)
         // Vérifie si l'argument est un identifiant valide
         if (!is_valid_identifier(argv[i]))
         {
-            ft_printf("export: `%s': not a valid identifier\n", argv[i]);
+            //ft_printf("export: `%s': not a valid identifier\n", argv[i]);
+            ft_putstr_fd(" not a valid identifier", 2);
             shell->exit_code = 1; // Met à jour le code de sortie
             return (1); // Indique une erreur
         }
