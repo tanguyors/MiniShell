@@ -54,6 +54,7 @@ int ft_echo(char **argv, struct s_shell *shell)
 {
     int i = 0;
     int newline = 1;
+    int j;
 
     // Gère l'option "-n"
     while (argv[i] && ft_strcmp(argv[i], "-n") == 0)
@@ -76,11 +77,22 @@ int ft_echo(char **argv, struct s_shell *shell)
         }
         else
         {
-            ft_putstr_fd(argv[i], 1); // Affiche l'argument normal
+            j = 0;
+            while (argv[i][j])
+            {
+                while(argv[i][j] == 39 || argv[i][j] == '"')
+                {
+                    j++;
+                }
+                ft_putchar_fd(argv[i][j++], 1);
+            }
+            //ft_putstr_fd(argv[i], 1); // Affiche l'argument normal
         }
-
-        if (argv[i + 1])
+        if (argv[i + 1] && argv[i + 1][0] != 39)
+        {
+            //ft_printf("\ntest echo: %c\n", argv[i + 1][0]);
             ft_putchar_fd(' ', 1); // Ajoute un espace entre les arguments
+        }
         i++;
     }
 
@@ -96,7 +108,7 @@ int ft_pwd(char **argv, struct s_shell *shell)
 
     if (getcwd(cwd, sizeof(cwd)) != NULL) 
     {
-        ft_printf("%s\n", cwd); // Affiche le répertoire courant avec un saut de ligne
+        ft_printf("%s", cwd); // Affiche le répertoire courant avec un saut de ligne
         return (0);
     } 
     else 

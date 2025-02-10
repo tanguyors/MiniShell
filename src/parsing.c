@@ -94,9 +94,11 @@ int p_command(int *i, char *str, struct s_shell **head, int *stop_flag)
 {
 	struct s_shell *tail;
 	int j;
+	int k;
 
-	while (is_space(str[(*i)]))
-		(*i)++;
+	k = 0;
+	//while (is_space(str[(*i)]))
+		//(*i)++;
 	if (str[(*i)] && !is_spec_char(str[(*i)]) && !is_space(str[(*i)]))
 	{
 		printf("command:\n");
@@ -108,7 +110,7 @@ int p_command(int *i, char *str, struct s_shell **head, int *stop_flag)
 		j = 0;
 		while (str[(*i)] != '\0' && !is_space(str[(*i)]) && !is_spec_char(str[(*i)]))
 		{
-			if (!is_space(str[(*i)]))
+			//if (!is_space(str[(*i)]))
 				tail->data[j++] = str[(*i)];
 			(*i)++;
 		}	
@@ -142,7 +144,7 @@ static int p_arg(int *i, char *str, struct s_shell **head)
 			if (!is_space(str[(*i)]))
 				tail->data[j++] = str[(*i)];
 			(*i)++;
-		}	
+		}
 		tail->data[j] = '\0';
 	}
 	return (1);
@@ -186,12 +188,12 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 		printf("tail exist, token: %d\n", tail->token);
 	if (str[(*i)] == 39)
 	{
-		(*i)++;
+		//(*i)++;
 		tail->token = TOKEN_SIMPLE_QUOTE;
-		while (str[(*i)] && (str[(*i)] != 39))
+		while (str[(*i)]/* && (str[(*i)] != 39)*/)
 		{
-			while(str[(*i)] == 39)
-				(*i)++;
+			//while(str[(*i)] == 39)
+				//(*i)++;
 			tail->data[j++] = str[(*i)];
 			(*i)++;
 		}
