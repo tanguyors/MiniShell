@@ -14,10 +14,13 @@ int ft_exit(char **argv, struct s_shell *shell)
         ft_putstr_fd("too many arguments", 2);
         exit(1);
     }
-    if (is_str(argv[0]))
+    if (argv[0])
     {
-       ft_putstr_fd("numeric argument required", 2);
-       exit(2);
+        if (!is_str(argv[0]))
+        {
+            ft_putstr_fd("numeric argument required", 2);
+            exit(2);
+        }
     }
     free(shell->rl_input);
     if (argv[0])
@@ -54,7 +57,6 @@ int ft_echo(char **argv, struct s_shell *shell)
 {
     int i = 0;
     int newline = 1;
-    int j;
 
     // Gère l'option "-n"
     while (argv[i] && ft_strcmp(argv[i], "-n") == 0)
@@ -65,37 +67,25 @@ int ft_echo(char **argv, struct s_shell *shell)
 
     // Parcourt les arguments
     while (argv[i])
-    {
+    {   
         if (argv[i][0] == '$') // Vérifie si c'est une variable d'environnement
         {
             // Récupère et affiche la valeur de la variable (sans le '$')
             ft_putstr_fd(expand_variable(argv[i] + 1), 1);
             if(argv[i][1] == '?')
             {
-                ft_printf("%d\n", shell->exit_code);
+                ft_printf("%d", shell->exit_code);
             }
         }
         else
         {
-            j = 0;
-            while (argv[i][j])
-            {
-                while(argv[i][j] == 39 || argv[i][j] == '"')
-                {
-                    j++;
-                }
-                ft_putchar_fd(argv[i][j++], 1);
-            }
-            //ft_putstr_fd(argv[i], 1); // Affiche l'argument normal
+            ft_putstr_fd(argv[i], 1); // Affiche l'argument normal
         }
-        if (argv[i + 1] && argv[i + 1][0] != 39)
-        {
-            //ft_printf("\ntest echo: %c\n", argv[i + 1][0]);
+        if (argv[i + 1])
             ft_putchar_fd(' ', 1); // Ajoute un espace entre les arguments
-        }
         i++;
     }
-
+    shell->exit_code = 0;
     if (newline)
         ft_putchar_fd('\n', 1); // Ajoute un saut de ligne si nécessaire
     return (0);
@@ -108,7 +98,8 @@ int ft_pwd(char **argv, struct s_shell *shell)
 
     if (getcwd(cwd, sizeof(cwd)) != NULL) 
     {
-        ft_printf("%s", cwd); // Affiche le répertoire courant avec un saut de ligne
+        ft_printf("%s\n", cwd); // Affiche le répertoire courant avec un saut de ligne
+        shell->exit_code = 0;
         return (0);
     } 
     else 
@@ -125,23 +116,26 @@ extern char **environ;
  *
  * Retourne 0 en cas de succès, 1 si des arguments sont passés.
  */
-int ft_env(char **argv, struct s_shell *shell) 
+int ft_env(char **argv, struct s_shell *shell)
 {
     int i = 0;
 
     // Vérifie si des arguments supplémentaires sont donnés
-    if (argv[1]) 
+    if (argv[1])
     {
         ft_printf("env: No such file or directory\n");
-        return (1);
+        shell->exit_code = 1; // Met à jour le code de sortie
+        return (1); // Indique une erreur
     }
+
     // Parcourt la variable globale environ et affiche chaque variable
-    while (environ[i]) 
+    while (environ[i])
     {
-        ft_printf("%s\n", environ);
+        ft_printf("%s\n", environ[i]);
         i++;
     }
-    return (0);
+    shell->exit_code = 0;
+    return (0); // Toujours succès
 }
 
 //-----------------------------------------------------------------------------------EXPORT------------------------------------------------------------------------------------------
@@ -181,102 +175,101 @@ int	is_valid_identifier(const char *str)
  *
  * Retourne 0 en cas de succès, 1 en cas d'erreur.
  */
-int	ft_export(char **argv, struct s_shell *shell)
+int ft_export(char **argv, struct s_shell *shell)
 {
-	int		i;      // Index pour parcourir les arguments
-	char	*name;   // Stocke le nom de la variable
-	char	*value;  // Stocke la valeur associée
-	// Si aucun argument n'est donné, affiche toutes les variables exportées
-	if (!argv[0])
-	{
-		i = 0;
-		// Parcourt toutes les variables d'environnement
-		while (environ[i])
-		{
-			// Affiche chaque variable avec le format "declare -x NOM=VALEUR"
-			ft_printf("declare -x %s\n", environ[i]);
-			i++;
-		}
-		return (0); // Fin de la commande avec succès
-	}
-	// Parcourt les arguments donnés pour les ajouter/modifier
-	i = 0;
-	while (argv[i])
-	{
-		// Vérifie si l'argument est un identifiant valide
-		if (!is_valid_identifier(argv[i]))
-		{
-			// Affiche une erreur si l'identifiant est invalide
-			ft_printf("export: `%s': not a valid identifier\n", argv[i]);
-		}
-		else
-		{
-			// Copie l'argument pour pouvoir le manipuler
-			name = ft_strdup(argv[i]);
+    int i = 0;
 
-			// Cherche la position de '=' dans la chaîne
-			value = ft_strchr(name, '=');
-			if (value) // Si '=' est trouvé
-			{
-				*value = '\0';    // Coupe la chaîne en deux à '='
-				value++;          // Pointe sur la valeur après '='
-				setenv(name, value, 1); // Ajoute ou met à jour la variable dans environ
-			}
-			else
-			{
-				// Si aucune valeur n'est donnée, ajoute une variable avec une valeur vide
-				setenv(name, "", 1);
-			}
-			free(name); // Libère la mémoire allouée pour le nom
-		}
-		i++; // Passe au prochain argument
-	}
-	return (0); // Fin de la commande avec succès
+    // Si aucun argument n'est donné, affiche toutes les variables exportées
+    if (!argv[0])
+    {
+        int j = 0;
+        while (environ[j])
+        {
+            ft_printf("declare -x %s\n", environ[j]);
+            j++;
+        }
+        return (0); // Toujours succès
+    }
+
+    // Parcourt les arguments donnés pour les ajouter/modifier
+    while (argv[i])
+    {
+        // Vérifie si l'argument est un identifiant valide
+        if (!is_valid_identifier(argv[i]))
+        {
+            //ft_printf("export: `%s': not a valid identifier\n", argv[i]);
+            ft_putstr_fd(" not a valid identifier", 2);
+            shell->exit_code = 1; // Met à jour le code de sortie
+            return (1); // Indique une erreur
+        }
+        else
+        {
+            // Copie l'argument pour pouvoir le manipuler
+            char *name = ft_strdup(argv[i]);
+            // Cherche la position de '=' dans la chaîne
+            char *value = ft_strchr(name, '=');
+            if (value) // Si '=' est trouvé
+            {
+                *value = '\0'; // Coupe la chaîne en deux à '='
+                value++; // Pointe sur la valeur après '='
+                setenv(name, value, 1); // Ajoute ou met à jour la variable dans environ
+            }
+            else
+            {
+                // Si aucune valeur n'est donnée, ajoute une variable avec une valeur vide
+                setenv(name, "", 1);
+            }
+            free(name); // Libère la mémoire allouée pour le nom
+        }
+        i++; // Passe au prochain argument
+    }
+    shell->exit_code = 0;
+    return (0); // Toujours succès
 }
 
 //--------------------------------------------------------------------------------------------------------------------------UNSET---------------------------------------------------------------------------------------------
 // Version definitive a revoir pour mettre a la norme !!!!!
-int	ft_unset(char **argv, struct s_shell *shell)
+int ft_unset(char **argv, struct s_shell *shell)
 {
-	int	i;
-	int	j;
-	int	k;
+    int i = 0;
 
-	if (!argv[0]) // Aucun argument : rien à faire
-		return (0);
+    if (!argv[0]) // Aucun argument : rien à faire
+        return (0);
 
-	i = 0;
-	while (argv[i])
-	{
-		if (!is_valid_identifier(argv[i]))
-		{
-			ft_printf("unset: `%s': not a valid identifier\n", argv[i]);
-		}
-		else
-		{
-			j = 0;
-			while (environ[j])
-			{
-				// Compare uniquement la partie avant le '='
-				if (ft_strncmp(environ[j], argv[i], ft_strlen(argv[i])) == 0 &&
-					environ[j][ft_strlen(argv[i])] == '=')
-				{
-					// Décale toutes les entrées après j
-					k = j;
-					while (environ[k + 1])
-					{
-						environ[k] = environ[k + 1];
-						k++;
-					}
-					environ[k] = NULL; // Termine le tableau après décalage
-					break; // Une fois trouvée et supprimée, arrête la recherche
-				}
-				j++;
-			}
-		}
-		i++;
-	}
-	return (0);
+    while (argv[i])
+    {
+        if (!is_valid_identifier(argv[i]))
+        {
+            ft_printf("unset: `%s': not a valid identifier\n", argv[i]);
+            shell->exit_code = 1; // Met à jour le code de sortie
+            return (1); // Indique une erreur
+        }
+        else
+        {
+            int j = 0;
+            while (environ[j])
+            {
+                // Compare uniquement la partie avant le '='
+                if (ft_strncmp(environ[j], argv[i], ft_strlen(argv[i])) == 0 &&
+                    environ[j][ft_strlen(argv[i])] == '=')
+                {
+                    // Décale toutes les entrées après j
+                    int k = j;
+                    while (environ[k + 1])
+                    {
+                        environ[k] = environ[k + 1];
+                        k++;
+                    }
+                    environ[k] = NULL; // Termine le tableau après décalage
+                    break; // Une fois trouvée et supprimée, arrête la recherche
+                }
+                j++;
+            }
+        }
+        i++;
+    }
+    shell->exit_code = 0;
+    return (0); // Toujours succès
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------CD---------------------------------------------------------------------------------------------------------------
@@ -340,38 +333,44 @@ int ft_cd(char **argv, struct s_shell *shell)
     if (!getcwd(cwd, sizeof(cwd))) // Récupère le répertoire courant
     {
         perror("cd");
-        return (1);
+        shell->exit_code = 1; // Met à jour le code de sortie
+        return (1); // Indique une erreur
     }
 
-    if (!argv[0] || ft_strcmp(argv[0], "~") == 0) // "cd" ou "cd ~"
+    if (!argv[1] || ft_strcmp(argv[1], "~") == 0) // "cd" ou "cd ~"
     {
         path = getenv("HOME");
         if (!path || !*path)
         {
             ft_printf("cd: HOME not set\n");
-            return (1);
+            shell->exit_code = 1; // Met à jour le code de sortie
+            return (1); // Indique une erreur
         }
     }
-    else if (ft_strcmp(argv[0], "-") == 0) // "cd -"
+    else if (ft_strcmp(argv[1], "-") == 0) // "cd -"
     {
         previous_dir = pop_dir();
         if (!previous_dir)
         {
             ft_printf("cd: No previous directory\n");
-            return (1);
+            shell->exit_code = 1; // Met à jour le code de sortie
+            return (1); // Indique une erreur
         }
         ft_printf("%s\n", previous_dir); // Affiche le répertoire précédent
         path = previous_dir;
     }
     else
-        path = argv[0]; // Sinon, utilise le chemin donné
+        path = argv[1]; // Sinon, utilise le chemin donné
 
     if (chdir(path) == -1)
     {
         ft_printf("cd: %s: No such file or directory\n", path);
-        return (1);
+        shell->exit_code = 1; // Met à jour le code de sortie
+        return (1); // Indique une erreur
     }
-    push_dir(cwd);    // Sauvegarde l'ancien répertoire
-    update_pwd();     // Met à jour PWD et OLDPWD
-    return (0);
+
+    push_dir(cwd); // Sauvegarde l'ancien répertoire
+    update_pwd(); // Met à jour PWD et OLDPWD
+    shell->exit_code = 0;
+    return (0); // Toujours succès
 }
