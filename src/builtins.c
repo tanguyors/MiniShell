@@ -14,10 +14,13 @@ int ft_exit(char **argv, struct s_shell *shell)
         ft_putstr_fd("too many arguments", 2);
         exit(1);
     }
-    if (is_str(argv[0]))
+    if (argv[0])
     {
-       ft_putstr_fd("numeric argument required", 2);
-       exit(2);
+        if (!is_str(argv[0]))
+        {
+            ft_putstr_fd("numeric argument required", 2);
+            exit(2);
+        }
     }
     free(shell->rl_input);
     if (argv[0])
@@ -78,7 +81,6 @@ int ft_echo(char **argv, struct s_shell *shell)
         {
             ft_putstr_fd(argv[i], 1); // Affiche l'argument normal
         }
-
         if (argv[i + 1])
             ft_putchar_fd(' ', 1); // Ajoute un espace entre les arguments
         i++;
@@ -178,7 +180,7 @@ int ft_export(char **argv, struct s_shell *shell)
     int i = 0;
 
     // Si aucun argument n'est donné, affiche toutes les variables exportées
-    if (!argv[1])
+    if (!argv[0])
     {
         int j = 0;
         while (environ[j])
@@ -197,7 +199,6 @@ int ft_export(char **argv, struct s_shell *shell)
         {
             ft_printf("export: `%s': not a valid identifier\n", argv[i]);
             shell->exit_code = 1; // Met à jour le code de sortie
-            exit(1);
             return (1); // Indique une erreur
         }
         else
@@ -231,7 +232,7 @@ int ft_unset(char **argv, struct s_shell *shell)
 {
     int i = 0;
 
-    if (!argv[1]) // Aucun argument : rien à faire
+    if (!argv[0]) // Aucun argument : rien à faire
         return (0);
 
     while (argv[i])
