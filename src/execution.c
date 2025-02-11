@@ -199,7 +199,7 @@ static int setup_redirection(struct s_shell *shell, struct s_shell *current, int
     fd = open(current->data, flag, file_access);
     if (fd == -1)
     {
-        printf("minishell: %s: No such file or directory\n", current->data);
+		ft_putstr_fd(" No such file or directory", 2);
 		shell->exit_code = 1;
         return (-1);
     }
@@ -572,6 +572,7 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
     int fd[2];
     int prev_fd;
     pid_t pid;
+	int status;
 
 	prev_fd = -1;
     while (current)
@@ -593,8 +594,10 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
         while (current && current->token != TOKEN_CMD)
 			current = current->next;
     }
-    while (wait(NULL) > 0)
+    while (wait(&status) > 0)
         continue;
+	if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
+        shell->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie
 }
 
 
