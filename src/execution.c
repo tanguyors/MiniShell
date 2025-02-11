@@ -70,8 +70,8 @@ void std_execution(struct s_shell *shell, struct s_shell *current)
 			if(ft_strchr(current->data, '/'))
 				printf("bash: %s: Is a redictory\n", current->data);
 			else
-            	printf("%s: command not found\n", current->data);
-			exit_with_error(NULL, args, 1);
+				ft_putstr_fd(" command not found\n", 2);
+			exit_with_error(NULL, args, 127);
         }
 		free_array(args);
     }

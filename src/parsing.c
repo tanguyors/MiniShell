@@ -17,7 +17,7 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 		tail = get_last_node(*head);
 		tail->token = TOKEN_FILE;
 		j = 0;
-		while (str[(*i)] != '\0' && !is_space(str[(*i)])) 
+		while (str[(*i)] != '\0' && !is_space(str[(*i)]) && str[(*i)] != '|') 
 			tail->data[j++] = str[(*i)++];
 		tail->data[j] = '\0';
 	}
