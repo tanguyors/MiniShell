@@ -26,7 +26,7 @@ char *get_absolute_path(char *command)
 	path_env = getenv("PATH");
     if (path_env == NULL) 
 	{
-        perror("Error PATH not found\n");
+		ft_putstr_fd("Error PATH not found\n", 2);
         return (NULL);
     }
     ft_strncpy(path_copy, path_env, sizeof(path_copy));
@@ -67,7 +67,7 @@ void std_execution(struct s_shell *shell, struct s_shell *current)
         args = get_all_data(current);
         if (execve(command, args, environ) == -1) 
 		{
-			if(ft_strchr(current->data, '/'))
+			if(ft_strchr(current->data, '/') && ft_strchr(current->data, '.'))
 			{
 				ft_putstr_fd(" No such file or directory\n", 2);
 				exit_with_error(NULL, args, 126);
@@ -600,9 +600,12 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
 			current = current->next;
     }
     while (wait(&status) > 0)
-        continue;
+		continue;
 	if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
         shell->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie
+	//else if (WIFSIGNALED(status))
+		//shell->exit_code = WTERMSIG(status) + 128;
+	
 }
 
 
