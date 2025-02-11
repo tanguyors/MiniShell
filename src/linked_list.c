@@ -46,6 +46,19 @@ void print_token(struct s_shell *current)
 	ft_printf("NULL\n");
 }
 
+int get_nb_token(struct s_shell *current)
+{
+	int i;
+
+	i = 0;
+	while (current != NULL)
+	{
+		current = current->next;
+		i++;
+	}
+	return (i);
+}
+
 /* Fonction complémentaire de create_node 
 	permet de set la size ainsi que d'initialiser data, 
 	si necessaire*/
