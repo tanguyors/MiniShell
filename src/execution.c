@@ -81,7 +81,6 @@ void std_execution(struct s_shell *shell, struct s_shell *current)
             exit_with_error("waitpid error", NULL, 1);
         if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
             shell->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie
-		ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
     }
 }
 
@@ -109,7 +108,6 @@ void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
     }
 	// Si aucune commande builtin ne correspond
 	std_execution(shell, current);
-	ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
     //ft_printf("minishell: %s: command not found\n", current->data);
 }
 
@@ -189,7 +187,6 @@ void extract_data(struct s_shell *shell, struct s_shell *current)
 	printf("EXTRACT_DATA !\n");
 	data = get_arg_data(current);
 	cmd_execution(shell, current, data);
-	ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
 	free(data);
 }
 
@@ -205,7 +202,7 @@ static int setup_redirection(struct s_shell *shell, struct s_shell *current, int
     fd = open(current->data, flag, file_access);
     if (fd == -1)
     {
-        printf("minishell: %s: No such file or directory\n", current->data);
+        ft_putstr_fd(" No such file or directory", 2);
 		shell->exit_code = 1;
         return (-1);
     }
@@ -560,7 +557,6 @@ static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct 
 	close(fd[0]);
 	close(fd[1]);
 	extract_data(shell, current);
-	ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
 	exit(shell->exit_code);
 }
 
@@ -583,6 +579,7 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
     int fd[2];
     int prev_fd;
     pid_t pid;
+	int status;
 
 	prev_fd = -1;
 	printf("MULTI_PIPE_HANDLING !\n");
@@ -591,7 +588,6 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
         pipe_and_fork(fd, &pid);
         if (pid == 0)
 			child_process(shell, fd, prev_fd, current);
-		ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
         // Parent : Gérer les descripteurs
         if (prev_fd != -1)
             close(prev_fd);
@@ -606,9 +602,10 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
         while (current && current->token != TOKEN_CMD)
 			current = current->next;
     }
-    while (wait(NULL) > 0)
+    while (wait(&status) > 0)
         continue;
-	ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
+	if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
+        shell->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie
 }
 
 
@@ -666,6 +663,5 @@ void parse_execution(struct s_shell *shell, struct s_shell *head)
 	else
 	{
 		multi_pipe_handling(shell, current);
-		ft_printf("TEST EXIT CODE: %d\n", shell->exit_code);
 	}
 }
