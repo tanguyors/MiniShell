@@ -68,10 +68,15 @@ void std_execution(struct s_shell *shell, struct s_shell *current)
         if (execve(command, args, environ) == -1) 
 		{
 			if(ft_strchr(current->data, '/'))
-				printf("bash: %s: Is a redictory\n", current->data);
+			{
+				ft_putstr_fd(" No such file or directory\n", 2);
+				exit_with_error(NULL, args, 126);
+			}
 			else
+			{
 				ft_putstr_fd(" command not found\n", 2);
-			exit_with_error(NULL, args, 127);
+				exit_with_error(NULL, args, 127);
+			}
         }
 		free_array(args);
     }

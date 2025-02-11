@@ -123,7 +123,7 @@ int ft_env(char **argv, struct s_shell *shell)
     // Vérifie si des arguments supplémentaires sont donnés
     if (argv[1])
     {
-        ft_printf("env: No such file or directory\n");
+        ft_putstr_fd(" No such file or directory\n", 2);
         shell->exit_code = 1; // Met à jour le code de sortie
         return (1); // Indique une erreur
     }
@@ -240,7 +240,7 @@ int ft_unset(char **argv, struct s_shell *shell)
     {
         if (!is_valid_identifier(argv[i]))
         {
-            ft_printf("unset: `%s': not a valid identifier\n", argv[i]);
+            ft_putstr_fd(" not a valid identifier\n", 2);
             shell->exit_code = 1; // Met à jour le code de sortie
             return (1); // Indique une erreur
         }
@@ -342,7 +342,7 @@ int ft_cd(char **argv, struct s_shell *shell)
         path = getenv("HOME");
         if (!path || !*path)
         {
-            ft_printf("cd: HOME not set\n");
+            ft_putstr_fd(" HOME not set\n", 2);
             shell->exit_code = 1; // Met à jour le code de sortie
             return (1); // Indique une erreur
         }
@@ -352,7 +352,7 @@ int ft_cd(char **argv, struct s_shell *shell)
         previous_dir = pop_dir();
         if (!previous_dir)
         {
-            ft_printf("cd: No previous directory\n");
+            ft_putstr_fd(" No previous directory\n", 2);
             shell->exit_code = 1; // Met à jour le code de sortie
             return (1); // Indique une erreur
         }
@@ -364,7 +364,7 @@ int ft_cd(char **argv, struct s_shell *shell)
 
     if (chdir(path) == -1)
     {
-        ft_printf("cd: %s: No such file or directory\n", path);
+        ft_putstr_fd(" No such file or directory\n", 2);
         shell->exit_code = 1; // Met à jour le code de sortie
         return (1); // Indique une erreur
     }

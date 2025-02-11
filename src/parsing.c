@@ -244,6 +244,8 @@ struct s_shell *p_post_parsing(struct s_shell *head, char *str)
 			current->token = TOKEN_ARG;
 		current = current->next;
 	}
+	if (get_nb_token(head) == 1)
+		head->token = TOKEN_CMD;
 	return (head);
 }
 
