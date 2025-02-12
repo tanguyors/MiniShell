@@ -7,8 +7,7 @@
 			 -Checker les leaks.
 			 -Remise à la norme. */
 
-/* Erreur :  -gérer "cat << eof | grep a" 
-             -résoudre pipe error exit code */
+/* Erreur :  -gérer le std input lors de echo arg | ./minishell  ( isatty )*/
 static void ascii_art()
 {
     printf("\n\n\n");

@@ -192,22 +192,89 @@ void extract_data(struct s_shell *shell, struct s_shell *current)
 	free(data);
 }
 
+static int access_redir_R(struct s_shell *shell, struct s_shell *current, int flag, int file_access)
+{
+	int fd;
+
+	/*if (access(current->data, F_OK) != 0)
+	{
+		fd = open(current->data, flag, file_access);
+		if (fd == -1)
+		{
+			ft_putstr_fd(" No such file or directory\n", 2);
+			shell->exit_code = 1;
+			return (-1);
+		}
+	}*/
+	if (access(current->data, R_OK) == 0)
+	{
+		fd = open(current->data, flag, file_access);
+		if (fd == -1)
+		{
+			ft_putstr_fd(" No such file or directory\n", 2);
+			shell->exit_code = 1;
+			return (-1);
+		}
+	}
+	else
+	{
+		ft_putstr_fd(" Permission denied\n", 2);
+		shell->exit_code = 1;
+		return (-1);
+	}
+	return (fd);
+}
+
+static int access_redir_W(struct s_shell *shell, struct s_shell *current, int flag, int file_access)
+{
+	int fd;
+
+	if (access(current->data, F_OK) != 0)
+	{
+		fd = open(current->data, flag, file_access);
+		if (fd == -1)
+		{
+			ft_putstr_fd(" No such file or directory\n", 2);
+			shell->exit_code = 1;
+			return (-1);
+		}
+	}
+	else if (access(current->data, W_OK | R_OK) == 0)
+	{
+		fd = open(current->data, flag, file_access);
+		if (fd == -1)
+		{
+			ft_putstr_fd(" No such file or directory\n", 2);
+			shell->exit_code = 1;
+			return (-1);
+		}
+	}
+	else
+	{
+		ft_putstr_fd(" Permission denied\n", 2);
+		shell->exit_code = 1;
+		return (-1);
+	}
+	return (fd);
+}
+
 static int setup_redirection(struct s_shell *shell, struct s_shell *current, int flag, int file_access)
 {
 	int fd;
 
 	if (!current || !current->next)
         return (-1);
-    
     while (current && current->token != TOKEN_FILE)
 		current = current->next;					 // Déplacement vers le TOKEN_FILE
-    fd = open(current->data, flag, file_access);
-    if (fd == -1)
-    {
-		ft_putstr_fd(" No such file or directory", 2);
-		shell->exit_code = 1;
-        return (-1);
-    }
+
+	if (file_access == 0)
+	{
+		fd = access_redir_R(shell, current, flag, file_access);
+	}
+	else
+	{
+		fd = access_redir_W(shell, current, flag, file_access);
+	}
 	return(fd);
 }
 
@@ -288,6 +355,7 @@ static void redir_append(struct s_shell *shell, struct s_shell *current)
 	struct s_shell *head;
 
 	head = current;
+
 	fd = setup_redirection(shell, current, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd == -1)
 		return ;
@@ -543,6 +611,7 @@ static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct 
 		close(prev_fd);
 	}
 	child_redir2(shell, current);
+	//ft_printf("TEST EXIT PIPE: %d\n", shell->exit_code);
 	// Si un pipe suivant existe, connectez-le à STDOUT
 	//printf("test current token: %s\n", get_token_name(current->token));
 	//printf("nb_pipe: %d\n", nb_pipe);
@@ -585,6 +654,7 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
         pipe_and_fork(fd, &pid);
         if (pid == 0)
 			child_process(shell, fd, prev_fd, current);
+		//ft_printf("TEST EXIT PIPE: %d\n", shell->exit_code);
         // Parent : Gérer les descripteurs
         if (prev_fd != -1)
             close(prev_fd);
@@ -599,12 +669,12 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
         while (current && current->token != TOKEN_CMD)
 			current = current->next;
     }
-    while (wait(&status) > 0)
+    while (wait(NULL) > 0)
 		continue;
 	if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
         shell->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie
-	//else if (WIFSIGNALED(status))
-		//shell->exit_code = WTERMSIG(status) + 128;
+	else if (WIFSIGNALED(status))
+		shell->exit_code = WTERMSIG(status) + 128;
 	
 }
 
