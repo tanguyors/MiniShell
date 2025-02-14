@@ -69,7 +69,7 @@ void std_execution(struct s_shell *shell, struct s_shell *current)
 		{
 			if(ft_strchr(current->data, '/') && ft_strchr(current->data, '.'))
 			{
-				ft_putstr_fd(" No such file or directory\n", 2);
+				perror(" execve: ");
 				exit_with_error(NULL, args, 126);
 			}
 			else
@@ -192,88 +192,25 @@ void extract_data(struct s_shell *shell, struct s_shell *current)
 	free(data);
 }
 
-static int access_redir_R(struct s_shell *shell, struct s_shell *current, int flag, int file_access)
-{
-	int fd;
-
-	/*if (access(current->data, F_OK) != 0)
-	{
-		fd = open(current->data, flag, file_access);
-		if (fd == -1)
-		{
-			ft_putstr_fd(" No such file or directory\n", 2);
-			shell->exit_code = 1;
-			return (-1);
-		}
-	}*/
-	if (access(current->data, R_OK) == 0)
-	{
-		fd = open(current->data, flag, file_access);
-		if (fd == -1)
-		{
-			ft_putstr_fd(" No such file or directory\n", 2);
-			shell->exit_code = 1;
-			return (-1);
-		}
-	}
-	else
-	{
-		ft_putstr_fd(" Permission denied\n", 2);
-		shell->exit_code = 1;
-		return (-1);
-	}
-	return (fd);
-}
-
-static int access_redir_W(struct s_shell *shell, struct s_shell *current, int flag, int file_access)
-{
-	int fd;
-
-	if (access(current->data, F_OK) != 0)
-	{
-		fd = open(current->data, flag, file_access);
-		if (fd == -1)
-		{
-			ft_putstr_fd(" No such file or directory\n", 2);
-			shell->exit_code = 1;
-			return (-1);
-		}
-	}
-	else if (access(current->data, W_OK | R_OK) == 0)
-	{
-		fd = open(current->data, flag, file_access);
-		if (fd == -1)
-		{
-			ft_putstr_fd(" No such file or directory\n", 2);
-			shell->exit_code = 1;
-			return (-1);
-		}
-	}
-	else
-	{
-		ft_putstr_fd(" Permission denied\n", 2);
-		shell->exit_code = 1;
-		return (-1);
-	}
-	return (fd);
-}
-
 static int setup_redirection(struct s_shell *shell, struct s_shell *current, int flag, int file_access)
 {
 	int fd;
 
-	if (!current || !current->next)
+	if (!current || !(current)->next)
         return (-1);
-    while (current && current->token != TOKEN_FILE)
-		current = current->next;					 // Déplacement vers le TOKEN_FILE
-
-	if (file_access == 0)
+    while (current && (current)->token != TOKEN_FILE)
 	{
-		fd = access_redir_R(shell, current, flag, file_access);
+		current = (current)->next;					 // Déplacement vers le TOKEN_FILE
+		ft_printf("test data: %s\n", (current)->data);
 	}
-	else
+	ft_printf("test\n");
+	fd = open((current)->data, flag, file_access);
+	if (fd == -1)
 	{
-		fd = access_redir_W(shell, current, flag, file_access);
+		//ft_putstr_fd(" No such file or directory\n", 2);
+		perror("open: ");
+		shell->exit_code = 1;
+		return (-1);
 	}
 	return(fd);
 }
@@ -281,7 +218,7 @@ static int setup_redirection(struct s_shell *shell, struct s_shell *current, int
 /* Gestion de la redirection d'entrée (<)
 	Redirige l'entrée standard vers un fichier 
 	resultat < file affiché sur la console même avant un pipe ( a regler ) */
-static void redir_input(struct s_shell *shell, struct s_shell *current)
+/*static void redir_input(struct s_shell *shell, struct s_shell *current)
 {
     int fd;
 	int saved_stdin;
@@ -290,7 +227,14 @@ static void redir_input(struct s_shell *shell, struct s_shell *current)
 	head = current;
 	fd = setup_redirection(shell, current, O_RDONLY, 0);
 	if (fd == -1)
+	{
+		//ft_putstr_fd(" No such file or directory\n", 2);
+		perror("open: ");
+		shell->exit_code = 1;
 		return ;
+	}
+	//if (fd == -1)
+		//return ;
     // Sauvegarde de l'entrée standard originale
     saved_stdin = dup(STDIN_FILENO);
     if (saved_stdin == -1)
@@ -312,7 +256,7 @@ static void redir_input(struct s_shell *shell, struct s_shell *current)
     dup2(saved_stdin, STDIN_FILENO);
     close(saved_stdin);
     close(fd);
-}
+}*/
 
 /* Gestion de la redirection de sortie (>)
 	Redirige la sortie standard vers un fichier */
@@ -348,7 +292,7 @@ static void redir_output(struct s_shell *shell, struct s_shell *current)
 
 /* Gestion de la redirection en mode append (>>)
 	Ajoute la sortie à la fin du fichier */
-static void redir_append(struct s_shell *shell, struct s_shell *current)
+/*static void redir_append(struct s_shell *shell, struct s_shell *current)
 {
     int fd;
 	int saved_stdout;
@@ -386,11 +330,11 @@ void setup_heredoc(struct s_shell **current, int (*pipe_fd)[2])
 		*current = (*current)->next;
     if (pipe(*pipe_fd) == -1)
         return ;
-}
+}*/
 
 /* Permet de gérer le cas ou une variable d'environnement
 	doit être interprêté */
-char *h_expand_var(char *line, char **new_line, char **end_line)
+/*char *h_expand_var(char *line, char **new_line, char **end_line)
 {
 	char *expanded_var;
 	char *dollar_pos;
@@ -448,11 +392,11 @@ void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
         write(pipe_fd[0][1], "\n", 1);
         free(line);
     }
-}
+}*/
 
 /* Gestion du heredoc (<<)
 	Lit l'entrée jusqu'à ce que le délimiteur soit rencontré */
-static void redir_heredoc(struct s_shell *shell, struct s_shell *current)
+/*static void redir_heredoc(struct s_shell *shell, struct s_shell *current)
 {
     int pipe_fd[2];
 	int saved_stdin;
@@ -475,7 +419,7 @@ static void redir_heredoc(struct s_shell *shell, struct s_shell *current)
     dup2(saved_stdin, STDIN_FILENO);
     close(saved_stdin);
     close(pipe_fd[0]);
-}
+}*/
 
 
 /* Redirige vers le bon token de redirection 
@@ -489,7 +433,7 @@ void redirection_execution(struct s_shell *shell, struct s_shell *current)
 		which_redir = which_redir->next;
 	if (which_redir->token == REDIR_INPUT)
 	{
-		redir_input(shell, current);
+		//redir_input(shell, current);
 	}
 	else if (which_redir->token == REDIR_OUTPUT)
 	{
@@ -497,11 +441,11 @@ void redirection_execution(struct s_shell *shell, struct s_shell *current)
 	}
 	else if (which_redir->token == REDIR_APPEND)
 	{
-		redir_append(shell, current);
+		//redir_append(shell, current);
 	}
 	else if (which_redir->token == REDIR_HEREDOC)
 	{
-		redir_heredoc(shell, current);
+		//redir_heredoc(shell, current);
 	}
 }
 
