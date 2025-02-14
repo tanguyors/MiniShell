@@ -62,7 +62,7 @@ typedef struct s_builtin
 
 /*-- Parsing --*/
 char **parse_tokens(char *input);
-struct s_shell *parsing(char *str, struct s_shell *value);
+struct s_shell *parsing(char *str, struct s_shell *head, struct s_shell *shell);
 void parse_commands(char **tokens);
 int p_command(int *i, char *str, struct s_shell **value, int *stop_flag);
 /*-- Linked_list --*/

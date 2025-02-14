@@ -52,7 +52,9 @@ int main(void)
             free(shell.rl_input);
             exit(shell.exit_code);
         }
-        head = parsing(shell.rl_input, head);
+        head = parsing(shell.rl_input, head, &shell);
+        if (!head)
+            main();
 		parse_execution(&shell, head);
         free(shell.rl_input);
         if (head)

@@ -8,7 +8,6 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 {
 	struct s_shell *tail;
 	int j;
-
 	while (is_space(str[(*i)]))
 		(*i)++;
 	if (str[(*i)] /* && is_alnum(str[(*i)]) */)
@@ -24,7 +23,7 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 	else
 	{
 		free(str);
-		exit_with_error("bash: syntax error near unexpected token `newline'\n", NULL, 1);
+		ft_putstr_fd("bash: syntax error near unexpected token `newline'\n", 2);
 		*stop_flag = 1;
 	}
 	while (is_space(str[(*i)]))
@@ -193,7 +192,7 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 	p_double_quotes(i, str, tail);
 }
 
-struct s_shell *post_parsing_condition(struct s_shell *current, char *str, int *break_flag)
+struct s_shell *post_parsing_condition(struct s_shell *current, char *str, int *stop_flag)
 {
 
 	if (current->token == TOKEN_CMD && current->next->token == TOKEN_CMD)
@@ -203,14 +202,15 @@ struct s_shell *post_parsing_condition(struct s_shell *current, char *str, int *
 	if (current->token == TOKEN_PIPE && current->next->token == TOKEN_PIPE)
 	{
 		free(str);
-		exit_with_error("bash: syntax error near unexpected token `|'", NULL, 1);
-		*break_flag = 1;
+		ft_putstr_fd("bash: syntax error near unexpected token `|'\n", 2);
+		*stop_flag = 1;
+		return (NULL);
 	}
 	if (is_token_red(current->token) && current->next->token != TOKEN_FILE)
 	{
 		free(str);
-		exit_with_error("bash: syntax error near unexpected token `newline'", NULL, 1);
-		*break_flag = 1;
+		ft_putstr_fd("bash: syntax error near unexpected token `newline'\n", 2);
+		*stop_flag = 1;
 	}
 	return (current);
 }
@@ -219,7 +219,7 @@ struct s_shell *post_parsing_condition(struct s_shell *current, char *str, int *
 	succession d'une prochaine commande sans pipe  */
 /* Appel récursif a parsing afin de gérer le cas ou 
 	une commande n'a pas été fourni après un pipe */
-struct s_shell *p_post_parsing(struct s_shell *head, char *str)
+struct s_shell *p_post_parsing(struct s_shell *head, char *str, struct s_shell *shell)
 {
 	struct s_shell *current;
 	int break_flag;
@@ -232,13 +232,15 @@ struct s_shell *p_post_parsing(struct s_shell *head, char *str)
 		if (current && current->next)
 		{
 			current = post_parsing_condition(current, str,  &break_flag);
+			if (!current)
+				return (NULL);
 			if (break_flag)
 				break;
 		}
 		if (current->token == TOKEN_PIPE && !current->next)
 		{
 			rl_input = readline("> ");
-			current = parsing(rl_input, current);
+			current = parsing(rl_input, current, shell);
 		}
 		if (current->token == TOKEN_DOUBLE_QUOTE || current->token == TOKEN_SIMPLE_QUOTE)
 			current->token = TOKEN_ARG;
@@ -267,7 +269,7 @@ struct s_shell *pre_parsing(char *str, struct s_shell *head, int *stop_flag)
 
 /* Parsing principale permettant de parcourir l'entièreté de la string
 	et y crée une liste chainé avec les différentes valeurs et tokens */
-struct s_shell *parsing(char *str, struct s_shell *head)
+struct s_shell *parsing(char *str, struct s_shell *head, struct s_shell *shell)
 {
     int i;
 	int stop_flag;
@@ -292,6 +294,7 @@ struct s_shell *parsing(char *str, struct s_shell *head)
         else
             i++;
     }
-	head = p_post_parsing(head, str);
+	shell->exit_code = stop_flag;
+	head = p_post_parsing(head, str, shell);
     return (head);
 }
