@@ -56,6 +56,7 @@ char *expand_variable(const char *var)
 int ft_echo(char **argv, struct s_shell *shell)
 {
     int i = 0;
+    int j = 0;
     int newline = 1;
 
     // Gère l'option "-n"
@@ -68,28 +69,32 @@ int ft_echo(char **argv, struct s_shell *shell)
     // Parcourt les arguments
     while (argv[i])
     {   
-        if (argv[i][0] == '$') // Vérifie si c'est une variable d'environnement
-        {
-            // Récupère et affiche la valeur de la variable (sans le '$')
-            ft_putstr_fd(expand_variable(argv[i] + 1), 1);
-            if(argv[i][1] == '?')
+        while(argv[j])
+        {    
+            if (argv[i][j] == '$') // Vérifie si c'est une variable d'environnement
             {
-                ft_printf("%d", shell->exit_code);
+                // Récupère et affiche la valeur de la variable (sans le '$')
+                ft_putstr_fd(expand_variable(argv[i] + 1), 1);
+                if(argv[i + 1][j] == '?')
+                {
+                    ft_printf("%d", shell->exit_code);
+                }
             }
+            else
+            {
+                ft_putstr_fd(argv[i], 1); // Affiche l'argument normal
+            }
+            if (argv[i + 1])
+                ft_putchar_fd(' ', 1); // Ajoute un espace entre les arguments
+            j++;
         }
-        else
-        {
-            ft_putstr_fd(argv[i], 1); // Affiche l'argument normal
-        }
-        if (argv[i + 1])
-            ft_putchar_fd(' ', 1); // Ajoute un espace entre les arguments
+        shell->exit_code = 0;
+        if (newline)
+            ft_putchar_fd('\n', 1); // Ajoute un saut de ligne si nécessaire
         i++;
+        return (0);
     }
-    shell->exit_code = 0;
-    if (newline)
-        ft_putchar_fd('\n', 1); // Ajoute un saut de ligne si nécessaire
-    return (0);
-}
+} 
  //--------------------------------------------------------------------------------------PWD------------------------------------------------------------------------
 int ft_pwd(char **argv, struct s_shell *shell)
 {
