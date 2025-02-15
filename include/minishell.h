@@ -65,6 +65,7 @@ char **parse_tokens(char *input);
 struct s_shell *parsing(char *str, struct s_shell *head, struct s_shell *shell);
 void parse_commands(char **tokens);
 int p_command(int *i, char *str, struct s_shell **value, int *stop_flag);
+void p_redirection(int *i, char *str, struct s_shell **head, int *stop_flag);
 /*-- Linked_list --*/
 void print_list(struct s_shell *current);
 void print_token(struct s_shell *current);

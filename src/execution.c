@@ -192,19 +192,19 @@ void extract_data(struct s_shell *shell, struct s_shell *current)
 	free(data);
 }
 
-static int setup_redirection(struct s_shell *shell, struct s_shell *current, int flag, int file_access)
+static int setup_redirection(struct s_shell *shell, struct s_shell **current, int flag, int file_access)
 {
 	int fd;
 
-	if (!current || !(current)->next)
+	if (!*current || !(*current)->next)
         return (-1);
-    while (current && (current)->token != TOKEN_FILE)
+    while (*current && (*current)->token != TOKEN_FILE)
 	{
-		current = (current)->next;					 // Déplacement vers le TOKEN_FILE
-		ft_printf("test data: %s\n", (current)->data);
+		*current = (*current)->next;					 // Déplacement vers le TOKEN_FILE
+		ft_printf("test data: %s\n", (*current)->data);
 	}
 	ft_printf("test\n");
-	fd = open((current)->data, flag, file_access);
+	fd = open((*current)->data, flag, file_access);
 	if (fd == -1)
 	{
 		//ft_putstr_fd(" No such file or directory\n", 2);
@@ -260,13 +260,13 @@ static int setup_redirection(struct s_shell *shell, struct s_shell *current, int
 
 /* Gestion de la redirection de sortie (>)
 	Redirige la sortie standard vers un fichier */
-static void redir_output(struct s_shell *shell, struct s_shell *current)
+static void redir_output(struct s_shell *shell, struct s_shell **current)
 {
     int fd;
 	int saved_stdout;
 	struct s_shell *head;
 
-	head = current;
+	head = *current;
 	fd = setup_redirection(shell, current, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
 		return ;
@@ -437,7 +437,7 @@ void redirection_execution(struct s_shell *shell, struct s_shell *current)
 	}
 	else if (which_redir->token == REDIR_OUTPUT)
 	{
-		redir_output(shell, current);
+		redir_output(shell, &current);
 	}
 	else if (which_redir->token == REDIR_APPEND)
 	{
@@ -496,7 +496,7 @@ void redirection_execution(struct s_shell *shell, struct s_shell *current)
 		exit_with_error("waitpid error", NULL);
 }*/
 
-static void child_redir(struct s_shell *shell, struct s_shell *current)
+/*static void child_redir_old(struct s_shell *shell, struct s_shell *current)
 {
 	struct s_shell *current_redir;
 	struct s_shell *first_arg;
@@ -520,9 +520,9 @@ static void child_redir(struct s_shell *shell, struct s_shell *current)
 			redirection_execution(shell, current_redir);
 		}
 	}	
-}
+}*/
 
-static void child_redir2(struct s_shell *shell, struct s_shell *current)
+static void child_redir(struct s_shell *shell, struct s_shell *current)
 {
 	struct s_shell *current_redir;
 	struct s_shell *first_arg;
@@ -554,7 +554,7 @@ static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct 
 			exit_with_error("dup2 error prev_fd", NULL, 1);
 		close(prev_fd);
 	}
-	child_redir2(shell, current);
+	child_redir(shell, current);
 	//ft_printf("TEST EXIT PIPE: %d\n", shell->exit_code);
 	// Si un pipe suivant existe, connectez-le à STDOUT
 	//printf("test current token: %s\n", get_token_name(current->token));
@@ -639,7 +639,7 @@ void exec_without_pipe(struct s_shell *shell, struct s_shell *current)
 				first_arg = current;
 				flag = 1;
 			}
-			if (current->next->token || current->token)
+			if (current->token || current->next->token )
 			{
 				if (is_token_red(current->next->token) || is_token_red(current->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
 				{
