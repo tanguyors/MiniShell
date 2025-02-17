@@ -24,7 +24,7 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 	}
 	else
 	{
-		free(str);
+		//free(str);
 		ft_putstr_fd("bash: syntax error near unexpected token `newline'\n", 2);
 		*stop_flag = 1;
 	}
@@ -205,14 +205,14 @@ struct s_shell *post_parsing_condition(struct s_shell *current, char *str, int *
 		current->next->token = TOKEN_ARG;
 	if (current->token == TOKEN_PIPE && current->next->token == TOKEN_PIPE)
 	{
-		free(str);
+		//free(str);
 		ft_putstr_fd("bash: syntax error near unexpected token `|'\n", 2);
 		*stop_flag = 1;
 		return (NULL);
 	}
 	if (is_token_red(current->token) && current->next->token != TOKEN_FILE)
 	{
-		free(str);
+		//free(str);
 		ft_putstr_fd("bash: syntax error near unexpected token `newline'\n", 2);
 		*stop_flag = 1;
 	}

@@ -33,13 +33,12 @@ static void signals()
     sigaction(SIGQUIT, &sa, NULL);
 }
 
-int main(void)
+static void main_2(void)
 {
     struct s_shell shell;
     struct s_shell *head;
 
     signals();
-    //ascii_art();
     shell.exit_code = 0;
     while (1)
     {
@@ -53,11 +52,11 @@ int main(void)
             exit(shell.exit_code);
         }
         head = parsing(shell.rl_input, head, &shell);
-        if (!head)
+        if (!head || shell.exit_code)
         {
             if (shell.rl_input)
                 free(shell.rl_input);
-            main();
+            main_2();
         }
 		parse_execution(&shell, head);
         if (shell.rl_input)
@@ -69,5 +68,11 @@ int main(void)
             free_list(head);
         }
     }
+}
+
+int main(void)
+{
+    ascii_art();
+    main_2();
     return (0);
 }
