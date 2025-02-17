@@ -40,6 +40,7 @@ struct s_shell
 {
     struct s_shell *next;
     struct s_shell *prev;
+    struct s_shell *file;
     enum e_tokens token;
     char *data;
     int exit_code;

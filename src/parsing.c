@@ -10,7 +10,7 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 	int j;
 	while (is_space(str[(*i)]))
 		(*i)++;
-	printf("i = %d, char = %c\n", *i, str[*i]);
+	//printf("i = %d, char = %c\n", *i, str[*i]);
 	if (str[(*i)] /* && is_alnum(str[(*i)]) */)
 	{
 		insert_tail(head, NULL, "TOKEN_FILE");
@@ -20,7 +20,7 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 		while (str[(*i)] != '\0' && !is_redirect(str[(*i)]) && !is_space(str[(*i)]) && str[(*i)] != '|') 
 			tail->data[j++] = str[(*i)++];
 		tail->data[j] = '\0';
-		printf("i = %d, char = %c\n", *i, str[*i]);
+		//printf("i = %d, char = %c\n", *i, str[*i]);
 	}
 	else
 	{
@@ -32,7 +32,7 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 		(*i)++;
 	if (is_redirect(str[(*i)]))
 		p_redirection(i, str, head, stop_flag);
-	printf("i = %d, char = %c\n", *i, str[*i]);
+	//printf("i = %d, char = %c\n", *i, str[*i]);
 }
 
 /* Fonction permettant de déterminer le type de redirection */
@@ -54,7 +54,6 @@ enum e_tokens which_red(int *i, char *str)
 void p_redirection(int *i, char *str, struct s_shell **head, int *stop_flag)
 {
 	struct s_shell *tail;
-	printf("TEST REDIR\n");
 	if (is_redirect(str[(*i)]))
 	{
 		insert_tail(head, NULL, "TOKEN_RED");
@@ -67,7 +66,6 @@ void p_redirection(int *i, char *str, struct s_shell **head, int *stop_flag)
 			tail->data[1] = str[(*i)++];
 			tail->data[2] = '\0';
 		}
-		printf("i = %d, char = %c\n", *i, str[*i]);
 		r_in_out_file(i, str, head, stop_flag);
 	}
 }

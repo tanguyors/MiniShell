@@ -192,19 +192,20 @@ void extract_data(struct s_shell *shell, struct s_shell *current)
 	free(data);
 }
 
-static int setup_redirection(struct s_shell *shell, struct s_shell **current, int flag, int file_access)
+static int setup_redirection(struct s_shell *shell, struct s_shell *current, int flag, int file_access)
 {
 	int fd;
 
-	if (!*current || !(*current)->next)
+	if (!shell->file || !shell->file->next)
         return (-1);
-    while (*current && (*current)->token != TOKEN_FILE)
+	
+    while (shell->file && shell->file->token != TOKEN_FILE)
 	{
-		*current = (*current)->next;					 // Déplacement vers le TOKEN_FILE
-		ft_printf("test data: %s\n", (*current)->data);
+		//printf("setup [%d]\n", i);
+		shell->file = shell->file->next;					 // Déplacement vers le TOKEN_FILE
+		ft_printf("test data: %s\n", shell->file->data);
 	}
-	ft_printf("test\n");
-	fd = open((*current)->data, flag, file_access);
+	fd = open(shell->file->data, flag, file_access);
 	if (fd == -1)
 	{
 		//ft_putstr_fd(" No such file or directory\n", 2);
@@ -212,6 +213,7 @@ static int setup_redirection(struct s_shell *shell, struct s_shell **current, in
 		shell->exit_code = 1;
 		return (-1);
 	}
+	shell->file = shell->file->next;
 	return(fd);
 }
 
@@ -260,14 +262,14 @@ static int setup_redirection(struct s_shell *shell, struct s_shell **current, in
 
 /* Gestion de la redirection de sortie (>)
 	Redirige la sortie standard vers un fichier */
-static void redir_output(struct s_shell *shell, struct s_shell **current)
+static void redir_output(struct s_shell *shell, struct s_shell *first_arg)
 {
     int fd;
 	int saved_stdout;
 	struct s_shell *head;
 
-	head = *current;
-	fd = setup_redirection(shell, current, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	head = first_arg;
+	fd = setup_redirection(shell, first_arg, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
 		return ;
     saved_stdout = dup(STDOUT_FILENO);
@@ -283,7 +285,7 @@ static void redir_output(struct s_shell *shell, struct s_shell **current)
         return ;
     }
 	//printf("redir_output current token: %s\n", get_token_name(current->token));
-    if (head && head->token == TOKEN_CMD)
+    if (head && head->token == TOKEN_CMD && !shell->file)
         extract_data(shell, head);
     dup2(saved_stdout, STDOUT_FILENO);
     close(saved_stdout);
@@ -424,28 +426,28 @@ void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
 
 /* Redirige vers le bon token de redirection 
 	SUPPR PRINTF erreur heredoc */
-void redirection_execution(struct s_shell *shell, struct s_shell *current)
+void redirection_execution(struct s_shell *shell, struct s_shell *first_arg)
 {
 	struct s_shell *which_redir;
 
-	which_redir = current;
+	which_redir = first_arg;
 	while (!is_token_red(which_redir->token))
 		which_redir = which_redir->next;
 	if (which_redir->token == REDIR_INPUT)
 	{
-		//redir_input(shell, current);
+		//redir_input(shell, first_arg);
 	}
 	else if (which_redir->token == REDIR_OUTPUT)
 	{
-		redir_output(shell, &current);
+		redir_output(shell, first_arg);
 	}
 	else if (which_redir->token == REDIR_APPEND)
 	{
-		//redir_append(shell, current);
+		//redir_append(shell, first_arg);
 	}
 	else if (which_redir->token == REDIR_HEREDOC)
 	{
-		//redir_heredoc(shell, current);
+		//redir_heredoc(shell, first_arg);
 	}
 }
 
@@ -623,42 +625,43 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
 }
 
 
-void exec_without_pipe(struct s_shell *shell, struct s_shell *current)
+void exec_without_pipe(struct s_shell *shell, struct s_shell *head)
 {
 	int flag;
 	struct s_shell *first_arg;
 
 	flag = 0;
-	first_arg = current;
-	while (current)
+	first_arg = head;
+	shell->file = head;
+	while (head)
 	{
-		if (is_redirection_in_list(current))
+		if (is_redirection_in_list(head))
 		{
-			if (current->next->token == TOKEN_ARG && !flag)
+			if (head->next->token == TOKEN_ARG && !flag)
 			{
-				first_arg = current;
+				first_arg = head;
 				flag = 1;
 			}
-			if (current->token || current->next->token )
+			if (head->token || head->next->token )
 			{
-				if (is_token_red(current->next->token) || is_token_red(current->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
+				if (is_token_red(head->next->token) || is_token_red(head->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
 				{
 					redirection_execution(shell, first_arg);
-					current = current->next;
+					head = head->next;
 				}
 			}
 		}
 		else
 		{
-			if (current && current->token)
+			if (head && head->token)
 			{
-				if (current->token == TOKEN_CMD) // relié a TOKEN_ARG, cherche un token ARG
+				if (head->token == TOKEN_CMD) // relié a TOKEN_ARG, cherche un token ARG
 				{
-					extract_data(shell, current);
+					extract_data(shell, head);
 				}
 			}
 		}
-		current = current->next;
+		head = head->next;
 	}
 }
 
@@ -667,15 +670,12 @@ void exec_without_pipe(struct s_shell *shell, struct s_shell *current)
 /* Passage par référence necessaire ? */
 void parse_execution(struct s_shell *shell, struct s_shell *head)
 {
-	struct s_shell *current;
-
-	current = head;
-	if (!is_pipe(current))
+	if (!is_pipe(head))
 	{
-		exec_without_pipe(shell, current);
+		exec_without_pipe(shell, head);
 	}
 	else
 	{
-		multi_pipe_handling(shell, current);
+		multi_pipe_handling(shell, head);
 	}
 }
