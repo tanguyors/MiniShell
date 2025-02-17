@@ -2,6 +2,8 @@
 //Implementations des commandes interne
 #include "../include/minishell.h"
 
+
+
 int ft_exit(char **argv, struct s_shell *shell)
 {
     int argc;
@@ -30,14 +32,120 @@ int ft_exit(char **argv, struct s_shell *shell)
 
 //------------------------------------------------------------------------------------------ECHO----------------------------------------------------------------
 /**
- * ft_echo - Implémente le built-in echo.
- * @argv: Tableau d'arguments, argv[0] = "echo".
+ * expand_token - Parcourt `input` et remplace chaque occurrence de '$...' par
+ *                la valeur de la variable d'environnement correspondante.
+ * @input:             La chaîne d'entrée à analyser.
+ * @is_in_single_quote: Indique si ce token était entouré de single quotes (1 = oui, 0 = non).
+ * @shell:             Pointeur vers la structure s_shell (pour récupérer shell->exit_code, etc.).
  *
- * Retourne 0 en cas de succès.
+ * Retourne un pointeur vers la nouvelle chaîne allouée, ou NULL en cas d'erreur.
+ * À toi de free la chaîne après usage pour éviter les leaks.
+ *
+ * Cette fonction ne fait pas de réallocation dynamique
+ *        si la variable expandée est très longue. Pour le minishell,
+ *        tu peux prévoir un buffer plus grand ou ajouter une logique
+ *        de réallocation
  */
 
-/* Parse et récupère la variable d'environnement */
-char *expand_variable(const char *var)
+char *expand_token(const char *input, int is_in_single_quote, struct s_shell *shell)
+{
+    // 1) Sécurité : si input est NULL, on renvoie NULL directement.
+    if (!input)
+        return NULL;
+
+    // 2) Si c'est entouré de single quotes, on n’expanse rien
+    //    => on retourne juste une copie brute de la chaîne.
+    if (is_in_single_quote)
+        return ft_strdup(input);
+
+    // 3) Déterminer la taille d'allocation.
+    //    Pour être sûr de ne pas manquer de place en cas de variables plus longues,
+    //    on peut faire un "x2" ou "x3" sur la taille d’input. 
+    //    À adapter selon tes besoins.
+    size_t input_len = ft_strlen(input);
+    size_t max_len   = input_len * 2 + 1;  // +1 pour le \0 final
+
+    char *result = malloc(max_len);
+    if (!result)
+        return NULL; // Erreur d'allocation mémoire
+
+    size_t i = 0; // Index pour parcourir `input`
+    size_t j = 0; // Index pour remplir `result`
+
+    while (input[i])
+    {
+        // Détection du caractère '$'
+        if (input[i] == '$')
+        {
+            // Cas particulier : '$?' => code de retour de la dernière commande
+            if (input[i + 1] == '?')
+            {
+                // Convertir shell->exit_code en string via ft_itoa
+                char *code_str = ft_itoa(shell->exit_code);
+                if (code_str)
+                {
+                    // Recopier code_str dans result
+                    size_t k = 0;
+                    while (code_str[k] && (j + 1) < max_len)
+                        result[j++] = code_str[k++];
+                    free(code_str);
+                }
+                // On a consommé 2 caractères : '$?'
+                i += 2;
+            }
+            else
+            {
+                // Avancer pour ignorer le '$'
+                i++;
+
+                // Lire le nom de variable (alphanumérique + underscore)
+                size_t var_start = i;
+                while ((input[i] >= '0' && input[i] <= '9') ||
+                       (input[i] >= 'A' && input[i] <= 'Z') ||
+                       (input[i] >= 'a' && input[i] <= 'z') ||
+                        input[i] == '_')
+                {
+                    i++;
+                }
+                // var_len = longueur du nom de variable
+                size_t var_len = i - var_start;
+
+                // Extraire le nom dans une nouvelle chaîne
+                char *var_name = ft_substr(input, var_start, var_len);
+                if (!var_name)
+                {
+                    free(result);
+                    return NULL; // Erreur d'allocation
+                }
+
+                // Récupérer la valeur (via getenv ou ta gestion d'environ)
+                char *var_value = getenv(var_name); 
+                free(var_name);
+
+                // Si la variable n’existe pas, on considère que c’est vide
+                if (!var_value)
+                    var_value = "";
+
+                // Recopier var_value dans result
+                size_t k = 0;
+                while (var_value[k] && (j + 1) < max_len)
+                    result[j++] = var_value[k++];
+            }
+        }
+        else
+        {
+            // Caractère normal => on le recopie dans result
+            if ((j + 1) < max_len)
+                result[j++] = input[i];
+            i++;
+        }
+    }
+    // Terminaison de la chaîne
+    result[j] = '\0';
+
+    return result;
+}
+/*char *expand_variable(const char *var)
 {
     size_t len = 0;
     char *var_name;
@@ -51,45 +159,50 @@ char *expand_variable(const char *var)
     if (value)
         return (value);
     return ("");
-}
+}*/
 
 int ft_echo(char **argv, struct s_shell *shell)
 {
     int i = 0;
     int newline = 1;
 
-    // Gère l'option "-n"
+    // 1) Gérer l'option '-n'
     while (argv[i] && ft_strcmp(argv[i], "-n") == 0)
     {
         newline = 0;
         i++;
     }
 
-    // Parcourt les arguments
+    // 2) Parcourir les arguments restants
     while (argv[i])
-    {   
-        if (argv[i][0] == '$') // Vérifie si c'est une variable d'environnement
-        {
-            // Récupère et affiche la valeur de la variable (sans le '$')
-            ft_putstr_fd(expand_variable(argv[i] + 1), 1);
-            if(argv[i][1] == '?')
-            {
-                ft_printf("%d", shell->exit_code);
-            }
-        }
-        else
-        {
-            ft_putstr_fd(argv[i], 1); // Affiche l'argument normal
-        }
+    {
+        // Ici, on suppose qu'on ne gère pas la différence single/double quotes
+        // dans echo, donc on met 'is_in_single_quote = 0' pour autoriser l'expansion.
+        // (Si ton parsing stocke un flag, tu le passes en paramètre.)
+        char *expanded = expand_token(argv[i], 0, shell);
+
+        ft_putstr_fd(expanded, 1);
+
+        // Afficher un espace entre les arguments (sauf avant le \n final)
         if (argv[i + 1])
-            ft_putchar_fd(' ', 1); // Ajoute un espace entre les arguments
+            ft_putchar_fd(' ', 1);
+
+        // Penser à free la nouvelle chaîne pour éviter une fuite mémoire
+        free(expanded);
+
         i++;
     }
-    shell->exit_code = 0;
+
+    // 3) Ajouter le \n si on n’a pas rencontré de '-n'
     if (newline)
-        ft_putchar_fd('\n', 1); // Ajoute un saut de ligne si nécessaire
+        ft_putchar_fd('\n', 1);
+
+    // 4) Ajuster le code de sortie si besoin
+    shell->exit_code = 0;
+
     return (0);
 }
+
  //--------------------------------------------------------------------------------------PWD------------------------------------------------------------------------
 int ft_pwd(char **argv, struct s_shell *shell)
 {
