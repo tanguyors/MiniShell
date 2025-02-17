@@ -145,7 +145,7 @@ char *expand_token(const char *input, int is_in_single_quote, struct s_shell *sh
 
     return result;
 }
-/*char *expand_variable(const char *var)
+char *expand_variable(const char *var)
 {
     size_t len = 0;
     char *var_name;
@@ -159,7 +159,7 @@ char *expand_token(const char *input, int is_in_single_quote, struct s_shell *sh
     if (value)
         return (value);
     return ("");
-}*/
+}
 
 int ft_echo(char **argv, struct s_shell *shell)
 {

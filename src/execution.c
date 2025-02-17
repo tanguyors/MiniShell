@@ -203,7 +203,7 @@ static int setup_redirection(struct s_shell *shell, struct s_shell *current, int
 	{
 		//printf("setup [%d]\n", i);
 		shell->file = shell->file->next;					 // Déplacement vers le TOKEN_FILE
-		ft_printf("test data: %s\n", shell->file->data);
+		//ft_printf("test data: %s\n", shell->file->data);
 	}
 	fd = open(shell->file->data, flag, file_access);
 	if (fd == -1)
@@ -220,7 +220,7 @@ static int setup_redirection(struct s_shell *shell, struct s_shell *current, int
 /* Gestion de la redirection d'entrée (<)
 	Redirige l'entrée standard vers un fichier 
 	resultat < file affiché sur la console même avant un pipe ( a regler ) */
-/*static void redir_input(struct s_shell *shell, struct s_shell *current)
+static void redir_input(struct s_shell *shell, struct s_shell *current)
 {
     int fd;
 	int saved_stdin;
@@ -252,13 +252,13 @@ static int setup_redirection(struct s_shell *shell, struct s_shell *current, int
         return ;
     }
     // Exécution de la commande si présente
-    if (head && head->token == TOKEN_CMD)
+    if (head && head->token == TOKEN_CMD  && !shell->file)
         extract_data(shell, head);
     // Restauration de l'entrée standard
     dup2(saved_stdin, STDIN_FILENO);
     close(saved_stdin);
     close(fd);
-}*/
+}
 
 /* Gestion de la redirection de sortie (>)
 	Redirige la sortie standard vers un fichier */
@@ -294,7 +294,7 @@ static void redir_output(struct s_shell *shell, struct s_shell *first_arg)
 
 /* Gestion de la redirection en mode append (>>)
 	Ajoute la sortie à la fin du fichier */
-/*static void redir_append(struct s_shell *shell, struct s_shell *current)
+static void redir_append(struct s_shell *shell, struct s_shell *current)
 {
     int fd;
 	int saved_stdout;
@@ -317,7 +317,7 @@ static void redir_output(struct s_shell *shell, struct s_shell *first_arg)
         close(saved_stdout);
         return ;
     }
-    if (head && head->token == TOKEN_CMD)
+    if (head && head->token == TOKEN_CMD && !shell->file)
         extract_data(shell, head);
     dup2(saved_stdout, STDOUT_FILENO);
     close(saved_stdout);
@@ -332,11 +332,11 @@ void setup_heredoc(struct s_shell **current, int (*pipe_fd)[2])
 		*current = (*current)->next;
     if (pipe(*pipe_fd) == -1)
         return ;
-}*/
+}
 
 /* Permet de gérer le cas ou une variable d'environnement
 	doit être interprêté */
-/*char *h_expand_var(char *line, char **new_line, char **end_line)
+char *h_expand_var(char *line, char **new_line, char **end_line)
 {
 	char *expanded_var;
 	char *dollar_pos;
@@ -394,11 +394,11 @@ void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
         write(pipe_fd[0][1], "\n", 1);
         free(line);
     }
-}*/
+}
 
 /* Gestion du heredoc (<<)
 	Lit l'entrée jusqu'à ce que le délimiteur soit rencontré */
-/*static void redir_heredoc(struct s_shell *shell, struct s_shell *current)
+static void redir_heredoc(struct s_shell *shell, struct s_shell *current)
 {
     int pipe_fd[2];
 	int saved_stdin;
@@ -414,14 +414,14 @@ void loop_heredoc(struct s_shell *current, int (*pipe_fd)[2])
     close(pipe_fd[1]);
     if (dup2(pipe_fd[0], STDIN_FILENO) != -1)
     {
-        if (head && head->token == TOKEN_CMD)
+        if (head && head->token == TOKEN_CMD && !shell->file)
             extract_data(shell, head);
     }
     // Restauration
     dup2(saved_stdin, STDIN_FILENO);
     close(saved_stdin);
     close(pipe_fd[0]);
-}*/
+}
 
 
 /* Redirige vers le bon token de redirection 
@@ -435,7 +435,7 @@ void redirection_execution(struct s_shell *shell, struct s_shell *first_arg)
 		which_redir = which_redir->next;
 	if (which_redir->token == REDIR_INPUT)
 	{
-		//redir_input(shell, first_arg);
+		redir_input(shell, first_arg);
 	}
 	else if (which_redir->token == REDIR_OUTPUT)
 	{
@@ -443,11 +443,11 @@ void redirection_execution(struct s_shell *shell, struct s_shell *first_arg)
 	}
 	else if (which_redir->token == REDIR_APPEND)
 	{
-		//redir_append(shell, first_arg);
+		redir_append(shell, first_arg);
 	}
 	else if (which_redir->token == REDIR_HEREDOC)
 	{
-		//redir_heredoc(shell, first_arg);
+		redir_heredoc(shell, first_arg);
 	}
 }
 
@@ -529,18 +529,24 @@ static void child_redir(struct s_shell *shell, struct s_shell *current)
 	struct s_shell *current_redir;
 	struct s_shell *first_arg;
 
-	if (is_redirection_in_list(current))
+	shell->file = current;
+	current_redir = current;
+	current_redir = current_redir->next;
+	while (current)
 	{
-		current_redir = current;
-		current_redir = current_redir->next;
-		if (current_redir->next)
+		if (is_redirection_in_list(current))
 		{
-			while(current_redir->next && current_redir->token != TOKEN_CMD) // ajouter is_token_red(current->next->next->token)
+			if (current_redir->next)
 			{
-				current_redir = current_redir->next;
+				while(current_redir && current_redir->token != TOKEN_CMD) // ajouter is_token_red(current->next->next->token)
+				{
+					current_redir = current_redir->next;
+				}
+				redirection_execution(shell, current_redir);
+				current = current->next;
 			}
-			redirection_execution(shell, current_redir);
 		}
+		current = current->next;
 	}
 }
 

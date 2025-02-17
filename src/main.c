@@ -63,8 +63,8 @@ static void main_2(void)
             free(shell.rl_input);
         if (head)
         {
-            print_list(head);
-			print_token(head);
+            //print_list(head);
+			//print_token(head);
             free_list(head);
         }
     }
@@ -72,7 +72,7 @@ static void main_2(void)
 
 int main(void)
 {
-    ascii_art();
+    //ascii_art();
     main_2();
     return (0);
 }
