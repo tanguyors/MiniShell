@@ -28,6 +28,7 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 		ft_putstr_fd("bash: syntax error near unexpected token `newline'\n", 2);
 		*stop_flag = 1;
 	}
+	ft_printf("test data: %s\n", tail->data);
 	while (is_space(str[(*i)]))
 		(*i)++;
 	if (is_redirect(str[(*i)]))

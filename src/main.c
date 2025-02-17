@@ -7,7 +7,8 @@
 			 -Checker les leaks.
 			 -Remise à la norme. */
 
-/* Erreur :  -gérer le std input lors de echo arg | ./minishell  ( isatty )*/
+/* Erreur :  -gérer le std input lors de echo arg | ./minishell  ( isatty )
+             -gérer cat < "./test.txt", parsing des quotes?  */
 static void ascii_art()
 {
     ft_printf("\n\n\n");
@@ -63,8 +64,8 @@ static void main_2(void)
             free(shell.rl_input);
         if (head)
         {
-            //print_list(head);
-			//print_token(head);
+            print_list(head);
+			print_token(head);
             free_list(head);
         }
     }
