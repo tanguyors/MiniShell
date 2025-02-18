@@ -34,13 +34,11 @@ static void signals()
     sigaction(SIGQUIT, &sa, NULL);
 }
 
-static void main_2(void)
+static void main_2(struct s_shell shell)
 {
-    struct s_shell shell;
     struct s_shell *head;
 
     signals();
-    shell.exit_code = 0;
     while (1)
     {
         head = NULL;
@@ -57,7 +55,7 @@ static void main_2(void)
         {
             if (shell.rl_input)
                 free(shell.rl_input);
-            main_2();
+            main_2(shell);
         }
 		parse_execution(&shell, head);
         if (shell.rl_input)
@@ -68,12 +66,15 @@ static void main_2(void)
 			print_token(head);
             free_list(head);
         }
+        ft_printf("test exit code: %d\n", shell.exit_code);
     }
 }
 
 int main(void)
 {
+    struct s_shell shell;
     //ascii_art();
-    main_2();
+    shell.exit_code = 0;
+    main_2(shell);
     return (0);
 }
