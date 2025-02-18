@@ -60,6 +60,13 @@ int is_space(int c)
     return (0);
 }
 
+int is_quotes(int c)
+{
+	if (c == '"' || c == 39)
+		return (1);
+	return (0);
+}
+
 /* Détermine s'il y a un pipe dans la liste chaînée 
 	auquel cas renvois le nombre de pipe total */
 int is_pipe(struct s_shell *current)

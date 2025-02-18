@@ -104,6 +104,7 @@ int is_space(int c);
 int is_token_red(enum e_tokens token);
 int is_redirection_in_list(struct s_shell *head);
 int is_pipe(struct s_shell *current);
+int is_quotes(int c);
 char *expand_token(const char *input, int is_in_single_quote, struct s_shell *shell);
 /*-- Executions --*/
 void parse_execution(struct s_shell *shell, struct s_shell *head);

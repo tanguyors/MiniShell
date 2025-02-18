@@ -17,8 +17,13 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 		tail = get_last_node(*head);
 		tail->token = TOKEN_FILE;
 		j = 0;
-		while (str[(*i)] != '\0' && !is_redirect(str[(*i)]) && !is_space(str[(*i)]) && str[(*i)] != '|') 
-			tail->data[j++] = str[(*i)++];
+		while (str[(*i)] != '\0' && !is_redirect(str[(*i)]) && !is_space(str[(*i)]) && str[(*i)] != '|')
+		{
+			if (is_quotes(str[(*i)]))
+				(*i)++;
+			else
+				tail->data[j++] = str[(*i)++];
+		}
 		tail->data[j] = '\0';
 		//printf("i = %d, char = %c\n", *i, str[*i]);
 	}
@@ -28,7 +33,7 @@ static void r_in_out_file(int *i, char *str, struct s_shell **head, int *stop_fl
 		ft_putstr_fd("bash: syntax error near unexpected token `newline'\n", 2);
 		*stop_flag = 1;
 	}
-	ft_printf("test data: %s\n", tail->data);
+	//ft_printf("test data: %s\n", tail->data);
 	while (is_space(str[(*i)]))
 		(*i)++;
 	if (is_redirect(str[(*i)]))
