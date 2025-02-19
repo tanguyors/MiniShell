@@ -1,0 +1,153 @@
+Voici une solution que tu peux mettre en place pour respecter le comportement attendu :
+
+Dès le parsing, tu attribues le bon type de token à tes chaînes :
+
+TOKEN_SIMPLE_QUOTE pour '...'
+TOKEN_DOUBLE_QUOTE pour "..."
+TOKEN_CMD ou TOKEN_ARG pour ce qui n’est pas dans des quotes.
+Dans la fonction d’expansion (ici, expand_token), tu vérifies si c’est un token issu de single quotes. Si oui, tu laisses la chaîne telle quelle (aucune expansion). Si c’est un token double quotes ou un token normal, tu parcours la chaîne pour remplacer $VAR, $?, etc.
+
+1) Adapter le parsing (dans parsing.c)
+Actuellement, tu as deux fonctions dans parsing.c qui reconnaissent les quotes :
+
+p_quotes() crée un node en mettant tail->token = TOKEN_CMD ou TOKEN_SIMPLE_QUOTE ou TOKEN_DOUBLE_QUOTE.
+Regarde ce passage :
+
+c
+Copier
+Modifier
+static void p_quotes(int *i, char *str, struct s_shell **head)
+{
+    struct s_shell *tail;
+    int j;
+
+    j = 0;
+    insert_tail(head, NULL, "TOKEN_QUOTES");
+    tail = get_last_node(*head);
+    tail->token = TOKEN_CMD;
+    if (str[(*i)] == 39) // single quote ?
+    {
+        (*i)++;
+        tail->token = TOKEN_SIMPLE_QUOTE;
+        while (str[(*i)] && (str[(*i)] != 39))
+        {
+            while(str[(*i)] == 39)
+                (*i)++;
+            tail->data[j++] = str[(*i)];
+            (*i)++;
+        }
+        tail->data[j] = '\0';
+        (*i)++;
+    }
+    p_double_quotes(i, str, tail); // Vérifie si c’est des doubles quotes
+}
+Tu vois que tu forces tail->token = TOKEN_CMD juste avant. Alors que si c’est '...', tu mets tail->token = TOKEN_SIMPLE_QUOTE. Ou si c’est "...", la fonction p_double_quotes() derrière attribue TOKEN_DOUBLE_QUOTE.
+
+Problème : Après ce code, tu as ceci dans p_post_parsing() :
+
+c
+Copier
+Modifier
+if (current->token == TOKEN_DOUBLE_QUOTE || current->token == TOKEN_SIMPLE_QUOTE)
+    current->token = TOKEN_ARG;
+Autrement dit, même s’il s’agissait d’un single quote, tu remplaces ce token par TOKEN_ARG ! Du coup, plus tard, tu ne peux plus distinguer single quotes de double quotes.
+
+Solution :
+
+Ne modifie pas le type TOKEN_SIMPLE_QUOTE ou TOKEN_DOUBLE_QUOTE en TOKEN_ARG.
+
+Par exemple, supprime ou commente cette ligne dans p_post_parsing() :
+
+c
+Copier
+Modifier
+// if (current->token == TOKEN_DOUBLE_QUOTE || current->token == TOKEN_SIMPLE_QUOTE)
+//     current->token = TOKEN_ARG;
+À la place, gére l’interprétation dans la phase d’exécution. Par exemple, quand tu construis ton tableau d’arguments, tu considères TOKEN_DOUBLE_QUOTE comme un argument normal, mais tu sais qu’il est en double quotes et doit donc être expansé, et TOKEN_SIMPLE_QUOTE comme un argument sans expansion.
+
+2) Adapter la fonction expand_token pour distinguer single quotes
+Tu as déjà :
+
+c
+Copier
+Modifier
+char *expand_token(const char *input, int is_in_single_quote, struct s_shell *shell)
+{
+    if (!input)
+        return NULL;
+    if (is_in_single_quote)
+        return ft_strdup(input);
+
+    // sinon, expansion
+    ...
+}
+Ce que tu dois faire, c’est appeler expand_token(…, 1, …) si le token a pour type TOKEN_SIMPLE_QUOTE, et expand_token(…, 0, …) s’il est TOKEN_DOUBLE_QUOTE ou TOKEN_ARG.
+
+3) Appliquer l’expansion pour toute commande, pas juste echo
+Dans ton code actuel, la fonction ft_echo fait :
+
+c
+Copier
+Modifier
+char *expanded = expand_token(argv[i], 0, shell);
+Cela marche pour echo, mais si tu tapes cd '$HOME' ou ls "$HOME", tu n’auras pas le comportement correct (le shell standard expanse $HOME dans les double quotes, et pas dans les single quotes). L’idéal est de faire l’expansion après le parsing pour tous les tokens qui ne sont pas en single quotes.
+
+Concrètement
+Quand tu construis le tableau d’arguments (get_all_data(), get_arg_data()…), tu peux faire :
+
+c
+Copier
+Modifier
+if (p_arg->token == TOKEN_SIMPLE_QUOTE)
+    expanded = expand_token(p_arg->data, 1, shell);  // 1 => single quotes => pas d’expansion
+else
+    expanded = expand_token(p_arg->data, 0, shell);  // double quotes ou arg normal => expansion
+Ensuite, tu mets expanded dans data[i] et tu free() l’ancienne si besoin. Ainsi, toute commande profite du même mécanisme d’expansion, pas seulement echo.
+
+4) Exemple de correctif minimal
+Étape A : Dans p_post_parsing(), commente ou supprime le bloc qui transforme TOKEN_DOUBLE_QUOTE / TOKEN_SIMPLE_QUOTE en TOKEN_ARG.
+
+Étape B : Dans get_arg_data(), tu fais quelque chose comme :
+
+c
+Copier
+Modifier
+// Pseudocode
+while (p_arg && p_arg->token != TOKEN_PIPE)
+{
+    if (p_arg->token == TOKEN_CMD || p_arg->token == TOKEN_ARG
+        || p_arg->token == TOKEN_DOUBLE_QUOTE || p_arg->token == TOKEN_SIMPLE_QUOTE)
+    {
+        // Appel à expand_token
+        int is_single = (p_arg->token == TOKEN_SIMPLE_QUOTE) ? 1 : 0;
+        char *expanded = expand_token(p_arg->data, is_single, shell);
+
+        data[i++] = expanded; // On stocke la version expansée
+    }
+    p_arg = p_arg->next;
+}
+data[i] = NULL;
+Étape C : Vérifie que tu ne refais pas encore l’expansion dans ft_echo. Soit tu le fais globalement pour toutes les commandes (ce qui est le comportement normal d’un shell), soit tu laisses ft_echo comme c’est, mais tu risques une expansion en double pour echo.
+
+5) Test de validation
+Une fois cela fait, tu devrais voir dans ton MiniShell :
+
+bash
+Copier
+Modifier
+echo "Salut $USER"
+# -> Salut torsini (par exemple)
+
+echo 'Salut $USER'
+# -> Salut $USER  (aucune expansion, c'est exact)
+
+ls "$HOME"
+# -> liste le contenu du répertoire représenté par $HOME
+# -> (avant la correction, peut-être que ça n'était pas expandé)
+Conclusion
+La “solution” pour obtenir le bon comportement (pas d’expansion dans '...', expansion dans "...") est :
+
+Ne pas écraser TOKEN_SIMPLE_QUOTE / TOKEN_DOUBLE_QUOTE avec TOKEN_ARG.
+Lors de la construction des arguments, appeler expand_token(...) avec un paramètre is_in_single_quote = 1 si c’est '...', et = 0 sinon (ou directement si c’est TOKEN_DOUBLE_QUOTE).
+Si tu veux un code plus propre, réalise l’expansion après le parsing pour tous les tokens. Ainsi, echo, cd, ls, etc. en bénéficieront.
+Ainsi, tu respectes la sémantique d’un shell : les single quotes désactivent l’expansion, les double quotes la maintiennent.

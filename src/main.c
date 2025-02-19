@@ -62,11 +62,14 @@ static void main_2(struct s_shell shell)
             free(shell.rl_input);
         if (head)
         {
-            print_list(head);
-			print_token(head);
+            //print_list(head);
+            //ft_printf("\n");
+			//print_token(head);
+            //ft_printf("\n");
             free_list(head);
+            //ft_printf("\n");
         }
-        ft_printf("test exit code: %d\n", shell.exit_code);
+        //ft_printf("test exit code: %d\n", shell.exit_code);
     }
 }
 
