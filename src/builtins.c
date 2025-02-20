@@ -172,7 +172,6 @@ int ft_echo(char **argv, struct s_shell *shell)
         newline = 0;
         i++;
     }
-
     // 2) Parcourir les arguments restants
     while (argv[i])
     {

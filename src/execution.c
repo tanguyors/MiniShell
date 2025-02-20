@@ -211,7 +211,6 @@ static int setup_redirection(struct s_shell *shell, struct s_shell *current, int
 		//ft_putstr_fd(" No such file or directory\n", 2);
 		perror("open: ");
 		shell->exit_code = 1;
-		ft_printf("test exit code: %d\n", shell->exit_code);
 		return (-1);
 	}
 	shell->file = shell->file->next;
@@ -231,7 +230,6 @@ static void redir_input(struct s_shell *shell, struct s_shell *current)
 	fd = setup_redirection(shell, current, O_RDONLY, 0);
 	if (fd == -1)
 	{
-		ft_printf("test exit code: %d\n", shell->exit_code);
 		//ft_putstr_fd(" No such file or directory\n", 2);
 		perror("open: ");
 		shell->exit_code = 1;
@@ -451,7 +449,6 @@ void redirection_execution(struct s_shell *shell, struct s_shell *first_arg)
 	{
 		redir_heredoc(shell, first_arg);
 	}
-	ft_printf("test exit code: %d\n", shell->exit_code);
 }
 
 /* Devenu obsolète après l'ajout de multi_pipe_handling() */
@@ -672,7 +669,6 @@ void exec_without_pipe(struct s_shell *shell, struct s_shell *head)
 		}
 		head = head->next;
 	}
-	ft_printf("test exit code: %d\n", shell->exit_code);
 }
 
 /* Permet de trier les executions des commandes,
@@ -682,8 +678,9 @@ void parse_execution(struct s_shell *shell, struct s_shell *head)
 {
 	if (!is_pipe(head))
 	{
+		ft_printf("before parse exit code: %d\n", shell->exit_code);
 		exec_without_pipe(shell, head);
-		ft_printf("test exit code: %d\n", shell->exit_code);
+		ft_printf("after parse exit code: %d\n", shell->exit_code);
 	}
 	else
 	{

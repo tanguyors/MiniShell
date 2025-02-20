@@ -304,7 +304,8 @@ struct s_shell *parsing(char *str, struct s_shell *head, struct s_shell *shell)
         else
             i++;
     }
-	shell->exit_code = stop_flag;
+	//if (!shell->exit_code)
+		//shell->exit_code = stop_flag;
 	head = p_post_parsing(head, str, shell);
     return (head);
 }
