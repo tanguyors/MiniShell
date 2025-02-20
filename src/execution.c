@@ -87,6 +87,7 @@ void std_execution(struct s_shell *shell, struct s_shell *current)
         if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
             shell->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie
     }
+	//ft_printf("std execution exit code: %d\n", shell->exit_code);
 }
 
 /* Initialise les builtin et parcourt l'array builtin afin de trouver la commande correspondante
@@ -110,6 +111,7 @@ void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
         }
         i++;
     }
+	//ft_printf("cmd execution exit code: %d\n", shell->exit_code);
 	// Si aucune commande builtin ne correspond
 	std_execution(shell, current);
     //ft_printf("minishell: %s: command not found\n", current->data);
@@ -187,9 +189,11 @@ void extract_data(struct s_shell *shell, struct s_shell *current)
 {
 	char **data;
 
+	//ft_printf("extract data exit code: %d\n", shell->exit_code);
 	data = get_arg_data(current);
 	cmd_execution(shell, current, data);
 	free(data);
+	//ft_printf("after extract data exit code: %d\n", shell->exit_code);
 }
 
 static int setup_redirection(struct s_shell *shell, struct s_shell *current, int flag, int file_access)
@@ -548,6 +552,7 @@ static void child_redir(struct s_shell *shell, struct s_shell *current)
 		}
 		current = current->next;
 	}
+	//ft_printf("child redir exit code: %d\n", shell->exit_code);
 }
 
 static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct s_shell *current)
@@ -562,6 +567,7 @@ static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct 
 			exit_with_error("dup2 error prev_fd", NULL, 1);
 		close(prev_fd);
 	}
+	//ft_printf("child process exit code: %d\n", shell->exit_code);
 	child_redir(shell, current);
 	//ft_printf("TEST EXIT PIPE: %d\n", shell->exit_code);
 	// Si un pipe suivant existe, connectez-le à STDOUT
@@ -576,6 +582,7 @@ static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct 
 	close(fd[0]);
 	close(fd[1]);
 	extract_data(shell, current);
+	//ft_printf("child process exit code 2: %d\n", shell->exit_code);
 	exit(shell->exit_code);
 }
 
@@ -589,6 +596,28 @@ static void pipe_and_fork(int fd[2], int *pid)
 		exit_with_error("fork error", NULL, 1);
 }
 
+static void m_p_h_wait(struct s_shell *shell, int last_pid, int pid, int status)
+{
+	waitpid(last_pid, &status, 0);
+	if (WIFEXITED(status))
+		shell->exit_code = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status))
+		shell->exit_code = WTERMSIG(status) + 128;
+}
+
+static void m_p_h_fork_suceed(struct s_shell *current, int prev_fd, int fd[2])
+{
+	if (prev_fd != -1)
+		close(prev_fd);
+	if (current->next)
+	{
+		close(fd[1]);
+		prev_fd = fd[0];
+	}
+	else
+		close(fd[0]);
+}
+
 /* Permet de gérer first_arg cas où un pipe est présent dans la liste. 
 	Utilisation de fork afin de créer un processus enfant, 
 	celui ci va redirigé la sortie de la commande en fonction des pipes. 
@@ -598,36 +627,31 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
     int fd[2];
     int prev_fd;
     pid_t pid;
-	int status;
+    pid_t last_pid;
+    int status;
 
-	prev_fd = -1;
+	last_pid = -1;
+    prev_fd = -1;
     while (current)
     {
         pipe_and_fork(fd, &pid);
         if (pid == 0)
-			child_process(shell, fd, prev_fd, current);
-		//ft_printf("TEST EXIT PIPE: %d\n", shell->exit_code);
-        // Parent : Gérer les descripteurs
-        if (prev_fd != -1)
-            close(prev_fd);
- 		if (current->next)
-        {
-            close(fd[1]);    // Fermer le côté écriture du pipe actuel
-            prev_fd = fd[0]; // Garder le côté lecture pour la prochaine commande
-        }
+            child_process(shell, fd, prev_fd, current);
         else
-			close(fd[0]); // Pas de commande suivante, fermer les descripteurs restants
+        {
+            last_pid = pid;  // Mettre à jour le dernier PID à chaque fork
+			m_p_h_fork_suceed(current, prev_fd, fd);
+        }
         current = current->next;
         while (current && current->token != TOKEN_CMD)
-			current = current->next;
+            current = current->next;
     }
+    // Attendre le dernier processus enfant et récupérer son statut
+	if (last_pid != -1)
+		m_p_h_wait(shell, last_pid, pid, status);
     while (wait(NULL) > 0)
-		continue;
-	if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
-        shell->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie
-	else if (WIFSIGNALED(status))
-		shell->exit_code = WTERMSIG(status) + 128;
-	
+        continue;
+    //ft_printf("multi pipe exit code: %d\n", shell->exit_code);
 }
 
 
@@ -678,9 +702,9 @@ void parse_execution(struct s_shell *shell, struct s_shell *head)
 {
 	if (!is_pipe(head))
 	{
-		ft_printf("before parse exit code: %d\n", shell->exit_code);
+		//ft_printf("before parse exit code: %d\n", shell->exit_code);
 		exec_without_pipe(shell, head);
-		ft_printf("after parse exit code: %d\n", shell->exit_code);
+		//ft_printf("after parse exit code: %d\n", shell->exit_code);
 	}
 	else
 	{

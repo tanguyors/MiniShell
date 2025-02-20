@@ -50,9 +50,9 @@ static void main_2(struct s_shell shell)
             free(shell.rl_input);
             exit(shell.exit_code);
         }
-        ft_printf("before parsing exit code: %d\n", shell.exit_code);
+        //ft_printf("before parsing exit code: %d\n", shell.exit_code);
         head = parsing(shell.rl_input, head, &shell);
-        ft_printf("after parsing exit code: %d\n", shell.exit_code);
+        //ft_printf("after parsing exit code: %d\n", shell.exit_code);
         if (!head)
         {
             if (shell.rl_input)
@@ -64,8 +64,8 @@ static void main_2(struct s_shell shell)
             free(shell.rl_input);
         if (head)
         {
-            print_list(head);
-			print_token(head);
+            //print_list(head);
+			//print_token(head);
             free_list(head);
         }
     }
