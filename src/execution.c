@@ -601,8 +601,8 @@ static void m_p_h_wait(struct s_shell *shell, int last_pid, int pid, int status)
 	waitpid(last_pid, &status, 0);
 	if (WIFEXITED(status))
 		shell->exit_code = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-		shell->exit_code = WTERMSIG(status) + 128;
+	//else if (WIFSIGNALED(status))
+		//shell->exit_code = WTERMSIG(status) + 128;
 }
 
 static void m_p_h_fork_suceed(struct s_shell *current, int prev_fd, int fd[2])
@@ -640,16 +640,25 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
         else
         {
             last_pid = pid;  // Mettre à jour le dernier PID à chaque fork
-			m_p_h_fork_suceed(current, prev_fd, fd);
+			//m_p_h_fork_suceed(current, prev_fd, fd);
+			if (prev_fd != -1)
+				close(prev_fd);
+			if (current->next)
+			{
+				close(fd[1]);
+				prev_fd = fd[0];
+			}
+			else
+				close(fd[0]);
         }
         current = current->next;
         while (current && current->token != TOKEN_CMD)
             current = current->next;
     }
-    // Attendre le dernier processus enfant et récupérer son statut
+	 // Attendre le dernier processus enfant et récupérer son statut
 	if (last_pid != -1)
 		m_p_h_wait(shell, last_pid, pid, status);
-    while (wait(NULL) > 0)
+	while (wait(NULL) > 0)
         continue;
     //ft_printf("multi pipe exit code: %d\n", shell->exit_code);
 }

@@ -160,12 +160,12 @@ static void p_double_quotes(int *i, char *str, struct s_shell *tail)
 	j = 0;
 	if (str[(*i)] == '"')
 	{
-		(*i)++;
+		//(*i)++;
 		tail->token = TOKEN_DOUBLE_QUOTE;
-		while (str[(*i)] && (str[(*i)] != '"'))
+		while (str[(*i)] /*&& (str[(*i)] != '"')*/)
 		{
-			while(str[(*i)] == '"')
-				(*i)++;
+			/*while(str[(*i)] == '"')
+				(*i)++;*/
 			
 			tail->data[j++] = str[(*i)];
 			(*i)++;
@@ -187,12 +187,12 @@ static void p_quotes(int *i, char *str, struct s_shell **head)
 	tail->token = TOKEN_CMD;
 	if (str[(*i)] == 39)
 	{
-		(*i)++;
+		//(*i)++;
 		tail->token = TOKEN_SIMPLE_QUOTE;
-		while (str[(*i)] && (str[(*i)] != 39))
+		while (str[(*i)]/* && (str[(*i)] != 39)*/)
 		{
-			while(str[(*i)] == 39)
-				(*i)++;
+			/*while(str[(*i)] == 39)
+				(*i)++;*/
 			tail->data[j++] = str[(*i)];
 			(*i)++;
 		}
