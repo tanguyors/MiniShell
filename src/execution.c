@@ -82,10 +82,11 @@ void std_execution(struct s_shell *shell, struct s_shell *current)
     }
     else
     {
-        if (waitpid(pid, &status, 0) == -1) // Attendre le processus enfant
-            exit_with_error("waitpid error", NULL, 1);
+        waitpid(pid, &status, 0); // Attendre le processus enfant
         if (WIFEXITED(status)) // Vérifier si le processus a terminé normalement
             shell->exit_code = WEXITSTATUS(status); // Mettre à jour le code de sortie
+		else if (WIFSIGNALED(status))
+			shell->exit_code = WTERMSIG(status) + 128;
     }
 	//ft_printf("std execution exit code: %d\n", shell->exit_code);
 }
