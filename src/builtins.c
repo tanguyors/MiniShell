@@ -329,7 +329,8 @@ int ft_export(char **argv, struct s_shell *shell)
         }
         return (0); // Toujours succès
     }
-
+    if (argv[1])
+        ft_strcat(argv[0], argv[1]);
     // Parcourt les arguments donnés pour les ajouter/modifier
     while (argv[i])
     {
