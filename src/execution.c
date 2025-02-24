@@ -120,7 +120,7 @@ void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
 
 /* Data des arguments des commandes uniquement 
 	mémoire alloué au char ** */
-char **get_arg_data(struct s_shell *current)
+/*char **get_arg_data(struct s_shell *current)
 {
 	int i;
 	struct s_shell *p_arg;
@@ -145,6 +145,30 @@ char **get_arg_data(struct s_shell *current)
 		p_arg = p_arg->next;
 	}
 	return (data);
+}*/
+
+char **get_arg_data(struct s_shell *current, struct s_shell *shell)
+{
+    char **data = ft_calloc(1024, sizeof(char *));
+    int i = 0;
+
+    while (current && current->token != TOKEN_PIPE)
+    {
+        if (current->token == TOKEN_SIMPLE_QUOTE)
+        {
+            // -> Pas d’expansion
+            data[i] = expand_token(current->data, 1, shell);
+        }
+        else
+        {
+            // -> Expansion autorisée
+            data[i] = expand_token(current->data, 0, shell);
+        }
+        i++;
+        current = current->next;
+    }
+    data[i] = NULL;
+    return data;
 }
 
 /* Data des commandes + leurs arguments 
@@ -191,7 +215,7 @@ void extract_data(struct s_shell *shell, struct s_shell *current)
 	char **data;
 
 	//ft_printf("extract data exit code: %d\n", shell->exit_code);
-	data = get_arg_data(current);
+	data = get_arg_data(current, shell);
 	cmd_execution(shell, current, data);
 	free(data);
 	//ft_printf("after extract data exit code: %d\n", shell->exit_code);

@@ -161,7 +161,7 @@ char *expand_variable(const char *var)
     return ("");
 }
 
-int ft_echo(char **argv, struct s_shell *shell)
+/*int ft_echo(char **argv, struct s_shell *shell)
 {
     int i = 0;
     int newline = 1;
@@ -199,6 +199,33 @@ int ft_echo(char **argv, struct s_shell *shell)
     // 4) Ajuster le code de sortie si besoin
     shell->exit_code = 0;
 
+    return (0);
+}*/
+int ft_echo(char **argv, struct s_shell *shell)
+{
+    int i = 0;
+    int newline = 1;
+
+    // Gérer l'option -n
+    while (argv[i] && ft_strcmp(argv[i], "-n") == 0)
+    {
+        newline = 0;
+        i++;
+    }
+
+    // Afficher directement argv[i], déjà expansé
+    while (argv[i])
+    {
+        ft_putstr_fd(argv[i], 1);
+        if (argv[i + 1])
+            ft_putchar_fd(' ', 1);
+        i++;
+    }
+
+    if (newline)
+        ft_putchar_fd('\n', 1);
+
+    shell->exit_code = 0;
     return (0);
 }
 

@@ -252,8 +252,6 @@ struct s_shell *p_post_parsing(struct s_shell *head, char *str, struct s_shell *
 			rl_input = readline("> ");
 			current = parsing(rl_input, current, shell);
 		}
-		if (current->token == TOKEN_DOUBLE_QUOTE || current->token == TOKEN_SIMPLE_QUOTE)
-			current->token = TOKEN_ARG;
 		current = current->next;
 	}
 	if (get_nb_token(head) == 1)

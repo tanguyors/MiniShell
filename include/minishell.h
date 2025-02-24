@@ -87,7 +87,7 @@ void update_pwd(void);
 const char *get_token_name(enum e_tokens token);
 void exit_with_error(const char *str_error, char **array, int exit_code);
 char **get_all_data(struct s_shell *current);
-char **get_arg_data(struct s_shell *current);
+char **get_arg_data(struct s_shell *current, struct s_shell *shell);
 char *ft_strtok(char *str, const char *delim);
 char *ft_strncpy(char *dest, const char *src, size_t n);
 char *ft_strcat(char *dest, const char *src);
