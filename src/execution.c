@@ -149,9 +149,11 @@ void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
 
 char **get_arg_data(struct s_shell *current, struct s_shell *shell)
 {
-    char **data = ft_calloc(1024, sizeof(char *));
-    int i = 0;
+    char **data;
+    int i;
 
+	i = 0;
+	data = ft_calloc(1024, sizeof(char *));
     while (current && current->token != TOKEN_PIPE)
     {
         if (current->token == TOKEN_SIMPLE_QUOTE)
@@ -168,7 +170,7 @@ char **get_arg_data(struct s_shell *current, struct s_shell *shell)
         current = current->next;
     }
     data[i] = NULL;
-    return data;
+    return (data);
 }
 
 /* Data des commandes + leurs arguments 

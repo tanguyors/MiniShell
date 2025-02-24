@@ -67,6 +67,7 @@ struct s_shell *parsing(char *str, struct s_shell *head, struct s_shell *shell);
 void parse_commands(char **tokens);
 int p_command(int *i, char *str, struct s_shell **value, int *stop_flag);
 void p_redirection(int *i, char *str, struct s_shell **head, int *stop_flag);
+void p_quotes(int *i, char *str, struct s_shell **head);
 /*-- Linked_list --*/
 void print_list(struct s_shell *current);
 void print_token(struct s_shell *current);
@@ -105,6 +106,7 @@ int is_token_red(enum e_tokens token);
 int is_redirection_in_list(struct s_shell *head);
 int is_pipe(struct s_shell *current);
 int is_quotes(int c);
+int is_spec_char_no_space(int c);
 char *expand_token(const char *input, int is_in_single_quote, struct s_shell *shell);
 /*-- Executions --*/
 void parse_execution(struct s_shell *shell, struct s_shell *head);

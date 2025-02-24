@@ -11,7 +11,7 @@ int ft_exit(char **argv, struct s_shell *shell)
     argc = 0;
     while (argv[argc])
         argc++;
-    if (argc > 1)
+    if (argc > 2)
     {
         ft_putstr_fd("too many arguments", 2);
         exit(1);
@@ -57,7 +57,6 @@ char *expand_token(const char *input, int is_in_single_quote, struct s_shell *sh
     //    => on retourne juste une copie brute de la chaîne.
     if (is_in_single_quote)
         return ft_strdup(input);
-
     // 3) Déterminer la taille d'allocation.
     //    Pour être sûr de ne pas manquer de place en cas de variables plus longues,
     //    on peut faire un "x2" ou "x3" sur la taille d’input. 
@@ -203,7 +202,7 @@ char *expand_variable(const char *var)
 }*/
 int ft_echo(char **argv, struct s_shell *shell)
 {
-    int i = 0;
+    int i = 1;
     int newline = 1;
 
     // Gérer l'option -n
@@ -217,8 +216,8 @@ int ft_echo(char **argv, struct s_shell *shell)
     while (argv[i])
     {
         ft_putstr_fd(argv[i], 1);
-        if (argv[i + 1])
-            ft_putchar_fd(' ', 1);
+        //if (argv[i + 1])
+            //ft_putchar_fd(' ', 1);
         i++;
     }
 

@@ -14,6 +14,13 @@ int is_spec_char(int c)
 	return (0);
 }
 
+int is_spec_char_no_space(int c)
+{
+    if (c == 39 || c == '"' || c == '|' || c == '-' || is_redirect(c))
+		return (1);
+	return (0);
+}
+
 int is_ignored_char(int c)
 {
     if (c == '/' || c == '\\' || c == '!' || c == ':' || c == '.')

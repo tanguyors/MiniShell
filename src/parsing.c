@@ -123,6 +123,33 @@ int p_command(int *i, char *str, struct s_shell **head, int *stop_flag)
 	return (1);
 }
 
+static void std_arg(int *i, char *str, struct s_shell **head)
+{
+	struct s_shell *tail;
+	int j;
+
+	insert_tail(head, NULL, NULL);
+	tail = get_last_node(*head);
+	tail->token = TOKEN_ARG;
+	j = 0;
+	while (str[(*i)] != '\0' && !is_spec_char_no_space(str[(*i)]))
+	{
+		if (is_space(str[(*i)]))
+			tail->data[j++] = ' ';
+		while (is_quotes(str[(*i)]))
+			(*i)++;
+		if (is_spec_char_no_space(str[(*i)]))
+			break;
+		while (is_space(str[(*i)]))
+			(*i)++;
+		if (is_spec_char_no_space(str[(*i)]))
+			break;
+		tail->data[j++] = str[(*i)];
+		(*i)++;
+	}
+	tail->data[j] = '\0';
+}
+
 /* Fonction permettant de tokenizer les arguments de commandes */
 static int p_arg(int *i, char *str, struct s_shell **head)
 {
@@ -131,7 +158,6 @@ static int p_arg(int *i, char *str, struct s_shell **head)
 
 	while (is_space(str[(*i)]))
 		(*i)++;
-
 	if (str[(*i)] && str[(*i)] == '-')
 	{
 		insert_tail(head, NULL, NULL);
@@ -145,61 +171,72 @@ static int p_arg(int *i, char *str, struct s_shell **head)
 			if (!is_space(str[(*i)]))
 				tail->data[j++] = str[(*i)];
 			(*i)++;
-		}	
+		}
 		tail->data[j] = '\0';
 	}
+	//else if (str[(*i)] && !is_spec_char_no_space(str[(*i)]))
+		//std_arg(i, str, head);
 	return (1);
 }
 
 /* Fonction complémentaire a p_quotes, permet de vérifier s'il y a des double quotes
 	et tokenize en conséquence */
-static void p_double_quotes(int *i, char *str, struct s_shell *tail)
+static void p_double_quotes(int *i, char *str, struct s_shell **head)
 {
-	int j;
+    int j = 0;
 
-	j = 0;
-	if (str[(*i)] == '"')
-	{
-		//(*i)++;
+    if (str[*i] == '"')
+    {
+		// Insertion d'un nouveau nœud pour les double quotes
+		insert_tail(head, NULL, "TOKEN_QUOTES");
+		struct s_shell *tail = get_last_node(*head);
 		tail->token = TOKEN_DOUBLE_QUOTE;
-		while (str[(*i)] /*&& (str[(*i)] != '"')*/)
-		{
-			/*while(str[(*i)] == '"')
-				(*i)++;*/
-			
-			tail->data[j++] = str[(*i)];
-			(*i)++;
-		}
-		tail->data[j] = '\0';
-		(*i)++;
-	}
+        (*i)++;  // Passer le premier "
+        while (str[*i] && (str[*i] != '"'))
+        {
+            while (str[*i] == '"')
+                (*i)++;
+            
+            tail->data[j++] = str[*i];
+            (*i)++;
+        }
+		if (str[(*i) + 1] == ' ')
+			tail->data[j++] = ' ';
+        tail->data[j] = '\0';
+        (*i)++;  // Passer le dernier "
+    }
+    if (str[*i] == '"' || str[*i] == 39)
+        p_quotes(i, str, head);
 }
 
+
 /* Fonction de vérification et tokenization des quotes */
-static void p_quotes(int *i, char *str, struct s_shell **head)
+void p_quotes(int *i, char *str, struct s_shell **head)
 {
 	struct s_shell *tail;
 	int j;
 
 	j = 0;
-	insert_tail(head, NULL, "TOKEN_QUOTES");
-	tail = get_last_node(*head);
-	tail->token = TOKEN_CMD;
 	if (str[(*i)] == 39)
 	{
-		//(*i)++;
+		insert_tail(head, NULL, "TOKEN_QUOTES");
+		tail = get_last_node(*head);
 		tail->token = TOKEN_SIMPLE_QUOTE;
-		while (str[(*i)]/* && (str[(*i)] != 39)*/)
+		(*i)++;
+		while (str[(*i)] && (str[(*i)] != 39))
 		{
-			/*while(str[(*i)] == 39)
-				(*i)++;*/
+			while(str[(*i)] == 39)
+				(*i)++;
 			tail->data[j++] = str[(*i)];
 			(*i)++;
 		}
+		if (str[(*i) + 1] == ' ')
+			tail->data[j++] = ' ';
 		tail->data[j] = '\0';
 		(*i)++;
 	}
-	p_double_quotes(i, str, tail);
+	if (str[(*i)] == '"')
+		p_double_quotes(i, str, head);
 }
 
 struct s_shell *post_parsing_condition(struct s_shell *current, char *str, int *stop_flag)
@@ -294,7 +331,9 @@ struct s_shell *parsing(char *str, struct s_shell *head, struct s_shell *shell)
         if (!is_spec_char(str[i]))
             p_command(&i, str, &head, &stop_flag);
         else if (str[i] == '-')
-            p_arg(&i, str, &head);
+        	p_arg(&i, str, &head);
+		//if (is_redirect(str[i]))
+			//p_redirection(&i, str, &head, &stop_flag);
 		else if (str[i] == 39 || str[i] == '"')
             p_quotes(&i, str, &head);
 		else if (str[i] == '|')
