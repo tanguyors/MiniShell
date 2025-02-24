@@ -258,6 +258,7 @@ struct s_shell *post_parsing_condition(struct s_shell *current, char *str, int *
 		//free(str);
 		ft_putstr_fd("bash: syntax error near unexpected token `newline'\n", 2);
 		*stop_flag = 1;
+		return (NULL);
 	}
 	return (current);
 }
@@ -344,5 +345,8 @@ struct s_shell *parsing(char *str, struct s_shell *head, struct s_shell *shell)
 	//if (!shell->exit_code)
 		//shell->exit_code = stop_flag;
 	head = p_post_parsing(head, str, shell);
+	print_list(head);
+	if (stop_flag)
+		return (NULL);
     return (head);
 }
