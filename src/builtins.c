@@ -204,8 +204,20 @@ int ft_echo(char **argv, struct s_shell *shell)
 {
     int i = 1;
     int newline = 1;
+    char *result;
 
+    /*if (argv[i] && argv[i + 1])
+    {
+        while (argv[i])
+        {
+            result = ft_strjoin(argv[i], argv[i + 1]);
+            i++;
+        }
+    }
+    if (result)
+        printf("test result: %s\n", result);*/
     // Gérer l'option -n
+    i = 1;
     while (argv[i] && ft_strcmp(argv[i], "-n") == 0)
     {
         newline = 0;

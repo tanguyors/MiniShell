@@ -134,13 +134,13 @@ static void std_arg(int *i, char *str, struct s_shell **head)
 	j = 0;
 	while (str[(*i)] != '\0' && !is_spec_char_no_space(str[(*i)]))
 	{
-		if (is_space(str[(*i)]))
+		if (is_space(str[(*i)]) && str[(*i) + 1 ] != '|')
 			tail->data[j++] = ' ';
-		while (is_quotes(str[(*i)]))
+		while (str[(*i)] != '\0' && is_space(str[(*i)]))
 			(*i)++;
 		if (is_spec_char_no_space(str[(*i)]))
 			break;
-		while (is_space(str[(*i)]))
+		while (str[(*i)] != '\0' && is_quotes(str[(*i)]))
 			(*i)++;
 		if (is_spec_char_no_space(str[(*i)]))
 			break;
@@ -156,8 +156,11 @@ static int p_arg(int *i, char *str, struct s_shell **head)
 	struct s_shell *tail;
 	int j;
 
-	while (is_space(str[(*i)]))
-		(*i)++;
+	if (str[(*i)])
+	{
+		while (is_space(str[(*i)]))
+			(*i)++;
+	}
 	if (str[(*i)] && str[(*i)] == '-')
 	{
 		insert_tail(head, NULL, NULL);
@@ -174,8 +177,8 @@ static int p_arg(int *i, char *str, struct s_shell **head)
 		}
 		tail->data[j] = '\0';
 	}
-	//else if (str[(*i)] && !is_spec_char_no_space(str[(*i)]))
-		//std_arg(i, str, head);
+	else if (str[(*i)] && !is_spec_char_no_space(str[(*i)]))
+		std_arg(i, str, head);
 	return (1);
 }
 
@@ -329,23 +332,27 @@ struct s_shell *parsing(char *str, struct s_shell *head, struct s_shell *shell)
             i++;
         if (is_redirect(str[i]))
 			p_redirection(&i, str, &head, &stop_flag);
+		//printf("test str: %c\n", str[i]);
         if (!is_spec_char(str[i]))
             p_command(&i, str, &head, &stop_flag);
-        else if (str[i] == '-')
+		//printf("test str: %c\n", str[i]);
+        //else if (str[i] == '-')
+		if (str[i])
         	p_arg(&i, str, &head);
-		//if (is_redirect(str[i]))
-			//p_redirection(&i, str, &head, &stop_flag);
+		//printf("test str: %c\n", str[i]);
+		if (is_redirect(str[i]))
+			p_redirection(&i, str, &head, &stop_flag);
 		else if (str[i] == 39 || str[i] == '"')
             p_quotes(&i, str, &head);
 		else if (str[i] == '|')
             p_pipe(&i, str, &head);
         else
             i++;
+		
     }
 	//if (!shell->exit_code)
 		//shell->exit_code = stop_flag;
 	head = p_post_parsing(head, str, shell);
-	print_list(head);
 	if (stop_flag)
 		return (NULL);
     return (head);
