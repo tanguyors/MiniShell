@@ -219,7 +219,7 @@ void extract_data(struct s_shell *shell, struct s_shell *current)
 	//ft_printf("extract data exit code: %d\n", shell->exit_code);
 	data = get_arg_data(current, shell);
 	cmd_execution(shell, current, data);
-	free(data);
+	free_array(data);
 	//ft_printf("after extract data exit code: %d\n", shell->exit_code);
 }
 
