@@ -57,7 +57,7 @@ typedef struct s_dir_stack
 typedef struct s_builtin
 {
     char *name;
-    int (*func)(char **, struct s_shell *);
+    int (*func)(char **, struct s_shell *, struct s_shell *);
 } t_builtin;
 
 
@@ -111,14 +111,14 @@ char *expand_token(const char *input, int is_in_single_quote, struct s_shell *sh
 /*-- Executions --*/
 void parse_execution(struct s_shell *shell, struct s_shell *head);
 /*-- Built-in --*/
-int ft_exit(char **argv, struct s_shell *shell);
-int ft_echo(char **argv, struct s_shell *shell);
-int ft_pwd(char **argv, struct s_shell *shell);
-int ft_env(char **argv, struct s_shell *shell);
-int	ft_export(char **argv, struct s_shell *shell);
+int ft_exit(char **argv, struct s_shell *shell, struct s_shell *head);
+int ft_echo(char **argv, struct s_shell *shell, struct s_shell *head);
+int ft_pwd(char **argv, struct s_shell *shell, struct s_shell *head);
+int ft_env(char **argv, struct s_shell *shell, struct s_shell *head);
+int	ft_export(char **argv, struct s_shell *shell, struct s_shell *head);
 int	is_valid_identifier(const char *str);
-int ft_unset(char **argv, struct s_shell *shell);
-int ft_cd(char **argv, struct s_shell *shell);
+int ft_unset(char **argv, struct s_shell *shell, struct s_shell *head);
+int ft_cd(char **argv, struct s_shell *shell, struct s_shell *head);
 static char *construct_path(const char *base, const char *input);
 void push_dir(const char *dir);
 char *pop_dir(void);
