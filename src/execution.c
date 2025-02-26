@@ -114,6 +114,7 @@ void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
     }
 	//ft_printf("cmd execution exit code: %d\n", shell->exit_code);
 	// Si aucune commande builtin ne correspond
+	free_array(data);
 	std_execution(shell, current);
     //ft_printf("minishell: %s: command not found\n", current->data);
 }

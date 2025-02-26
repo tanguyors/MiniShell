@@ -7,7 +7,9 @@
 int ft_exit(char **argv, struct s_shell *shell, struct s_shell *head)
 {
     int argc;
+    int value;
 
+    value = 0;
     argc = 0;
     while (argv[argc])
         argc++;
@@ -17,6 +19,7 @@ int ft_exit(char **argv, struct s_shell *shell, struct s_shell *head)
     if (argc > 2)
     {
         ft_putstr_fd("too many arguments", 2);
+        free_array(argv);
         exit(1);
     }
     if (argv[1])
@@ -24,12 +27,16 @@ int ft_exit(char **argv, struct s_shell *shell, struct s_shell *head)
         if (!is_str(argv[0]))
         {
             ft_putstr_fd("numeric argument required", 2);
+            free_array(argv);
             exit(2);
         }
     }
-
     if (argv[0])
-        exit(ft_atoi(argv[0]));
+    {
+        value = ft_atoi(argv[0]);
+        free_array(argv);
+        exit(value);
+    }
 	exit(shell->exit_code);
 }
 
