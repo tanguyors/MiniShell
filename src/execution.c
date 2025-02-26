@@ -107,7 +107,7 @@ void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data)
 		//printf("current data: %s\n", current->data);
         if (ft_strcmp(current->data, builtin[i].name) == 0)
         {
-            builtin[i].func(data, shell); // Appelle la fonction correspondante.
+            builtin[i].func(data, shell, current); // Appelle la fonction correspondante.
             return;
         }
         i++;
@@ -154,6 +154,8 @@ char **get_arg_data(struct s_shell *current, struct s_shell *shell)
 
 	i = 0;
 	data = ft_calloc(1024, sizeof(char *));
+	if (!data)
+		exit_with_error("allocation error", NULL, 1);
     while (current && current->token != TOKEN_PIPE)
     {
         if (current->token == TOKEN_SIMPLE_QUOTE)

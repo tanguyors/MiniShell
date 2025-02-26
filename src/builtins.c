@@ -4,19 +4,22 @@
 
 
 
-int ft_exit(char **argv, struct s_shell *shell)
+int ft_exit(char **argv, struct s_shell *shell, struct s_shell *head)
 {
     int argc;
 
     argc = 0;
     while (argv[argc])
         argc++;
+    free(shell->rl_input);
+    rl_clear_history();
+    free_list(head);
     if (argc > 2)
     {
         ft_putstr_fd("too many arguments", 2);
         exit(1);
     }
-    if (argv[0])
+    if (argv[1])
     {
         if (!is_str(argv[0]))
         {
@@ -24,7 +27,7 @@ int ft_exit(char **argv, struct s_shell *shell)
             exit(2);
         }
     }
-    free(shell->rl_input);
+
     if (argv[0])
         exit(ft_atoi(argv[0]));
 	exit(shell->exit_code);
@@ -200,7 +203,7 @@ char *expand_variable(const char *var)
 
     return (0);
 }*/
-int ft_echo(char **argv, struct s_shell *shell)
+int ft_echo(char **argv, struct s_shell *shell, struct s_shell *head)
 {
     int i = 1;
     int newline = 1;
@@ -241,7 +244,7 @@ int ft_echo(char **argv, struct s_shell *shell)
 }
 
  //--------------------------------------------------------------------------------------PWD------------------------------------------------------------------------
-int ft_pwd(char **argv, struct s_shell *shell)
+int ft_pwd(char **argv, struct s_shell *shell, struct s_shell *head)
 {
 	(void)argv;
     char cwd[1024]; // Buffer pour stocker le chemin
@@ -266,7 +269,7 @@ extern char **environ;
  *
  * Retourne 0 en cas de succès, 1 si des arguments sont passés.
  */
-int ft_env(char **argv, struct s_shell *shell)
+int ft_env(char **argv, struct s_shell *shell, struct s_shell *head)
 {
     int i = 0;
 
@@ -325,7 +328,7 @@ int	is_valid_identifier(const char *str)
  *
  * Retourne 0 en cas de succès, 1 en cas d'erreur.
  */
-int ft_export(char **argv, struct s_shell *shell)
+int ft_export(char **argv, struct s_shell *shell, struct s_shell *head)
 {
     int i = 0;
 
@@ -380,7 +383,7 @@ int ft_export(char **argv, struct s_shell *shell)
 
 //--------------------------------------------------------------------------------------------------------------------------UNSET---------------------------------------------------------------------------------------------
 // Version definitive a revoir pour mettre a la norme !!!!!
-int ft_unset(char **argv, struct s_shell *shell)
+int ft_unset(char **argv, struct s_shell *shell, struct s_shell *head)
 {
     int i = 0;
 
@@ -475,7 +478,7 @@ char *pop_dir(void)
  * Retourne 0 en cas de succès, 1 en cas d'erreur.
  */
 
-int ft_cd(char **argv, struct s_shell *shell)
+int ft_cd(char **argv, struct s_shell *shell, struct s_shell *head)
 {
     char cwd[1024];
     char *path;

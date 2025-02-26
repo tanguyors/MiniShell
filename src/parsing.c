@@ -340,13 +340,13 @@ struct s_shell *parsing(char *str, struct s_shell *head, struct s_shell *shell)
 		if (str[i])
         	p_arg(&i, str, &head);
 		//printf("test str: %c\n", str[i]);
-		if (is_redirect(str[i]))
-			p_redirection(&i, str, &head, &stop_flag);
+		/*if (is_redirect(str[i]))
+			p_redirection(&i, str, &head, &stop_flag);*/
 		else if (str[i] == 39 || str[i] == '"')
             p_quotes(&i, str, &head);
 		else if (str[i] == '|')
             p_pipe(&i, str, &head);
-        else
+        else if (str[i])
             i++;
 		
     }

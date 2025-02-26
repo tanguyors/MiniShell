@@ -47,7 +47,9 @@ static void main_2(struct s_shell shell)
             add_history(shell.rl_input);
         if (shell.rl_input == NULL)  // Permet d'exit le shell (ctrl + D)
         {
+            rl_clear_history();
             free(shell.rl_input);
+            free_list(head);
             exit(shell.exit_code);
         }
 
@@ -65,8 +67,8 @@ static void main_2(struct s_shell shell)
             free(shell.rl_input);
         if (head)
         {
-            print_list(head);
-			print_token(head);
+            //print_list(head);
+			//print_token(head);
             free_list(head);
         }
     }
