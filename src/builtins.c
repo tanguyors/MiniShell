@@ -268,7 +268,7 @@ int ft_pwd(char **argv, struct s_shell *shell, struct s_shell *head)
         shell->exit_code = 22;
     }
 }
-extern char **environ; 
+
 //-----------------------------------------------------------------------------------ENV---------------------------------------------------------------------------------
 /**
  * ft_env - Affiche toutes les variables d'environnement.
@@ -279,7 +279,7 @@ extern char **environ;
 int ft_env(char **argv, struct s_shell *shell, struct s_shell *head)
 {
     int i = 0;
-
+    extern char **environ; 
     // Vérifie si des arguments supplémentaires sont donnés
     if (argv[1])
     {
@@ -338,7 +338,7 @@ int	is_valid_identifier(const char *str)
 int ft_export(char **argv, struct s_shell *shell, struct s_shell *head)
 {
     int i = 0;
-
+    extern char **environ; 
     // Si aucun argument n'est donné, affiche toutes les variables exportées
     if (!argv[0])
     {
@@ -393,7 +393,8 @@ int ft_export(char **argv, struct s_shell *shell, struct s_shell *head)
 int ft_unset(char **argv, struct s_shell *shell, struct s_shell *head)
 {
     int i = 0;
-
+    extern char **environ; 
+    
     if (!argv[0]) // Aucun argument : rien à faire
         return (0);
 
