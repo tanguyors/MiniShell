@@ -37,6 +37,21 @@ void free_list(struct s_shell *head)
 	}
 }
 
+void free_stack(t_dir_stack *head)
+{
+	t_dir_stack *tmp;
+	int i;
+
+	while (head != NULL)
+	{
+		tmp = head;
+		head = head->next;
+		//if (tmp->dir != NULL)
+			//free(tmp->dir);
+		free(tmp);
+	}
+}
+
 char *ft_strcpy(char *dest, char *src)
 {
 	int i;

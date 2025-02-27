@@ -532,6 +532,7 @@ int ft_cd(char **argv, struct s_shell *shell, struct s_shell *head)
     }
 
     push_dir(cwd); // Sauvegarde l'ancien répertoire
+    //free_stack(g_dir_stack);
     update_pwd(); // Met à jour PWD et OLDPWD
     shell->exit_code = 0;
     return (0); // Toujours succès

@@ -94,6 +94,7 @@ char *ft_strncpy(char *dest, const char *src, size_t n);
 char *ft_strcat(char *dest, const char *src);
 char *expand_variable(const char *var);
 int get_nb_token(struct s_shell *current);
+void free_stack(t_dir_stack *head);
 /*-- Is_Utils --*/
 int is_spec_char(int c);
 int is_ignored_char(int c);
