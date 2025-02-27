@@ -337,10 +337,10 @@ int	is_valid_identifier(const char *str)
  */
 int ft_export(char **argv, struct s_shell *shell, struct s_shell *head)
 {
-    int i = 0;
+    int i = 1;
     extern char **environ; 
     // Si aucun argument n'est donné, affiche toutes les variables exportées
-    if (!argv[0])
+    if (!argv[1])
     {
         int j = 0;
         while (environ[j])
@@ -392,9 +392,9 @@ int ft_export(char **argv, struct s_shell *shell, struct s_shell *head)
 // Version definitive a revoir pour mettre a la norme !!!!!
 int ft_unset(char **argv, struct s_shell *shell, struct s_shell *head)
 {
-    int i = 0;
+    int i = 1;
     extern char **environ; 
-    
+
     if (!argv[0]) // Aucun argument : rien à faire
         return (0);
 
