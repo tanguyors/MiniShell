@@ -5,7 +5,11 @@
 /* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées.
 			 -Tester la robustesse du code, faire un rapport des erreurs. <-- actuellement en cours
 			 -Checker les leaks.
-			 -Remise à la norme. */
+			 -Remise à la norme. 
+             
+             - initialisation de static t_dir_stack *g_dir_stack = NULL; // Pile globale dans le main 
+             - faire un pointeur vers la struct s_dir_stack depuis la struct s_shell 
+             - utiliser le nouveau pointeur shell->dir_stack->"value" pour acceder aux différente valeur de s_dir_stack */
 
 /* Erreur :  -gérer le std input lors de echo arg | ./minishell  ( isatty )
              -gérer cat < "./test.txt", parsing des quotes?  */
@@ -49,6 +53,7 @@ static void main_2(struct s_shell shell)
         {
             rl_clear_history();
             free(shell.rl_input);
+            free_list(head);
             exit(shell.exit_code);
         }
 
@@ -66,8 +71,8 @@ static void main_2(struct s_shell shell)
             free(shell.rl_input);
         if (head)
         {
-            //print_list(head);
-			//print_token(head);
+            print_list(head);
+			print_token(head);
             free_list(head);
         }
     }
