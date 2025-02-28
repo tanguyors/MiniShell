@@ -235,8 +235,9 @@ int ft_echo(char **argv, struct s_shell *shell, struct s_shell *head)
     }
 
     // Afficher directement argv[i], déjà expansé
-    while (argv[i])
+    while (argv[i] && !is_spec_char(argv[i][0]))
     {
+        printf("argv[%d]: %s\n", i, argv[i]);
         ft_putstr_fd(argv[i], 1);
         //if (argv[i + 1])
             //ft_putchar_fd(' ', 1);

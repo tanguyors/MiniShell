@@ -134,6 +134,7 @@ static void std_arg(int *i, char *str, struct s_shell **head)
 	j = 0;
 	while (str[(*i)] != '\0' && !is_spec_char_no_space(str[(*i)]))
 	{
+		printf("test std_arg: %c\n", str[(*i)]);
 		if (is_space(str[(*i)]) && str[(*i) + 1 ] != '|')
 			tail->data[j++] = ' ';
 		while (str[(*i)] != '\0' && is_space(str[(*i)]))
