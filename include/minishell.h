@@ -125,6 +125,7 @@ void push_dir(const char *dir);
 char *pop_dir(void);
 static void	remove_env_var(const char *var);
 int	ft_env(char **argv, struct s_shell *shell, struct s_shell *head);
+int	ft_export(char **argv, struct s_shell *shell, struct s_shell *head);
 /*-- Signal --*/
 void handle_signal(int sig, siginfo_t *info, void *context);
 

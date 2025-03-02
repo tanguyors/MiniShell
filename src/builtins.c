@@ -79,67 +79,7 @@ int	is_valid_identifier(const char *str)
 	return (1); // Renvoie 1 si tout est valide
 }
 
-/**
- * ft_export - Implémente la commande export.
- * @argv: Les arguments passés à la commande (argv[0] = "export").
- *
- * Retourne 0 en cas de succès, 1 en cas d'erreur.
- */
-int ft_export(char **argv, struct s_shell *shell, struct s_shell *head)
-{
-    int i = 1;
-    extern char **environ; 
-    // Si aucun argument n'est donné, affiche toutes les variables exportées
-    if (!argv[1])
-    {
-        int j = 0;
-        while (environ[j])
-        {
-            ft_printf("declare -x %s\n", environ[j]);
-            j++;
-        }
-        return (0); // Toujours succès
-    }
-    if (argv[1])
-        ft_strcat(argv[0], argv[1]);
-    // Parcourt les arguments donnés pour les ajouter/modifier
-    while (argv[i])
-    {
-        // Vérifie si l'argument est un identifiant valide
-        if (!is_valid_identifier(argv[i]))
-        {
-            //ft_printf("export: `%s': not a valid identifier\n", argv[i]);
-            ft_putstr_fd(" not a valid identifier", 2);
-            shell->exit_code = 1; // Met à jour le code de sortie
-            return (1); // Indique une erreur
-        }
-        else
-        {
-            // Copie l'argument pour pouvoir le manipuler
-            char *name = ft_strdup(argv[i]);
-            // Cherche la position de '=' dans la chaîne
-            char *value = ft_strchr(name, '=');
-            if (value) // Si '=' est trouvé
-            {
-                *value = '\0'; // Coupe la chaîne en deux à '='
-                value++; // Pointe sur la valeur après '='
-                setenv(name, value, 1); // Ajoute ou met à jour la variable dans environ
-            }
-            else
-            {
-                // Si aucune valeur n'est donnée, ajoute une variable avec une valeur vide
-                setenv(name, "", 1);
-            }
-            free(name); // Libère la mémoire allouée pour le nom
-        }
-        i++; // Passe au prochain argument
-    }
-    shell->exit_code = 0;
-    return (0); // Toujours succès
-}
 
-
-//-------------------------------------------------------------------------------------------------------------------------------------------CD---------------------------------------------------------------------------------------------------------------
 static char *construct_path(const char *base, const char *input)
 {
     char *full_path;
