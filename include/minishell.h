@@ -115,7 +115,7 @@ void parse_execution(struct s_shell *shell, struct s_shell *head);
 int ft_exit(char **argv, struct s_shell *shell, struct s_shell *head);
 int ft_echo(char **argv, struct s_shell *shell, struct s_shell *head);
 int ft_pwd(char **argv, struct s_shell *shell, struct s_shell *head);
-int ft_env(char **argv, struct s_shell *shell, struct s_shell *head);
+int	ft_unset(char **argv, struct s_shell *shell, struct s_shell *head);
 int	ft_export(char **argv, struct s_shell *shell, struct s_shell *head);
 int	is_valid_identifier(const char *str);
 int ft_unset(char **argv, struct s_shell *shell, struct s_shell *head);
@@ -123,6 +123,8 @@ int ft_cd(char **argv, struct s_shell *shell, struct s_shell *head);
 static char *construct_path(const char *base, const char *input);
 void push_dir(const char *dir);
 char *pop_dir(void);
+static void	remove_env_var(const char *var);
+int	ft_env(char **argv, struct s_shell *shell, struct s_shell *head);
 /*-- Signal --*/
 void handle_signal(int sig, siginfo_t *info, void *context);
 

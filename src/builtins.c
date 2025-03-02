@@ -61,48 +61,6 @@ int ft_pwd(char **argv, struct s_shell *shell, struct s_shell *head)
     }
 }
 
-//-----------------------------------------------------------------------------------ENV---------------------------------------------------------------------------------
-/**
- * ft_env - Affiche toutes les variables d'environnement.
- * @argv: Les arguments passés à la commande (argv[0] = "env").
- *
- * Retourne 0 en cas de succès, 1 si des arguments sont passés.
- */
-int ft_env(char **argv, struct s_shell *shell, struct s_shell *head)
-{
-    int i = 0;
-    extern char **environ; 
-    // Vérifie si des arguments supplémentaires sont donnés
-    if (argv[1])
-    {
-        ft_putstr_fd(" No such file or directory\n", 2);
-        shell->exit_code = 1; // Met à jour le code de sortie
-        return (1); // Indique une erreur
-    }
-
-    // Parcourt la variable globale environ et affiche chaque variable
-    while (environ[i])
-    {
-        ft_printf("%s\n", environ[i]);
-        i++;
-    }
-    shell->exit_code = 0;
-    return (0); // Toujours succès
-}
-
-//-----------------------------------------------------------------------------------EXPORT------------------------------------------------------------------------------------------
-/**
- * ft_export - Implémente la commande export.
- * @argv: Les arguments passés à la commande (argv[0] = "export").
- *
- * Retourne 0 en cas de succès, 1 en cas d'erreur.
- */
-/**
- * is_valid_identifier - Vérifie si le nom de variable est valide.
- * @str: Le nom à vérifier.
- *
- * Retourne 1 si le nom est valide, sinon 0.
- */
 int	is_valid_identifier(const char *str)
 {
 	int	i;
@@ -180,51 +138,6 @@ int ft_export(char **argv, struct s_shell *shell, struct s_shell *head)
     return (0); // Toujours succès
 }
 
-//--------------------------------------------------------------------------------------------------------------------------UNSET---------------------------------------------------------------------------------------------
-// Version definitive a revoir pour mettre a la norme !!!!!
-int ft_unset(char **argv, struct s_shell *shell, struct s_shell *head)
-{
-    int i = 1;
-    extern char **environ; 
-
-    if (!argv[0]) // Aucun argument : rien à faire
-        return (0);
-
-    while (argv[i])
-    {
-        if (!is_valid_identifier(argv[i]))
-        {
-            ft_putstr_fd(" not a valid identifier\n", 2);
-            shell->exit_code = 1; // Met à jour le code de sortie
-            return (1); // Indique une erreur
-        }
-        else
-        {
-            int j = 0;
-            while (environ[j])
-            {
-                // Compare uniquement la partie avant le '='
-                if (ft_strncmp(environ[j], argv[i], ft_strlen(argv[i])) == 0 &&
-                    environ[j][ft_strlen(argv[i])] == '=')
-                {
-                    // Décale toutes les entrées après j
-                    int k = j;
-                    while (environ[k + 1])
-                    {
-                        environ[k] = environ[k + 1];
-                        k++;
-                    }
-                    environ[k] = NULL; // Termine le tableau après décalage
-                    break; // Une fois trouvée et supprimée, arrête la recherche
-                }
-                j++;
-            }
-        }
-        i++;
-    }
-    shell->exit_code = 0;
-    return (0); // Toujours succès
-}
 
 //-------------------------------------------------------------------------------------------------------------------------------------------CD---------------------------------------------------------------------------------------------------------------
 static char *construct_path(const char *base, const char *input)
