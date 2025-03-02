@@ -233,3 +233,20 @@ char *ft_strcat(char *dest, const char *src)
     dest[dest_len + i] = '\0';
     return dest;
 }
+int	is_valid_identifier(const char *str)
+{
+	int	i;
+
+	// Vérifie que le premier caractère est une lettre ou un '_'
+	if (!str || (!ft_isalpha(str[0]) && str[0] != '_'))
+		return (0);
+	// Parcourt le reste de la chaîne pour vérifier les caractères autorisés
+	i = 1;
+	while (str[i] && str[i] != '=') // Arrête si un '=' est rencontré
+	{
+		if (!ft_isalnum(str[i]) && str[i] != '_') // Vérifie chaque caractère
+			return (0); // Renvoie 0 si un caractère invalide est trouvé
+		i++;
+	}
+	return (1); // Renvoie 1 si tout est valide
+}
