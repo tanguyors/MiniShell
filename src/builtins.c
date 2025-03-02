@@ -1,8 +1,4 @@
-
-//Implementations des commandes interne
 #include "../include/minishell.h"
-
-
 
 int ft_exit(char **argv, struct s_shell *shell, struct s_shell *head)
 {
@@ -58,64 +54,4 @@ int	is_valid_identifier(const char *str)
 		i++;
 	}
 	return (1); // Renvoie 1 si tout est valide
-}
-
-
-/**
- * ft_cd - Implémente la commande cd.
- * @argv: Tableau d'arguments (argv[0] = "cd").
- *
- * Retourne 0 en cas de succès, 1 en cas d'erreur.
- */
-
-int ft_cd(char **argv, struct s_shell *shell, struct s_shell *head)
-{
-    char cwd[1024];
-    char *path;
-    char *previous_dir;
-
-    if (!getcwd(cwd, sizeof(cwd))) // Récupère le répertoire courant
-    {
-        perror("cd");
-        shell->exit_code = 1; // Met à jour le code de sortie
-        return (1); // Indique une erreur
-    }
-
-    if (!argv[1] || ft_strcmp(argv[1], "~") == 0) // "cd" ou "cd ~"
-    {
-        path = getenv("HOME");
-        if (!path || !*path)
-        {
-            ft_putstr_fd(" HOME not set\n", 2);
-            shell->exit_code = 1; // Met à jour le code de sortie
-            return (1); // Indique une erreur
-        }
-    }
-    else if (ft_strcmp(argv[1], "-") == 0) // "cd -"
-    {
-        previous_dir = pop_dir();
-        if (!previous_dir)
-        {
-            ft_putstr_fd(" No previous directory\n", 2);
-            shell->exit_code = 1; // Met à jour le code de sortie
-            return (1); // Indique une erreur
-        }
-        ft_printf("%s\n", previous_dir); // Affiche le répertoire précédent
-        path = previous_dir;
-    }
-    else
-        path = argv[1]; // Sinon, utilise le chemin donné
-
-    if (chdir(path) == -1)
-    {
-        ft_putstr_fd(" No such file or directory\n", 2);
-        shell->exit_code = 1; // Met à jour le code de sortie
-        return (1); // Indique une erreur
-    }
-
-    push_dir(cwd); // Sauvegarde l'ancien répertoire
-    //free_stack(g_dir_stack);
-    update_pwd(); // Met à jour PWD et OLDPWD
-    shell->exit_code = 0;
-    return (0); // Toujours succès
 }
