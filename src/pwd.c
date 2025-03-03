@@ -62,3 +62,16 @@ char	*pop_dir(void)
 	free(top);
 	return (dir);
 }
+
+void clear_dir_stack(void)
+{
+    t_dir_stack *tmp;
+
+    while (g_dir_stack)
+    {
+        tmp = g_dir_stack;
+        g_dir_stack = g_dir_stack->next;
+        free(tmp->dir);
+        free(tmp);
+    }
+}

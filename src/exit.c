@@ -33,7 +33,7 @@ static int	check_exit_args(char **argv)
 **   - Vérifie les arguments via check_exit_args().
 **   - Quitte le programme avec le code de sortie approprié.
 */
-int	ft_exit(char **argv, struct s_shell *shell, struct s_shell *head)
+/*int	ft_exit(char **argv, struct s_shell *shell, struct s_shell *head)
 {
 	int	ret;
 	int	exit_val;
@@ -43,13 +43,50 @@ int	ft_exit(char **argv, struct s_shell *shell, struct s_shell *head)
 	rl_clear_history();
 	free_list(head);
 	free_array(argv);
+	clear_dir_stack();
 	if (ret)
 		exit(ret);
 	/* Si un argument est passé (argv[1]), on l'interprète comme le code de sortie.
 	   Sinon, on utilise shell->exit_code. */
-	if (argv[1])
-		exit_val = ft_atoi(argv[1]);
-	else
-		exit_val = shell->exit_code;
-	exit(exit_val);
+	//if (argv[1])
+		//exit_val = ft_atoi(argv[1]);
+	//else
+		//exit_val = shell->exit_code;
+	//exit(exit_val);
+//}
+int ft_exit(char **argv, struct s_shell *shell, struct s_shell *head)
+{
+    int argc;
+    int ret;
+    char *tmp;
+
+    argc = 0;
+    while (argv[argc])
+        argc++;
+    free(shell->rl_input);
+    rl_clear_history();
+    free_list(head);
+    if (argc > 2)
+    {
+        ft_putstr_fd("too many arguments\n", 2);
+        free_array(argv);
+        exit(1);
+    }
+    if (argc == 2)
+    {
+        if (!is_str(argv[1]))
+        {
+            ft_putstr_fd("numeric argument required\n", 2);
+            free_array(argv);
+            exit(2);
+        }
+        tmp = ft_strdup(argv[1]);  // Copie argv[1] dans une variable temporaire
+        ret = ft_atoi(tmp);
+        free(tmp);
+        free_array(argv);
+        exit(ret);
+    }
+    free_array(argv);
+	clear_dir_stack();
+    exit(shell->exit_code);
 }

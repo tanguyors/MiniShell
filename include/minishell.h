@@ -128,6 +128,7 @@ int	ft_env(char **argv, struct s_shell *shell, struct s_shell *head);
 int	ft_export(char **argv, struct s_shell *shell, struct s_shell *head);
 /*-- Signal --*/
 void handle_signal(int sig, siginfo_t *info, void *context);
+void clear_dir_stack(void);
 
 
 #endif
