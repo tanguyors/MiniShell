@@ -54,6 +54,7 @@ static void main_2(struct s_shell shell)
             rl_clear_history();
             free(shell.rl_input);
             free_list(head);
+            clear_dir_stack();
             exit(shell.exit_code);
         }
 

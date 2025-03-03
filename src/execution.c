@@ -584,7 +584,7 @@ static void child_redir(struct s_shell *shell, struct s_shell *current)
 	//ft_printf("child redir exit code: %d\n", shell->exit_code);
 }
 
-static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct s_shell *current)
+static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct s_shell *current, struct s_shell *head)
 {
 	int nb_pipe;
 
@@ -612,6 +612,10 @@ static void child_process(struct s_shell *shell, int fd[2], int prev_fd, struct 
 	close(fd[1]);
 	extract_data(shell, current);
 	//ft_printf("child process exit code 2: %d\n", shell->exit_code);
+	//print_list(current);
+	rl_clear_history();
+	free(shell->rl_input);
+	free_list(head);
 	exit(shell->exit_code);
 }
 
@@ -651,21 +655,29 @@ static void m_p_h_fork_suceed(struct s_shell *current, int prev_fd, int fd[2])
 	Utilisation de fork afin de créer un processus enfant, 
 	celui ci va redirigé la sortie de la commande en fonction des pipes. 
 	Ici le double pointeur current représente la liste chaînée complète*/
-void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
+void multi_pipe_handling(struct s_shell *shell, struct s_shell *head)
 {
     int fd[2];
     int prev_fd;
     pid_t pid;
     pid_t last_pid;
     int status;
+	struct s_shell *current;
 
 	last_pid = -1;
     prev_fd = -1;
+	//if (!head)
+		//return;
+	current = head;
+	print_list(current);
     while (current)
     {
         pipe_and_fork(fd, &pid);
         if (pid == 0)
-            child_process(shell, fd, prev_fd, current);
+		{
+            child_process(shell, fd, prev_fd, current, head);
+			exit (0); //joao
+		}
         else
         {
             last_pid = pid;  // Mettre à jour le dernier PID à chaque fork
@@ -685,10 +697,12 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *current)
             current = current->next;
     }
 	 // Attendre le dernier processus enfant et récupérer son statut
-	if (last_pid != -1)
-		m_p_h_wait(shell, last_pid, pid, status);
+	//if (last_pid != -1)
+		//m_p_h_wait(shell, last_pid, pid, status);
 	while (wait(NULL) > 0)
         continue;
+	if (WIFEXITED(status))
+		shell->exit_code = WEXITSTATUS(status);
     //ft_printf("multi pipe exit code: %d\n", shell->exit_code);
 }
 
