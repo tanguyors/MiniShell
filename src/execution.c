@@ -623,7 +623,6 @@ static void pipe_and_fork(int fd[2], int *pid)
 {
 	if (pipe(fd) == -1)
 		exit_with_error("pipe error", NULL, 1);
-
 	*pid = fork();
 	if (*pid < 0)
 		exit_with_error("fork error", NULL, 1);
@@ -666,43 +665,28 @@ void multi_pipe_handling(struct s_shell *shell, struct s_shell *head)
 
 	last_pid = -1;
     prev_fd = -1;
-	//if (!head)
-		//return;
 	current = head;
-	print_list(current);
+	//print_list(current);
     while (current)
     {
         pipe_and_fork(fd, &pid);
         if (pid == 0)
 		{
             child_process(shell, fd, prev_fd, current, head);
-			exit (0); //joao
+			//exit (0); // joao
 		}
         else
         {
             last_pid = pid;  // Mettre à jour le dernier PID à chaque fork
-			//m_p_h_fork_suceed(current, prev_fd, fd);
-			if (prev_fd != -1)
-				close(prev_fd);
-			if (current->next)
-			{
-				close(fd[1]);
-				prev_fd = fd[0];
-			}
-			else
-				close(fd[0]);
+			m_p_h_fork_suceed(current, prev_fd, fd);
         }
         current = current->next;
         while (current && current->token != TOKEN_CMD)
             current = current->next;
     }
 	 // Attendre le dernier processus enfant et récupérer son statut
-	//if (last_pid != -1)
-		//m_p_h_wait(shell, last_pid, pid, status);
-	while (wait(NULL) > 0)
-        continue;
-	if (WIFEXITED(status))
-		shell->exit_code = WEXITSTATUS(status);
+	if (last_pid != -1)
+		m_p_h_wait(shell, last_pid, pid, status);
     //ft_printf("multi pipe exit code: %d\n", shell->exit_code);
 }
 
