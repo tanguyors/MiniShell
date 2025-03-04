@@ -241,6 +241,9 @@ static void p_double_quotes(int *i, char *str, struct s_shell **head)
 /* écrit la data des quotes dans le noeud adéquat */
 static void quotes_data(int *i, char *str, struct s_shell *tail)
 {
+	int j;
+
+	j = 0;
 	(*i)++;
 	while (str[(*i)] && (str[(*i)] != 39))
 	{
@@ -259,9 +262,7 @@ static void quotes_data(int *i, char *str, struct s_shell *tail)
 int p_quotes(int *i, char *str, struct s_shell **head)
 {
 	struct s_shell *tail;
-	int j;
 
-	j = 0;
 	if (str[(*i)] == 39)
 	{
 		insert_tail(head, NULL, "TOKEN_QUOTES");
@@ -304,7 +305,6 @@ static struct s_shell *p_post_parsing(struct s_shell *head, char *str, struct s_
 	struct s_shell *current;
 	char *rl_input;
 
-	break_flag = 0;
 	current = head;
 	while (current)
 	{
