@@ -48,6 +48,8 @@ int is_str(char *str)
 
 int is_redirect(int c)
 {
+	if (!c)
+		return (0);
     if (c == '<' || c == '>')
         return(1);
     return(0);
