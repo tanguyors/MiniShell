@@ -653,7 +653,7 @@ static void m_p_h_fork_suceed(struct s_shell *current, int prev_fd, int fd[2])
 /* Permet de gérer first_arg cas où un pipe est présent dans la liste. 
 	Utilisation de fork afin de créer un processus enfant, 
 	celui ci va redirigé la sortie de la commande en fonction des pipes. 
-	Ici le double pointeur current représente la liste chaînée complète*/
+	Ici le double pointeur current représente la liste chaînée complète */
 void multi_pipe_handling(struct s_shell *shell, struct s_shell *head)
 {
     int fd[2];
