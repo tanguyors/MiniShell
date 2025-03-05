@@ -43,6 +43,7 @@ struct s_shell
     struct s_shell *file;
     enum e_tokens token;
     char *data;
+    int prev_fd;
     int exit_code;
     char *rl_input;
 };
@@ -65,9 +66,11 @@ typedef struct s_builtin
 char **parse_tokens(char *input);
 struct s_shell *parsing(char *str, struct s_shell *head, struct s_shell *shell);
 void parse_commands(char **tokens);
-int p_command(int *i, char *str, struct s_shell **value, int *stop_flag);
 int p_redirection(int *i, char *str, struct s_shell **head, int *stop_flag);
 int p_quotes(int *i, char *str, struct s_shell **head);
+int p_arg(int *i, char *str, struct s_shell **head);
+int p_pipe(int *i, char *str, struct s_shell **head);
+enum e_tokens which_red(int *i, char *str);
 /*-- Linked_list --*/
 void print_list(struct s_shell *current);
 void print_token(struct s_shell *current);
@@ -111,7 +114,20 @@ int is_spec_char_no_space(int c);
 char *expand_token(const char *input, int is_in_single_quote, struct s_shell *shell);
 /*-- Executions --*/
 void parse_execution(struct s_shell *shell, struct s_shell *head);
+void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data);
+void extract_data(struct s_shell *shell, struct s_shell *current);
+char **get_all_data(struct s_shell *current);
+char **get_arg_data(struct s_shell *current, struct s_shell *shell);
+char *get_absolute_path(char *command);
+/*-- Redirections --*/
+void redirection_execution(struct s_shell *shell, struct s_shell *first_arg);
+void redir_heredoc(struct s_shell *shell, struct s_shell *current);
+int setup_redirection(struct s_shell *shell, struct s_shell *current, int flag, int file_access);
+/*-- Pipes --*/
+void multi_pipe_handling(struct s_shell *shell, struct s_shell *head);
+void child_process(struct s_shell *shell, int fd[2], struct s_shell *current, struct s_shell *head);
 /*-- Built-in --*/
+void initialize_builtin(t_builtin *builtin);
 int ft_exit(char **argv, struct s_shell *shell, struct s_shell *head);
 int ft_echo(char **argv, struct s_shell *shell, struct s_shell *head);
 int ft_pwd(char **argv, struct s_shell *shell, struct s_shell *head);
@@ -129,6 +145,5 @@ int	ft_export(char **argv, struct s_shell *shell, struct s_shell *head);
 /*-- Signal --*/
 void handle_signal(int sig, siginfo_t *info, void *context);
 void clear_dir_stack(void);
-
 
 #endif

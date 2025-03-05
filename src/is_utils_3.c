@@ -1,54 +1,45 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   is_utils.c                                         :+:      :+:    :+:   */
+/*   is_utils_3.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 22:22:24 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:22:28 by lmonsat          ###   ########.fr       */
+/*   Created: 2025/03/05 22:12:14 by lmonsat           #+#    #+#             */
+/*   Updated: 2025/03/05 22:12:53 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int is_str(char *str)
+/* Détermine s'il y a un pipe dans la liste chaînée 
+	auquel cas renvois le nombre de pipe total */
+int is_pipe(struct s_shell *current)
 {
-	while (str)
+	int n;
+
+	n = 0;
+	while (current)
 	{
-		if (!is_alpha(*str))
-			return (0);
-		str++;
+		if (current->token)
+		{
+			if (current->token == TOKEN_PIPE)
+			{
+				n++;
+			}
+		}
+		current = current->next;
 	}
-	return (1);
+	return (n);
 }
 
-int is_redirect(int c)
+int is_redirection_in_list(struct s_shell *head)
 {
-	if (!c)
-		return (0);
-    if (c == '<' || c == '>')
-        return(1);
-    return(0);
-}
-
-int is_alnum(int c)
-{
-	if ((c >= '0' && c <= '9') || (is_alpha(c)))
-		return (1);
-	return (0);
-}
-
-int is_space(int c)
-{
-    if (c == ' ' || c == '\t')
-        return (1);
-    return (0);
-}
-
-int is_quotes(int c)
-{
-	if (c == '"' || c == 39)
-		return (1);
+	while (head && head->token)
+	{
+		if (is_token_red(head->token))
+			return (1);
+		head = head->next;
+	}
 	return (0);
 }

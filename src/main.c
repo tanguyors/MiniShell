@@ -1,6 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/05 22:21:56 by lmonsat           #+#    #+#             */
+/*   Updated: 2025/03/05 22:22:14 by lmonsat          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "../include/minishell.h"
-# include <unistd.h> 
 
 /* A faire : -Intégration de la variable $? permettant de voir la dernière sortie des commandes effectuées.
 			 -Tester la robustesse du code, faire un rapport des erreurs. <-- actuellement en cours
