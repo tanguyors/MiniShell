@@ -113,6 +113,7 @@ int is_quotes(int c);
 int is_spec_char_no_space(int c);
 char *expand_token(const char *input, int is_in_single_quote, struct s_shell *shell);
 /*-- Executions --*/
+void main_2(struct s_shell shell);
 void parse_execution(struct s_shell *shell, struct s_shell *head);
 void cmd_execution(struct s_shell *shell, struct s_shell *current, char **data);
 void extract_data(struct s_shell *shell, struct s_shell *current);

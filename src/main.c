@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:21:56 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:22:14 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/05 22:33:19 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,27 @@ static void signals()
     sigaction(SIGQUIT, &sa, NULL);
 }
 
-static void main_2(struct s_shell shell)
+static void parse_main(struct s_shell shell, struct s_shell *head)
+{
+    head = parsing(shell.rl_input, head, &shell);
+    if (!head)
+    {
+        if (shell.rl_input)
+            free(shell.rl_input);
+        main_2(shell);
+    }
+    parse_execution(&shell, head);
+    if (shell.rl_input)
+        free(shell.rl_input);
+    if (head)
+    {
+        print_list(head);
+        print_token(head);
+        free_list(head);
+    }
+}
+
+void main_2(struct s_shell shell)
 {
     struct s_shell *head;
 
@@ -57,9 +77,9 @@ static void main_2(struct s_shell shell)
     {
         head = NULL;
         shell.rl_input = readline("minishell> ");
-        if (shell.rl_input != NULL)       // Permet d'avoir un historique cmd
+        if (shell.rl_input != NULL)
             add_history(shell.rl_input);
-        if (shell.rl_input == NULL)  // Permet d'exit le shell (ctrl + D)
+        if (shell.rl_input == NULL)
         {
             rl_clear_history();
             free(shell.rl_input);
@@ -67,32 +87,14 @@ static void main_2(struct s_shell shell)
             clear_dir_stack();
             exit(shell.exit_code);
         }
-
-        //ft_printf("before parsing exit code: %d\n", shell.exit_code);
-        head = parsing(shell.rl_input, head, &shell);
-        //ft_printf("after parsing exit code: %d\n", shell.exit_code);
-        if (!head)
-        {
-            if (shell.rl_input)
-                free(shell.rl_input);
-            main_2(shell);
-        }
-		parse_execution(&shell, head);
-        if (shell.rl_input)
-            free(shell.rl_input);
-        if (head)
-        {
-            print_list(head);
-			print_token(head);
-            free_list(head);
-        }
+        parse_main(shell, head);
     }
 }
 
 int main(void)
 {
     struct s_shell shell;
-    //ascii_art();
+    ascii_art();
     shell.exit_code = 0;
     main_2(shell);
     return (0);

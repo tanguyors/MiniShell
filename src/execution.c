@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 17:52:02 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 17:52:28 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/05 22:29:29 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static void exec_data(struct s_shell *head, struct s_shell *shell)
 {
 	if (head && head->token)
 	{
-		if (head->token == TOKEN_CMD) // relié a TOKEN_ARG, cherche un token ARG
+		if (head->token == TOKEN_CMD)
 		{
 			extract_data(shell, head);
 		}
@@ -50,7 +50,7 @@ static void exec_without_pipe(struct s_shell *shell, struct s_shell *head)
 			first_arg = set_first_arg(shell, first_arg, &flag);
 			if (head->token || head->next->token)
 			{
-				if (is_token_red(head->next->token) || is_token_red(head->token)) // relié a TOKEN_RED, cherche REDIR_INPUT, REDIR_OUTPUT, REDIR_APPEND, REDIR_HEREDOC
+				if (is_token_red(head->next->token) || is_token_red(head->token))
 				{
 					redirection_execution(shell, first_arg);
 					head = head->next;

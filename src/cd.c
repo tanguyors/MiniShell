@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:23:29 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:23:33 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/05 22:28:59 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,8 @@ int	ft_cd(char **argv, struct s_shell *shell, struct s_shell *head)
 	char	cwd[1024];
 	char	*path;
 
-	// Récupère le répertoire courant
 	if (!getcwd(cwd, sizeof(cwd)))
 		return (handle_cd_error("cd: error getting current directory\n", shell));
-	// Détermine le chemin cible à partir des arguments
 	path = determine_path(argv, shell);
 	if (!path)
 	{
@@ -60,10 +58,8 @@ int	ft_cd(char **argv, struct s_shell *shell, struct s_shell *head)
 		else
 			return (handle_cd_error("No previous directory\n", shell));
 	}
-	// Change le répertoire
 	if (chdir(path) == -1)
 		return (handle_cd_error("No such file or directory\n", shell));
-	// Sauvegarde l'ancien répertoire et met à jour les variables PWD/OLDPWD
 	push_dir(cwd);
 	update_pwd();
 	shell->exit_code = 0;
