@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:22:59 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:23:03 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 14:28:27 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ int	ft_export(char **argv, struct s_shell *shell, struct s_shell *head)
 	int	i;
 
 	i = 1;
+	(void)head;
 	if (!argv[1])
 		return (export_display());
 	while (argv[i])

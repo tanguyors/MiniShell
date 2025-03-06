@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:22:48 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:22:49 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:38:08 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 **   - Si un argument est fourni mais n'est pas numérique, affiche un message.
 ** Retourne 0 en cas de succès, 1 si trop d'arguments et 2 si l'argument n'est pas numérique.
 */
-static int	check_exit_args(char **argv)
+/*static int	check_exit_args(char **argv)
 {
 	int	argc;
 
@@ -37,7 +37,7 @@ static int	check_exit_args(char **argv)
 		return (2);
 	}
 	return (0);
-}
+}*/
 
 /*
 ** ft_exit:
@@ -45,27 +45,6 @@ static int	check_exit_args(char **argv)
 **   - Vérifie les arguments via check_exit_args().
 **   - Quitte le programme avec le code de sortie approprié.
 */
-/*int	ft_exit(char **argv, struct s_shell *shell, struct s_shell *head)
-{
-	int	ret;
-	int	exit_val;
-
-	ret = check_exit_args(argv);
-	free(shell->rl_input);
-	rl_clear_history();
-	free_list(head);
-	free_array(argv);
-	clear_dir_stack();
-	if (ret)
-		exit(ret);
-	/* Si un argument est passé (argv[1]), on l'interprète comme le code de sortie.
-	   Sinon, on utilise shell->exit_code. */
-	//if (argv[1])
-		//exit_val = ft_atoi(argv[1]);
-	//else
-		//exit_val = shell->exit_code;
-	//exit(exit_val);
-//}
 int ft_exit(char **argv, struct s_shell *shell, struct s_shell *head)
 {
     int argc;

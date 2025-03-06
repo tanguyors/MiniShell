@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:21:24 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:21:27 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 14:23:58 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@
 
 void handle_signal(int sig, siginfo_t *info, void *context)
 {
+    (void)context;
+    (void)info;
+    
     if (sig == SIGINT)
     {
         write(1, "\n", 1);

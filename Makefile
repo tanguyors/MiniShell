@@ -1,19 +1,7 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/03/05 22:20:46 by lmonsat           #+#    #+#              #
-#    Updated: 2025/03/05 22:36:34 by lmonsat          ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 # Variables
 NAME = minishell
 CC = cc
-CFLAGS = -g #-Wall -Wextra -Werror
+CFLAGS = -g -Wall -Wextra -Werror
 SRC_DIR = src
 OBJ_DIR = obj
 INCLUDE = include

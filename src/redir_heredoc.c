@@ -6,13 +6,13 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 17:43:41 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 18:16:54 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:38:29 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int setup_redirection(struct s_shell *shell, struct s_shell *current, int flag, int file_access)
+int setup_redirection(struct s_shell *shell, int flag, int file_access)
 {
 	int fd;
 

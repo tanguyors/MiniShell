@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:21:41 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:21:42 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:36:21 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,39 +15,22 @@
 int	ft_pwd(char **argv, struct s_shell *shell, struct s_shell *head)
 {
 	(void)argv;
-	char cwd[1024]; // Buffer pour stocker le chemin
+	(void)head;
+	char cwd[1024];
 	if (getcwd(cwd, sizeof(cwd)) != NULL)
 	{
 		ft_printf("%s\n", cwd);
-		// Affiche le répertoire courant avec un saut de ligne
 		shell->exit_code = 0;
-		return (0);
 	}
 	else
 	{
-		perror("pwd"); // Affiche une erreur si getcwd échoue
+		perror("pwd");
 		shell->exit_code = 22;
 	}
+	return (0);
 }
 
-static char	*construct_path(const char *base, const char *input)
-{
-	char	*full_path;
-	size_t	base_len;
-
-	base_len = ft_strlen(base);
-	full_path = malloc(base_len + ft_strlen(input) + 2); // +2 pour '/' et '\0'
-	if (!full_path)
-		return (NULL);
-	ft_strlcpy(full_path, base, base_len + 1);                    
-		// Copie `base` dans `full_path`
-	ft_strlcat(full_path, "/", base_len + ft_strlen(input) + 2);   // Ajoute '/'
-	ft_strlcat(full_path, input, base_len + ft_strlen(input) + 2);
-		// Ajoute `input`
-	return (full_path);
-}
-
-static t_dir_stack	*g_dir_stack = NULL; // Pile globale
+static t_dir_stack	*g_dir_stack = NULL;
 
 void	push_dir(const char *dir)
 {
@@ -66,7 +49,7 @@ char	*pop_dir(void)
 	char *dir;
 
 	if (!g_dir_stack)
-		return (NULL); // Pile vide
+		return (NULL);
 	top = g_dir_stack;
 	dir = top->dir;
 	g_dir_stack = g_dir_stack->next;

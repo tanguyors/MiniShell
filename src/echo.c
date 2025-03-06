@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:23:14 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:29:11 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 14:29:01 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ int ft_echo(char **argv, struct s_shell *shell, struct s_shell *head)
 {
     int i = 1;
     int newline = 1;
-    char *result;
     
+    (void)head;
     i = 1;
     while (argv[i] && ft_strcmp(argv[i], "-n") == 0)
     {

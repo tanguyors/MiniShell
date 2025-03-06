@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:23:29 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:28:59 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:37:03 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static int	handle_cd_error(char *msg, struct s_shell *shell)
 	return (1);
 }
 
-static char	*determine_path(char **argv, struct s_shell *shell)
+static char	*determine_path(char **argv)
 {
 	char	*path;
 	char	*previous_dir;
@@ -48,9 +48,10 @@ int	ft_cd(char **argv, struct s_shell *shell, struct s_shell *head)
 	char	cwd[1024];
 	char	*path;
 
+	(void)head;
 	if (!getcwd(cwd, sizeof(cwd)))
 		return (handle_cd_error("cd: error getting current directory\n", shell));
-	path = determine_path(argv, shell);
+	path = determine_path(argv);
 	if (!path)
 	{
 		if (!argv[1] || ft_strcmp(argv[1], "~") == 0)

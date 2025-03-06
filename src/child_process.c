@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 17:42:30 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 17:50:53 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:42:20 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 static void child_redir(struct s_shell *shell, struct s_shell *current)
 {
 	struct s_shell *current_redir;
-	struct s_shell *first_arg;
 
 	shell->file = current;
 	current_redir = current;

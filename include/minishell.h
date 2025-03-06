@@ -123,7 +123,7 @@ char *get_absolute_path(char *command);
 /*-- Redirections --*/
 void redirection_execution(struct s_shell *shell, struct s_shell *first_arg);
 void redir_heredoc(struct s_shell *shell, struct s_shell *current);
-int setup_redirection(struct s_shell *shell, struct s_shell *current, int flag, int file_access);
+int setup_redirection(struct s_shell *shell, int flag, int file_access);
 /*-- Pipes --*/
 void multi_pipe_handling(struct s_shell *shell, struct s_shell *head);
 void child_process(struct s_shell *shell, int fd[2], struct s_shell *current, struct s_shell *head);
@@ -137,10 +137,8 @@ int	ft_export(char **argv, struct s_shell *shell, struct s_shell *head);
 int	is_valid_identifier(const char *str);
 int ft_unset(char **argv, struct s_shell *shell, struct s_shell *head);
 int ft_cd(char **argv, struct s_shell *shell, struct s_shell *head);
-static char *construct_path(const char *base, const char *input);
 void push_dir(const char *dir);
 char *pop_dir(void);
-static void	remove_env_var(const char *var);
 int	ft_env(char **argv, struct s_shell *shell, struct s_shell *head);
 int	ft_export(char **argv, struct s_shell *shell, struct s_shell *head);
 /*-- Signal --*/

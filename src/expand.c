@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:22:39 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:22:42 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:31:57 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ char	*expand_variable(const char *var)
 		return (value);
 	return ("");
 }
-static void	expand_exit_code(const char *input, size_t *i, char *result,
+static void	expand_exit_code(size_t *i, char *result,
 		size_t *j, size_t max_len, struct s_shell *shell)
 {
 	char	*code_str;
@@ -103,7 +103,7 @@ char	*expand_token(const char *input, int is_in_single_quote,
 		if (input[i] == '$')
 		{
 			if (input[i + 1] == '?')
-				expand_exit_code(input, &i, result, &j, max_len, shell);
+				expand_exit_code(&i, result, &j, max_len, shell);
 			else
 			{
 				i++; /* Skip the '$' */

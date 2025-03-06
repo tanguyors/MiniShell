@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 21:30:42 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 21:53:34 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:43:50 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ static void std_arg_data(int *i, char *str, struct s_shell *tail)
 static void std_arg(int *i, char *str, struct s_shell **head)
 {
 	struct s_shell *tail;
-	int j;
 
 	insert_tail(head, NULL, NULL);
 	tail = get_last_node(*head);

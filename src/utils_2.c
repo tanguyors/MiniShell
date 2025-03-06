@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:14:25 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:17:02 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:44:35 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ void free_array(char **array)
 void free_list(struct s_shell *head)
 {
 	struct s_shell	*tmp;
-	int i;
 
 	while (head != NULL)
 	{
@@ -49,14 +48,11 @@ void free_list(struct s_shell *head)
 void free_stack(t_dir_stack *head)
 {
 	t_dir_stack *tmp;
-	int i;
 
 	while (head != NULL)
 	{
 		tmp = head;
 		head = head->next;
-		//if (tmp->dir != NULL)
-			//free(tmp->dir);
 		free(tmp);
 	}
 }

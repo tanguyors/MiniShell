@@ -6,14 +6,14 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 21:37:02 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:08:53 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 14:23:24 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 /* Fonction permettant de tokenizer les commandes */
-static int p_command(int *i, char *str, struct s_shell **head, int *stop_flag)
+static int p_command(int *i, char *str, struct s_shell **head)
 {
 	struct s_shell *tail;
 	int j;
@@ -39,7 +39,7 @@ static int p_command(int *i, char *str, struct s_shell **head, int *stop_flag)
 	return (0);
 }
 
-static struct s_shell *post_parsing_condition(struct s_shell *current, char *str)
+static struct s_shell *post_parsing_condition(struct s_shell *current)
 {
 	if (current->token == TOKEN_CMD && current->next->token == TOKEN_CMD)
 		current->next->token = TOKEN_ARG;
@@ -62,7 +62,7 @@ static struct s_shell *post_parsing_condition(struct s_shell *current, char *str
 	succession d'une prochaine commande sans pipe  */
 /* Appel récursif a parsing afin de gérer le cas ou 
 	une commande n'a pas été fourni après un pipe */
-static struct s_shell *p_post_parsing(struct s_shell *head, char *str, struct s_shell *shell)
+static struct s_shell *p_post_parsing(struct s_shell *head, struct s_shell *shell)
 {
 	struct s_shell *current;
 	char *rl_input;
@@ -72,7 +72,7 @@ static struct s_shell *p_post_parsing(struct s_shell *head, char *str, struct s_
 	{
 		if (current && current->next)
 		{
-			current = post_parsing_condition(current, str);
+			current = post_parsing_condition(current);
 			if (!current)
 				return (NULL);
 		}
@@ -99,7 +99,7 @@ static int parsing_loop(char *str, int *i, struct s_shell **head, int *stop_flag
 	}
 	if (!is_spec_char(str[(*i)]))
 	{
-		if(p_command(i, str, head, stop_flag) == -1)
+		if(p_command(i, str, head) == -1)
 			return (-1);
 	}
 	if(p_arg(i, str, head) == -1)
@@ -139,7 +139,7 @@ struct s_shell *parsing(char *str, struct s_shell *head, struct s_shell *shell)
 		else if (str[(i)])
     		i++;
     }
-	head = p_post_parsing(head, str, shell);
+	head = p_post_parsing(head, shell);
 	if (stop_flag)
 		return (NULL);
     return (head);

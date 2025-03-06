@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:23:07 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:23:09 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 14:29:32 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@ int	ft_env(char **argv, struct s_shell *shell, struct s_shell *head)
 {
 	int i;
 	extern char **environ;
-
+	
+	(void)head;
 	i = 0;
 	if (argv[1])
 	{
@@ -63,6 +64,7 @@ int	ft_unset(char **argv, struct s_shell *shell, struct s_shell *head)
 {
 	int	i;
 
+	(void)head;
 	i = 1;
 	if (!argv[0])
 		return (0);

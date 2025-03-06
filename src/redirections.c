@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 17:46:03 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 17:55:07 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:41:41 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static void redir_input(struct s_shell *shell, struct s_shell *current)
 	struct s_shell *head;
 
 	head = current;
-	fd = setup_redirection(shell, current, O_RDONLY, 0);
+	fd = setup_redirection(shell, O_RDONLY, 0);
 	if (fd == -1)
 	{
 		perror("open: ");
@@ -62,7 +62,7 @@ static void redir_output(struct s_shell *shell, struct s_shell *first_arg)
 	struct s_shell *head;
 
 	head = first_arg;
-	fd = setup_redirection(shell, first_arg, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	fd = setup_redirection(shell, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
 		return ;
     saved_stdout = dup(STDOUT_FILENO);
@@ -93,7 +93,7 @@ static void redir_append(struct s_shell *shell, struct s_shell *current)
 	struct s_shell *head;
 
 	head = current;
-	fd = setup_redirection(shell, current, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	fd = setup_redirection(shell, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd == -1)
 		return ;
     saved_stdout = dup(STDOUT_FILENO);
