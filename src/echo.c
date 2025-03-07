@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:23:14 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/06 14:29:01 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/07 17:13:59 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int ft_echo(char **argv, struct s_shell *shell, struct s_shell *head)
         newline = 0;
         i++;
     }
-    while (argv[i] && argv[i][0] != '$')
+    while (argv[i])
     {
         ft_putstr_fd(argv[i], 1);
         i++;

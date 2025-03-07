@@ -12,7 +12,7 @@ LDLIBS = -lreadline
 # Fichiers source et objets
 SRC = main.c parsing.c execution.c signal.c utils.c is_utils.c linked_list.c echo.c env.c env2.c expand.c pwd.c cd.c exit.c \
 		cmd_execution.c get_data.c redirections.c redir_heredoc.c child_process.c multi_pipes.c parsing_quotes.c parsing_args.c \
-		parsing_redirections.c is_utils_2.c is_utils_3.c utils_2.c utils_3.c print_linked_list.c
+		parsing_redirections.c is_utils_2.c is_utils_3.c utils_2.c utils_3.c print_linked_list.c utils_4.c
 SRCS = $(addprefix $(SRC_DIR)/, $(SRC))
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
