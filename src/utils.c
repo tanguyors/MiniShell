@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:14:34 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:17:15 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:47:10 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,16 +49,14 @@ int	is_valid_identifier(const char *str)
 {
 	int	i;
 
-	// Vérifie que le premier caractère est une lettre ou un '_'
 	if (!str || (!ft_isalpha(str[0]) && str[0] != '_'))
 		return (0);
-	// Parcourt le reste de la chaîne pour vérifier les caractères autorisés
 	i = 1;
-	while (str[i] && str[i] != '=') // Arrête si un '=' est rencontré
+	while (str[i] && str[i] != '=')
 	{
-		if (!ft_isalnum(str[i]) && str[i] != '_') // Vérifie chaque caractère
-			return (0); // Renvoie 0 si un caractère invalide est trouvé
+		if (!ft_isalnum(str[i]) && str[i] != '_')
+			return (0);
 		i++;
 	}
-	return (1); // Renvoie 1 si tout est valide
+	return (1);
 }

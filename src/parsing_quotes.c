@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 21:30:52 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 21:36:40 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:48:14 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,10 @@ static void p_double_quotes(int *i, char *str, struct s_shell **head)
 
     if (str[*i] == '"')
     {
-		// Insertion d'un nouveau nœud pour les double quotes
 		insert_tail(head, NULL, "TOKEN_QUOTES");
 		struct s_shell *tail = get_last_node(*head);
 		tail->token = TOKEN_DOUBLE_QUOTE;
-        (*i)++;  // Passer le premier "
+        (*i)++;
         while (str[*i] && (str[*i] != '"'))
         {
             while (str[*i] == '"')
@@ -36,7 +35,7 @@ static void p_double_quotes(int *i, char *str, struct s_shell **head)
 		if (str[(*i) + 1] == ' ')
 			tail->data[j++] = ' ';
         tail->data[j] = '\0';
-        (*i)++;  // Passer le dernier "
+        (*i)++;
     }
     if (str[*i] == '"' || str[*i] == 39)
         p_quotes(i, str, head);

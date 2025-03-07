@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:14:25 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/06 15:44:35 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:46:12 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,13 @@ void free_array(char **array)
     
     i = 0;
     if (!array) 
-        return; // Rien à libérer
+        return;
     while (array[i]) 
     {
-        free(array[i]); // Libère chaque chaîne de caractères
+        free(array[i]);
         i++;
     }
-    free(array); // Libère le tableau lui-même
+    free(array);
 }
 
 void free_list(struct s_shell *head)
@@ -80,7 +80,7 @@ void update_pwd(void)
 
     if (getcwd(cwd, sizeof(cwd)))
     {
-        setenv("OLDPWD", getenv("PWD"), 1); // Met à jour OLDPWD avec l'ancien PWD
-        setenv("PWD", cwd, 1);              // Met à jour PWD avec le chemin actuel
+        setenv("OLDPWD", getenv("PWD"), 1);
+        setenv("PWD", cwd, 1);
     }
 }

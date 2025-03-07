@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:21:41 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/06 15:36:21 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 15:57:44 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ void	push_dir(const char *dir)
 	new_node->next = g_dir_stack;
 	g_dir_stack = new_node;
 }
+
 char	*pop_dir(void)
 {
 	t_dir_stack *top;

@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:14:48 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:16:49 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/06 16:16:28 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,41 +62,49 @@ static size_t	ft_strspn(const char *s, const char *accept)
     return (i);
 }
 
-char *ft_strtok(char *str, const char *delim)
+char *check_strtok(char **str, char *save_ptr)
 {
-    static char *save_ptr = NULL; // Le post-it magique
-    char *token_start;
-    char *token_end;
-    // Si on a fini, on retourne NULL
     if (str == NULL && (save_ptr == NULL || *save_ptr == '\0'))
-        return NULL;
-    // Début de la chaîne ou suite
+        return (NULL);
     if (str != NULL)
         save_ptr = str;
     else
+    {
         str = save_ptr;
-    // Saute les délimiteurs au début ("   bonjour" → "bonjour")
+    }
+    return (save_ptr);
+}
+
+char *ft_strtok(char *str, const char *delim)
+{
+    static char *save_ptr = NULL;
+    char *token_start;
+    char *token_end;
+
+    if (str == NULL && (save_ptr == NULL || *save_ptr == '\0'))
+        return (NULL);
+    if (str != NULL)
+        save_ptr = str;
+    else
+    {
+        str = save_ptr;
+    }
     str += ft_strspn(str, delim);
-    // Plus rien à découper ?
     if (*str == '\0') 
     {
         save_ptr = str;
-        return NULL;
+        return (NULL);
     }
-    // Trouve la fin du token
     token_start = str;
     token_end = token_start + ft_strcspn(token_start, delim);
-    // Coupe et sauvegarde
     if (*token_end != '\0') 
     {
         *token_end = '\0';
         save_ptr = token_end + 1;
     } 
     else 
-    {
         save_ptr = token_end;
-    }
-    return token_start;
+    return (token_start);
 }
 
 char *ft_strncpy(char *dest, const char *src, size_t n)
