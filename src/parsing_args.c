@@ -6,16 +6,16 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 21:30:42 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/06 15:43:50 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/07 19:02:15 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 /* Fonction permettant de tokenizer les pipes */
-int p_pipe(int *i, char *str, struct s_shell **head)
+int	p_pipe(int *i, char *str, struct s_shell **head)
 {
-	struct s_shell *tail;
+	struct s_shell	*tail;
 
 	if (str[(*i)] == '|')
 	{
@@ -33,36 +33,36 @@ int p_pipe(int *i, char *str, struct s_shell **head)
 	return (0);
 }
 
-static void std_arg_data(int *i, char *str, struct s_shell *tail)
+static void	std_arg_data(int *i, char *str, struct s_shell *tail)
 {
-	int j;
+	int	j;
 
 	j = 0;
 	while (str[(*i)] != '\0' && !is_spec_char_no_space(str[(*i)]))
 	{
-		if (is_space(str[(*i)]) && (str[(*i) + 1 ] && str[(*i) + 1 ] != '|'))
+		if (is_space(str[(*i)]) && (str[(*i) + 1] && str[(*i) + 1] != '|'))
 			tail->data[j++] = ' ';
 		while (str[(*i)] != '\0' && is_space(str[(*i)]))
 			(*i)++;
 		if (!str[(*i)])
-			break;
+			break ;
 		if (is_spec_char_no_space(str[(*i)]))
-			break;
+			break ;
 		while (str[(*i)] != '\0' && is_quotes(str[(*i)]))
 			(*i)++;
 		if (!str[(*i)])
-			break;
+			break ;
 		if (is_spec_char_no_space(str[(*i)]))
-			break;
+			break ;
 		tail->data[j++] = str[(*i)];
 		(*i)++;
 	}
 	tail->data[j] = '\0';
 }
 
-static void std_arg(int *i, char *str, struct s_shell **head)
+static void	std_arg(int *i, char *str, struct s_shell **head)
 {
-	struct s_shell *tail;
+	struct s_shell	*tail;
 
 	insert_tail(head, NULL, NULL);
 	tail = get_last_node(*head);
@@ -71,9 +71,9 @@ static void std_arg(int *i, char *str, struct s_shell **head)
 }
 
 /* écrit la data de l'arg '-' dans le noeud adéquat */
-static void dash_arg_data(int *i, char *str, struct s_shell *tail)
+static void	dash_arg_data(int *i, char *str, struct s_shell *tail)
 {
-	int j;
+	int	j;
 
 	j = 0;
 	tail->data[j++] = '-';
@@ -88,9 +88,9 @@ static void dash_arg_data(int *i, char *str, struct s_shell *tail)
 }
 
 /* Fonction permettant de tokenizer les arguments de commandes */
-int p_arg(int *i, char *str, struct s_shell **head)
+int	p_arg(int *i, char *str, struct s_shell **head)
 {
-	struct s_shell *tail;
+	struct s_shell	*tail;
 
 	if (str[(*i)])
 	{

@@ -6,17 +6,17 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 21:37:02 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/06 14:23:24 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/07 20:52:03 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 /* Fonction permettant de tokenizer les commandes */
-static int p_command(int *i, char *str, struct s_shell **head)
+static int	p_command(int *i, char *str, struct s_shell **head)
 {
-	struct s_shell *tail;
-	int j;
+	struct s_shell	*tail;
+	int				j;
 
 	while (is_space(str[(*i)]))
 		(*i)++;
@@ -26,12 +26,13 @@ static int p_command(int *i, char *str, struct s_shell **head)
 		tail = get_last_node(*head);
 		tail->token = TOKEN_CMD;
 		j = 0;
-		while (str[(*i)] != '\0' && !is_space(str[(*i)]) && !is_spec_char(str[(*i)]))
+		while (str[(*i)] != '\0' && !is_space(str[(*i)])
+			&& !is_spec_char(str[(*i)]))
 		{
 			if (!is_space(str[(*i)]))
 				tail->data[j++] = str[(*i)];
 			(*i)++;
-		}	
+		}
 		tail->data[j] = '\0';
 	}
 	if (!str[(*i)])
@@ -39,7 +40,7 @@ static int p_command(int *i, char *str, struct s_shell **head)
 	return (0);
 }
 
-static struct s_shell *post_parsing_condition(struct s_shell *current)
+static struct s_shell	*post_parsing_condition(struct s_shell *current)
 {
 	if (current->token == TOKEN_CMD && current->next->token == TOKEN_CMD)
 		current->next->token = TOKEN_ARG;
@@ -60,12 +61,13 @@ static struct s_shell *post_parsing_condition(struct s_shell *current)
 
 /* Second parsing corrige la succession de 2 commandes,
 	succession d'une prochaine commande sans pipe  */
-/* Appel récursif a parsing afin de gérer le cas ou 
+/* Appel récursif a parsing afin de gérer le cas ou
 	une commande n'a pas été fourni après un pipe */
-static struct s_shell *p_post_parsing(struct s_shell *head, struct s_shell *shell)
+static struct s_shell	*p_post_parsing(struct s_shell *head,
+		struct s_shell *shell)
 {
-	struct s_shell *current;
-	char *rl_input;
+	struct s_shell	*current;
+	char			*rl_input;
 
 	current = head;
 	while (current)
@@ -88,9 +90,10 @@ static struct s_shell *p_post_parsing(struct s_shell *head, struct s_shell *shel
 	return (head);
 }
 
-/* loop parcourant la string afin de la parser et tokenizer 
+/* loop parcourant la string afin de la parser et tokenizer
 	en cas d'erreur ou fin de str -1 est renvoyé */
-static int parsing_loop(char *str, int *i, struct s_shell **head, int *stop_flag)
+static int	parsing_loop(char *str, int *i, struct s_shell **head,
+		int *stop_flag)
 {
 	if (is_redirect(str[(*i)]))
 	{
@@ -99,14 +102,14 @@ static int parsing_loop(char *str, int *i, struct s_shell **head, int *stop_flag
 	}
 	if (!is_spec_char(str[(*i)]))
 	{
-		if(p_command(i, str, head) == -1)
+		if (p_command(i, str, head) == -1)
 			return (-1);
 	}
-	if(p_arg(i, str, head) == -1)
+	if (p_arg(i, str, head) == -1)
 		return (-1);
 	if (is_redirect(str[(*i)]))
 	{
-		if(p_redirection(i, str, head, stop_flag) == -1)
+		if (p_redirection(i, str, head, stop_flag) == -1)
 			return (-1);
 	}
 	if (str[(*i)] == 39 || str[(*i)] == '"')
@@ -117,31 +120,31 @@ static int parsing_loop(char *str, int *i, struct s_shell **head, int *stop_flag
 	return (0);
 }
 
-/* Parsing principal loop et parse la totalité de la str return NULL en cas d'erreur */
-struct s_shell *parsing(char *str, struct s_shell *head, struct s_shell *shell)
+/* Parsing principal loop et parse la totalité,
+	 de la str return NULL en cas d'erreur */
+struct s_shell	*parsing(char *str, struct s_shell *head, struct s_shell *shell)
 {
-    int i;
-	int stop_flag;
+	int	i;
+	int	stop_flag;
 
-    i = 0;
+	i = 0;
 	stop_flag = 0;
-    while (str[i] != '\0' && !stop_flag) 
-    {
-        while (str[i] && is_space(str[i]))
-            i++;
+	while (str[i] != '\0' && !stop_flag)
+	{
+		while (str[i] && is_space(str[i]))
+			i++;
 		if (parsing_loop(str, &i, &head, &stop_flag) == -1)
-			break;
+			break ;
 		if (str[i] == '|')
 		{
-			if(p_pipe(&i, str, &head) == -1)
-				break;
+			if (p_pipe(&i, str, &head) == -1)
+				break ;
 		}
 		else if (str[(i)])
-    		i++;
-    }
+			i++;
+	}
 	head = p_post_parsing(head, shell);
 	if (stop_flag)
 		return (NULL);
-    return (head);
+	return (head);
 }
-

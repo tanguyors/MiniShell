@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:21:41 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/06 15:57:44 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/07 20:28:32 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,10 @@
 
 int	ft_pwd(char **argv, struct s_shell *shell, struct s_shell *head)
 {
+	char	cwd[1024];
+
 	(void)argv;
 	(void)head;
-	char cwd[1024];
 	if (getcwd(cwd, sizeof(cwd)) != NULL)
 	{
 		ft_printf("%s\n", cwd);
@@ -39,15 +40,15 @@ void	push_dir(const char *dir)
 	new_node = malloc(sizeof(t_dir_stack));
 	if (!new_node)
 		return ;
-	new_node->dir = strdup(dir);
+	new_node->dir = ft_strdup(dir);
 	new_node->next = g_dir_stack;
 	g_dir_stack = new_node;
 }
 
 char	*pop_dir(void)
 {
-	t_dir_stack *top;
-	char *dir;
+	t_dir_stack	*top;
+	char		*dir;
 
 	if (!g_dir_stack)
 		return (NULL);
@@ -58,15 +59,15 @@ char	*pop_dir(void)
 	return (dir);
 }
 
-void clear_dir_stack(void)
+void	clear_dir_stack(void)
 {
-    t_dir_stack *tmp;
+	t_dir_stack	*tmp;
 
-    while (g_dir_stack)
-    {
-        tmp = g_dir_stack;
-        g_dir_stack = g_dir_stack->next;
-        free(tmp->dir);
-        free(tmp);
-    }
+	while (g_dir_stack)
+	{
+		tmp = g_dir_stack;
+		g_dir_stack = g_dir_stack->next;
+		free(tmp->dir);
+		free(tmp);
+	}
 }

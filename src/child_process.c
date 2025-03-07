@@ -6,15 +6,15 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 17:42:30 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/06 15:42:20 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/07 21:08:22 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-static void child_redir(struct s_shell *shell, struct s_shell *current)
+static void	child_redir(struct s_shell *shell, struct s_shell *current)
 {
-	struct s_shell *current_redir;
+	struct s_shell	*current_redir;
 
 	shell->file = current;
 	current_redir = current;
@@ -25,7 +25,7 @@ static void child_redir(struct s_shell *shell, struct s_shell *current)
 		{
 			if (current_redir->next)
 			{
-				while(current_redir && current_redir->token != TOKEN_CMD)
+				while (current_redir && current_redir->token != TOKEN_CMD)
 				{
 					current_redir = current_redir->next;
 				}
@@ -37,9 +37,10 @@ static void child_redir(struct s_shell *shell, struct s_shell *current)
 	}
 }
 
-void child_process(struct s_shell *shell, int fd[2], struct s_shell *current, struct s_shell *head)
+void	child_process(struct s_shell *shell, int fd[2], struct s_shell *current,
+		struct s_shell *head)
 {
-	int nb_pipe;
+	int	nb_pipe;
 
 	nb_pipe = is_pipe(current);
 	if (shell->prev_fd != -1)

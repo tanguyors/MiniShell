@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:22:59 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/06 14:28:27 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/07 17:24:46 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 */
 static int	export_display(void)
 {
-	extern char **environ;
-	int	j;
+	extern char	**environ;
+	int			j;
 
 	j = 0;
 	while (environ[j])
@@ -60,7 +60,8 @@ static void	export_update(char *arg)
 /*
 ** ft_export: Gère la commande export.
 ** Si aucun argument n'est donné, affiche l'environnement.
-** Sinon, pour chaque argument, vérifie la validité et met à jour l'environnement.
+** Sinon, pour chaque argument,
+	vérifie la validité et met à jour l'environnement.
 */
 int	ft_export(char **argv, struct s_shell *shell, struct s_shell *head)
 {

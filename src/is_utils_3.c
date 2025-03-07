@@ -6,17 +6,17 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:12:14 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/05 22:12:53 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/07 21:02:26 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-/* Détermine s'il y a un pipe dans la liste chaînée 
+/* Détermine s'il y a un pipe dans la liste chaînée
 	auquel cas renvois le nombre de pipe total */
-int is_pipe(struct s_shell *current)
+int	is_pipe(struct s_shell *current)
 {
-	int n;
+	int	n;
 
 	n = 0;
 	while (current)
@@ -33,7 +33,7 @@ int is_pipe(struct s_shell *current)
 	return (n);
 }
 
-int is_redirection_in_list(struct s_shell *head)
+int	is_redirection_in_list(struct s_shell *head)
 {
 	while (head && head->token)
 	{
