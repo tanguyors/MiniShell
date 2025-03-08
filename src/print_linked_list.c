@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:19:03 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/07 20:54:05 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/08 16:36:04 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 /* fonction de test */
 /*void	print_list(struct s_shell *current)
 {
+	int	i;
+
 	ft_printf("Liste chainé : ");
 	while (current != NULL)
 	{
@@ -24,7 +26,6 @@
 	}
 	ft_printf("NULL\n");
 }*/
-
 /* fonction de test */
 /*const char	*get_token_name(enum e_tokens token)
 {
@@ -58,7 +59,6 @@
 		return (NULL);
 	}
 }*/
-
 /* fonction de test */
 /*void	print_token(struct s_shell *current)
 {
@@ -70,11 +70,8 @@
 	}
 	ft_printf("NULL\n");
 }*/
-
 int	get_nb_token(struct s_shell *current)
 {
-	int	i;
-
 	i = 0;
 	while (current != NULL)
 	{

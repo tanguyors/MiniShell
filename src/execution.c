@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 17:52:02 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/08 15:24:04 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/08 16:37:05 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,8 @@ static void	exec_without_pipe(struct s_shell *shell, struct s_shell *head)
 		if (is_redirection_in_list(head))
 		{
 			first_arg = set_first_arg(head, first_arg, &flag);
-			if ((head && head->next) && (is_token_red(head->token) || is_token_red(head->next->token)))
+			if ((head && head->next) && (is_token_red(head->token)
+					|| is_token_red(head->next->token)))
 			{
 				redirection_execution(shell, first_arg);
 				head = head->next;
