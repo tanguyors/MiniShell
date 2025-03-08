@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 17:40:04 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/07 21:09:58 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/08 15:28:45 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,14 @@ static void	m_p_h_wait(struct s_shell *shell, int last_pid)
 		shell->exit_code = WTERMSIG(status) + 128;
 }
 
-static void	m_p_h_fork_suceed(struct s_shell *current, int prev_fd, int fd[2])
+static void	m_p_h_fork_suceed(struct s_shell *current, struct s_shell *shell, int fd[2])
 {
-	if (prev_fd != -1)
-		close(prev_fd);
+	if (shell->prev_fd != -1)
+		close(shell->prev_fd);
 	if (current->next)
 	{
 		close(fd[1]);
-		prev_fd = fd[0];
+		shell->prev_fd = fd[0];
 	}
 	else
 		close(fd[0]);
@@ -67,7 +67,7 @@ void	multi_pipe_handling(struct s_shell *shell, struct s_shell *head)
 		else
 		{
 			last_pid = pid;
-			m_p_h_fork_suceed(current, shell->prev_fd, fd);
+			m_p_h_fork_suceed(current, shell, fd);
 		}
 		current = current->next;
 		while (current && current->token != TOKEN_CMD)
