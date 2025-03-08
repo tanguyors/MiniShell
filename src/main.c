@@ -38,45 +38,45 @@ static void	signals(void)
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-static void	parse_main(struct s_shell shell, struct s_shell *head)
+static void parse_main(struct s_shell *shell, struct s_shell *head)
 {
-	head = parsing(shell.rl_input, head, &shell);
-	if (!head)
-	{
-		if (shell.rl_input)
-			free(shell.rl_input);
-		main_2(shell);
-	}
-	parse_execution(&shell, head);
-	if (shell.rl_input)
-		free(shell.rl_input);
-	if (head)
-	{
-		free_list(head);
-	}
+    head = parsing(shell->rl_input, head, shell);
+    if (!head)
+    {
+        if (shell->rl_input)
+            free(shell->rl_input);
+        main_2(*shell);
+    }
+    parse_execution(shell, head);
+    if (shell->rl_input)
+        free(shell->rl_input);
+    if (head)
+    {
+        free_list(head);
+    }
 }
 
-void	main_2(struct s_shell shell)
+void main_2(struct s_shell shell)
 {
-	struct s_shell	*head;
+    struct s_shell *head;
 
-	signals();
-	while (1)
-	{
-		head = NULL;
-		shell.rl_input = readline("minishell> ");
-		if (shell.rl_input != NULL)
-			add_history(shell.rl_input);
-		if (shell.rl_input == NULL)
-		{
-			rl_clear_history();
-			free(shell.rl_input);
-			free_list(head);
-			clear_dir_stack();
-			exit(shell.exit_code);
-		}
-		parse_main(shell, head);
-	}
+    signals();
+    while (1)
+    {
+        head = NULL;
+        shell.rl_input = readline("minishell> ");
+        if (shell.rl_input != NULL)
+            add_history(shell.rl_input);
+        if (shell.rl_input == NULL)
+        {
+            rl_clear_history();
+            free(shell.rl_input);
+            free_list(head);
+            clear_dir_stack();
+            exit(shell.exit_code);
+        }
+        parse_main(&shell, head);  // Notez le & (passage par référence)
+    }
 }
 
 int	main(void)
