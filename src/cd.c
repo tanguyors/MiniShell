@@ -19,7 +19,7 @@ static int	handle_cd_error(char *msg, struct s_shell *shell)
 	return (1);
 }
 
-static char	*determine_path(char **argv)
+static char	*determine_path(char **argv, struct s_shell *shell)
 {
 	char	*path;
 	char	*previous_dir;
@@ -32,7 +32,7 @@ static char	*determine_path(char **argv)
 	}
 	else if (ft_strcmp(argv[1], "-") == 0)
 	{
-		previous_dir = pop_dir();
+		previous_dir = pop_dir(shell);
 		if (!previous_dir)
 			return (NULL);
 		ft_printf("%s\n", previous_dir);
@@ -47,12 +47,26 @@ int	ft_cd(char **argv, struct s_shell *shell, struct s_shell *head)
 {
 	char	cwd[1024];
 	char	*path;
+	char	*home;
 
 	(void)head;
-	if (!getcwd(cwd, sizeof(cwd)))
-		return (handle_cd_error("cd: error getting current directory\n",
-				shell));
-	path = determine_path(argv);
+	ft_memset(cwd, 0, sizeof(cwd));
+	if (getcwd(cwd, sizeof(cwd)) == NULL)
+		return (1);
+	if (!argv[1])
+	{
+		home = getenv("HOME");
+		if (!home)
+			return (1);
+		push_dir(shell, cwd);
+		if (chdir(home) != 0)
+		{
+			perror("cd");
+			return (1);
+		}
+		return (0);
+	}
+	path = determine_path(argv, shell);
 	if (!path)
 	{
 		if (!argv[1] || ft_strcmp(argv[1], "~") == 0)
@@ -61,8 +75,12 @@ int	ft_cd(char **argv, struct s_shell *shell, struct s_shell *head)
 			return (handle_cd_error("No previous directory\n", shell));
 	}
 	if (chdir(path) == -1)
-		return (handle_cd_error("No such file or directory\n", shell));
-	push_dir(cwd);
+	{
+		perror("cd");
+		pop_dir(shell);
+		return (1);
+	}
+	push_dir(shell, cwd);
 	update_pwd();
 	shell->exit_code = 0;
 	return (0);

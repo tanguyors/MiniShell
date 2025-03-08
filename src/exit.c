@@ -91,6 +91,6 @@ int	ft_exit(char **argv, struct s_shell *shell, struct s_shell *head)
 		exit(ret);
 	}
 	free_array(argv);
-	clear_dir_stack();
+	clear_dir_stack(shell);
 	exit(shell->exit_code);
 }

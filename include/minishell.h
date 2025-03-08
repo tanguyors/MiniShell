@@ -47,6 +47,12 @@ enum					e_tokens
 	TOKEN_DOUBLE_QUOTE
 };
 
+typedef struct s_dir_stack
+{
+	char				*dir;
+	struct s_dir_stack	*next;
+}						t_dir_stack;
+
 struct					s_shell
 {
 	struct s_shell		*next;
@@ -60,13 +66,8 @@ struct					s_shell
 	size_t				expand_input_len;
 	size_t				expand_max_len;
 	char				*expand_result;
+	t_dir_stack         *dir_stack;
 };
-
-typedef struct s_dir_stack
-{
-	char				*dir;
-	struct s_dir_stack	*next;
-}						t_dir_stack;
 
 typedef struct s_builtin
 {
@@ -172,14 +173,14 @@ int						ft_unset(char **argv, struct s_shell *shell,
 							struct s_shell *head);
 int						ft_cd(char **argv, struct s_shell *shell,
 							struct s_shell *head);
-void					push_dir(const char *dir);
-char					*pop_dir(void);
+void					push_dir(struct s_shell *shell, const char *dir);
+char					*pop_dir(struct s_shell *shell);
 int						ft_env(char **argv, struct s_shell *shell,
 							struct s_shell *head);
 int						ft_export(char **argv, struct s_shell *shell,
 							struct s_shell *head);
 /*-- Signal --*/
 void					handle_signal(int sig, siginfo_t *info, void *context);
-void					clear_dir_stack(void);
+void					clear_dir_stack(struct s_shell *shell);
 
 #endif

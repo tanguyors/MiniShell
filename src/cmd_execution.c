@@ -19,7 +19,7 @@ static void	failed_execve(struct s_shell *current, struct s_shell *shell,
 	{
 		perror(" execve: ");
 		rl_clear_history();
-		clear_dir_stack();
+		clear_dir_stack(shell);
 		free(shell->rl_input);
 		free(current);
 		free_array(data);
@@ -29,7 +29,7 @@ static void	failed_execve(struct s_shell *current, struct s_shell *shell,
 	{
 		ft_putstr_fd(" command not found\n", 2);
 		rl_clear_history();
-		clear_dir_stack();
+		clear_dir_stack(shell);
 		free(shell->rl_input);
 		free(current);
 		free_array(data);

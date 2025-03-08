@@ -31,42 +31,51 @@ int	ft_pwd(char **argv, struct s_shell *shell, struct s_shell *head)
 	return (0);
 }
 
-static t_dir_stack	*g_dir_stack = NULL;
-
-void	push_dir(const char *dir)
+void	push_dir(struct s_shell *shell, const char *dir)
 {
-	t_dir_stack	*new_node;
+	t_dir_stack	*new;
 
-	new_node = malloc(sizeof(t_dir_stack));
-	if (!new_node)
-		return ;
-	new_node->dir = ft_strdup(dir);
-	new_node->next = g_dir_stack;
-	g_dir_stack = new_node;
+	if (!shell || !dir)
+		return;
+	new = malloc(sizeof(t_dir_stack));
+	if (!new)
+		return;
+	new->dir = NULL;
+	new->next = NULL;
+	new->dir = ft_strdup(dir);
+	if (!new->dir)
+	{
+		free(new);
+		return;
+	}
+	new->next = shell->dir_stack;
+	shell->dir_stack = new;
 }
 
-char	*pop_dir(void)
+char	*pop_dir(struct s_shell *shell)
 {
 	t_dir_stack	*top;
 	char		*dir;
 
-	if (!g_dir_stack)
+	if (!shell->dir_stack)
 		return (NULL);
-	top = g_dir_stack;
+	top = shell->dir_stack;
 	dir = top->dir;
-	g_dir_stack = g_dir_stack->next;
+	shell->dir_stack = shell->dir_stack->next;
 	free(top);
 	return (dir);
 }
 
-void	clear_dir_stack(void)
+void	clear_dir_stack(struct s_shell *shell)
 {
 	t_dir_stack	*tmp;
 
-	while (g_dir_stack)
+	if (!shell || !shell->dir_stack)
+		return;
+	while (shell->dir_stack)
 	{
-		tmp = g_dir_stack;
-		g_dir_stack = g_dir_stack->next;
+		tmp = shell->dir_stack;
+		shell->dir_stack = shell->dir_stack->next;
 		free(tmp->dir);
 		free(tmp);
 	}

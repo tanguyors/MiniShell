@@ -72,11 +72,19 @@ void	main_2(struct s_shell shell)
 			rl_clear_history();
 			free(shell.rl_input);
 			free_list(head);
-			clear_dir_stack();
-			exit(shell.exit_code);
+			clear_dir_stack(&shell);
+			break;
 		}
 		parse_main(&shell, head);
 	}
+	clear_dir_stack(&shell);
+}
+
+void	init_shell(struct s_shell *shell)
+{
+	// ... autres initialisations ...
+	shell->dir_stack = NULL;  // Ajout de cette ligne
+	// ... autres initialisations ...
 }
 
 int	main(void)
@@ -85,6 +93,7 @@ int	main(void)
 
 	ascii_art();
 	shell.exit_code = 0;
+	init_shell(&shell);
 	main_2(shell);
 	return (0);
 }
