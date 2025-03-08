@@ -21,18 +21,8 @@ static void	pipe_and_fork(int fd[2], int *pid)
 		exit_with_error("fork error", NULL, 1);
 }
 
-static void	m_p_h_wait(struct s_shell *shell, int last_pid)
-{
-	int	status;
-
-	waitpid(last_pid, &status, 0);
-	if (WIFEXITED(status))
-		shell->exit_code = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-		shell->exit_code = WTERMSIG(status) + 128;
-}
-
-static void	m_p_h_fork_suceed(struct s_shell *current, struct s_shell *shell, int fd[2])
+static void	m_p_h_fork_suceed(struct s_shell *current, struct s_shell *shell,
+		int fd[2])
 {
 	if (shell->prev_fd != -1)
 		close(shell->prev_fd);
@@ -45,19 +35,13 @@ static void	m_p_h_fork_suceed(struct s_shell *current, struct s_shell *shell, in
 		close(fd[0]);
 }
 
-/* Permet de gérer first_arg cas où un pipe est présent dans la liste.
-	Utilisation de fork afin de créer un processus enfant,
-	celui ci va redirigé la sortie de la commande en fonction des pipes.
-	Ici le double pointeur current représente la liste chaînée complète */
-void	multi_pipe_handling(struct s_shell *shell, struct s_shell *head)
+static void	handle_child_processes(struct s_shell *shell, struct s_shell *head,
+		pid_t *pids, int *pid_count)
 {
 	int				fd[2];
 	pid_t			pid;
-	pid_t			last_pid;
 	struct s_shell	*current;
 
-	last_pid = -1;
-	shell->prev_fd = -1;
 	current = head;
 	while (current)
 	{
@@ -66,13 +50,44 @@ void	multi_pipe_handling(struct s_shell *shell, struct s_shell *head)
 			child_process(shell, fd, current, head);
 		else
 		{
-			last_pid = pid;
+			pids[*pid_count] = pid;
+			(*pid_count)++;
 			m_p_h_fork_suceed(current, shell, fd);
 		}
 		current = current->next;
 		while (current && current->token != TOKEN_CMD)
 			current = current->next;
 	}
-	if (last_pid != -1)
-		m_p_h_wait(shell, last_pid);
+}
+
+static void	wait_for_processes(struct s_shell *shell, pid_t *pids,
+		int pid_count)
+{
+	int	status;
+	int	i;
+
+	i = 0;
+	while (i < pid_count)
+	{
+		waitpid(pids[i], &status, 0);
+		if (i == pid_count - 1)
+		{
+			if (WIFEXITED(status))
+				shell->exit_code = WEXITSTATUS(status);
+			else if (WIFSIGNALED(status))
+				shell->exit_code = WTERMSIG(status) + 128;
+		}
+		i++;
+	}
+}
+
+void	multi_pipe_handling(struct s_shell *shell, struct s_shell *head)
+{
+	pid_t	pids[1024];
+	int		pid_count;
+
+	pid_count = 0;
+	shell->prev_fd = -1;
+	handle_child_processes(shell, head, pids, &pid_count);
+	wait_for_processes(shell, pids, pid_count);
 }
