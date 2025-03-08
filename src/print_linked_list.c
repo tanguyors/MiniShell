@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:19:03 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/08 16:36:04 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/08 16:41:33 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@
 }*/
 int	get_nb_token(struct s_shell *current)
 {
+	int	i;
+
 	i = 0;
 	while (current != NULL)
 	{
