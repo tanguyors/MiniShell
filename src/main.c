@@ -80,12 +80,6 @@ void	main_2(struct s_shell shell)
 	clear_dir_stack(&shell);
 }
 
-void	init_shell(struct s_shell *shell)
-{
-	// ... autres initialisations ...
-	shell->dir_stack = NULL;  // Ajout de cette ligne
-	// ... autres initialisations ...
-}
 
 int	main(void)
 {
@@ -93,7 +87,7 @@ int	main(void)
 
 	ascii_art();
 	shell.exit_code = 0;
-	init_shell(&shell);
+	shell.dir_stack = NULL; 
 	main_2(shell);
 	return (0);
 }
