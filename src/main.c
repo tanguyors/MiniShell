@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:21:56 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/08 16:36:08 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/08 17:19:38 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,13 +73,12 @@ void	main_2(struct s_shell shell)
 			free(shell.rl_input);
 			free_list(head);
 			clear_dir_stack(&shell);
-			break;
+			break ;
 		}
 		parse_main(&shell, head);
 	}
 	clear_dir_stack(&shell);
 }
-
 
 int	main(void)
 {
@@ -87,7 +86,7 @@ int	main(void)
 
 	ascii_art();
 	shell.exit_code = 0;
-	shell.dir_stack = NULL; 
+	shell.dir_stack = NULL;
 	main_2(shell);
 	return (0);
 }

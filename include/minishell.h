@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 19:01:21 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/07 19:01:40 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/08 17:25:19 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # include <sys/wait.h>   // wait, waitpid
 # include <unistd.h>     // fork, execve, write, read, dup, dup2
 # define ARG_MAX 2097152 // Arg max de la plupart des systèmes linux
-	// getconf ARG_MAX
+						// getconf ARG_MAX
 # define NAME_MAX 255    // Name max d'un nom de fichier // getconf NAME_MAX /
 # define B_BLUE "\033[1;36m"
 # define RESET "\033[0m"
@@ -66,7 +66,7 @@ struct					s_shell
 	size_t				expand_input_len;
 	size_t				expand_max_len;
 	char				*expand_result;
-	t_dir_stack         *dir_stack;
+	t_dir_stack			*dir_stack;
 };
 
 typedef struct s_builtin

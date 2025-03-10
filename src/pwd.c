@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 22:21:41 by lmonsat           #+#    #+#             */
-/*   Updated: 2025/03/07 20:28:32 by lmonsat          ###   ########.fr       */
+/*   Updated: 2025/03/08 17:19:34 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,17 +36,17 @@ void	push_dir(struct s_shell *shell, const char *dir)
 	t_dir_stack	*new;
 
 	if (!shell || !dir)
-		return;
+		return ;
 	new = malloc(sizeof(t_dir_stack));
 	if (!new)
-		return;
+		return ;
 	new->dir = NULL;
 	new->next = NULL;
 	new->dir = ft_strdup(dir);
 	if (!new->dir)
 	{
 		free(new);
-		return;
+		return ;
 	}
 	new->next = shell->dir_stack;
 	shell->dir_stack = new;
@@ -71,7 +71,7 @@ void	clear_dir_stack(struct s_shell *shell)
 	t_dir_stack	*tmp;
 
 	if (!shell || !shell->dir_stack)
-		return;
+		return ;
 	while (shell->dir_stack)
 	{
 		tmp = shell->dir_stack;
