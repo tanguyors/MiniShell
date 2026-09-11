@@ -5,15 +5,15 @@
 #                                                     +:+ +:+         +:+      #
 #    By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/11/28 10:00:09 by root              #+#    #+#              #
-#    Updated: 2025/01/24 17:19:46 by lmonsat          ###   ########.fr        #
+#    Created: 2025/03/08 17:30:08 by lmonsat           #+#    #+#              #
+#    Updated: 2025/03/08 17:30:10 by lmonsat          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # Variables
 NAME = minishell
 CC = cc
-CFLAGS = -g #-Wall -Wextra -Werror
+CFLAGS = -g -Wall -Wextra -Werror
 SRC_DIR = src
 OBJ_DIR = obj
 INCLUDE = include
@@ -22,7 +22,18 @@ LIBFT = $(LIBFT_DIR)/libft.a
 LDLIBS = -lreadline
 
 # Fichiers source et objets
-SRC = main.c parsing.c execution.c builtins.c signal.c utils.c is_utils.c linked_list.c
+SRC = main.c \
+	lexer/parsing.c lexer/parsing_quotes.c lexer/parsing_args.c \
+	lexer/parsing_redirections.c lexer/expand.c \
+	parser/linked_list.c parser/print_linked_list.c \
+	executor/execution.c executor/cmd_execution.c executor/get_data.c \
+	executor/redirections.c executor/redir_heredoc.c \
+	executor/child_process.c executor/multi_pipes.c \
+	builtins/echo.c builtins/env.c builtins/env2.c \
+	builtins/pwd.c builtins/cd.c builtins/exit.c \
+	signals/signal.c \
+	utils/utils.c utils/utils_2.c utils/utils_3.c utils/utils_4.c \
+	utils/is_utils.c utils/is_utils_2.c utils/is_utils_3.c
 SRCS = $(addprefix $(SRC_DIR)/, $(SRC))
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
@@ -36,19 +47,13 @@ RESET = \033[0m
 all: $(NAME)
 
 $(NAME): $(OBJS) $(LIBFT)
-	@if [ ! -f $(NAME) ]; \
-	then \
-		echo "\n$(B_BLUE)Compiling $(NAME)...$(B_WHITE)\n"; \
-		echo "$(CC) $(CFLAGS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT) $(LDLIBS)"; \
-		$(CC) $(CFLAGS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT) $(LDLIBS); \
-		echo "\n$(B_GREEN)$(NAME) compiled successfully!$(B_WHITE)\n"; \
-	fi
+	@echo "\n$(B_BLUE)Compiling $(NAME)...$(B_WHITE)\n"
+	$(CC) $(CFLAGS) -I $(INCLUDE) -o $(NAME) $(OBJS) $(LIBFT) $(LDLIBS)
+	@echo "\n$(B_GREEN)$(NAME) compiled successfully!$(B_WHITE)\n"
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
-
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
 
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
@@ -71,4 +76,3 @@ fclean: clean
 re: fclean all
 
 .PHONY: all clean fclean re
-
