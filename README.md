@@ -1,12 +1,12 @@
 # MiniShell
 
 ```
- ââââ   âââââââââââ   âââââââââââââââââ  ââââââââââââââ     âââ
- âââââ âââââââââââââ  âââââââââââââââââ  ââââââââââââââ     âââ
- ââââââââââââââââââââ ââââââââââââââââââââââââââââ  âââ     âââ
- âââââââââââââââââââââââââââââââââââââââââââââââââ  âââ     âââ
- âââ âââ âââââââââ ââââââââââââââââââââ  âââââââââââââââââââââââââââ
- âââ     âââââââââ  âââââââââââââââââââ  âââââââââââââââââââââââââââ
+ ███╗   ███╗██╗███╗   ██╗██╗███████╗██╗  ██╗███████╗██╗     ██╗
+ ████╗ ████║██║████╗  ██║██║██╔════╝██║  ██║██╔════╝██║     ██║
+ ██╔████╔██║██║██╔██╗ ██║██║███████╗███████║█████╗  ██║     ██║
+ ██║╚██╔╝██║██║██║╚██╗██║██║╚════██║██╔══██║██╔══╝  ██║     ██║
+ ██║ ╚═╝ ██║██║██║ ╚████║██║███████║██║  ██║███████╗███████╗███████╗
+ ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
 ```
 
 > *As beautiful as a shell. Our own little bash.*
@@ -19,27 +19,27 @@
 
 ## About
 
-**MiniShell** is a simplified recreation of `bash`, built from scratch in C. This is one of the most challenging projects in the 42 curriculum â it covers **lexing**, **parsing**, **process management**, **file descriptor manipulation**, and the inner workings of a UNIX shell.
+MiniShell is a simplified recreation of bash, built from scratch in C. This is one of the most challenging projects in the 42 curriculum. It covers lexing, parsing, process management, file descriptor manipulation, and the inner workings of a UNIX shell.
 
 The goal: type a command, and it works like you'd expect in bash.
 
 ## Features
 
 ```
- âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
- â  minishell$                                             â
- â                                                         â
- â  â Command execution with absolute/relative paths       â
- â  â PATH resolution                                      â
- â  â Pipes                    cmd1 | cmd2 | cmd3          â
- â  â Redirections             > >> < <<                   â
- â  â Environment variables    $VAR, $?                    â
- â  â Single & double quotes   'literal' "expand $VAR"     â
- â  â Signal handling          ctrl-C, ctrl-D, ctrl-\      â
- â  â Exit status              $?                          â
- â  â Here-doc                 << DELIMITER                â
- â                                                         â
- âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+ ┌───────────────────────────────────────────────────────────┐
+ │  minishell$                                               │
+ │                                                           │
+ │  ✓ Command execution with absolute/relative paths         │
+ │  ✓ PATH resolution                                        │
+ │  ✓ Pipes                    cmd1 | cmd2 | cmd3            │
+ │  ✓ Redirections             > >> < <<                     │
+ │  ✓ Environment variables    $VAR, $?                      │
+ │  ✓ Single & double quotes   'literal' "expand $VAR"       │
+ │  ✓ Signal handling          ctrl-C, ctrl-D, ctrl-\        │
+ │  ✓ Exit status              $?                            │
+ │  ✓ Here-doc                 << DELIMITER                  │
+ │                                                           │
+ └───────────────────────────────────────────────────────────┘
 ```
 
 ### Builtins
@@ -83,18 +83,25 @@ minishell$ exit
 
 ```
 MiniShell/
-âââ src/
-â   âââ lexer/          # Tokenization
-â   âââ parser/         # AST construction
-â   âââ executor/       # Command execution
-â   âââ builtins/       # Built-in commands
-â   âââ signals/        # Signal handlers
-â   âââ utils/          # Helpers
-âââ include/
-âââ Makefile
-âââ README.md
+├── src/
+│   ├── lexer/          # Tokenization
+│   ├── parser/         # AST construction
+│   ├── executor/       # Command execution
+│   ├── builtins/       # Built-in commands
+│   ├── signals/        # Signal handlers
+│   └── utils/          # Helpers
+├── include/
+├── Makefile
+└── README.md
 ```
 
 ---
 
-*The shell is the programmer's forge. â 42 School*
+## Authors
+
+[lmonsat](https://profile.intra.42.fr/users/lmonsat)
+[torsini](https://profile.intra.42.fr/users/torsini)
+
+## 42 School
+
+This project was developed as part of the school's curriculum (https://42luxembourg.lu/).
